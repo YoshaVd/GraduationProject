@@ -34,6 +34,6 @@ protected:
 public:	
 	virtual void Tick(float DeltaTime) override;
 
-	UStaticMesh* _pBasicBlock;
+	UStaticMesh* _pBasicBlock = nullptr;
 	vector<vector<Tile>> _tilesArr;
 };

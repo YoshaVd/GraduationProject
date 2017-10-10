@@ -2,7 +2,6 @@
 #include "LevelGrid.h"
 
 ALevelBlockout::ALevelBlockout()
-	:Super()
 {
 	PrimaryActorTick.bCanEverTick = true;
 	LevelGrid* pGrid = new LevelGrid(5, 8);
@@ -32,7 +31,7 @@ void ALevelBlockout::GenerateBlockout()
 				Test->SetWorldLocation(FVector(c * 100, r * 100, 0));
 				Test->RegisterComponentWithWorld(GetWorld());
 				FAttachmentTransformRules rules = FAttachmentTransformRules(EAttachmentRule::SnapToTarget, false);
-				Test->AttachToComponent(RootComponent, rules);
+				Test->AttachToComponent(RootComponent,rules);
 			}
 		}
 	}

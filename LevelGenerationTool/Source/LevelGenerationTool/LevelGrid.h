@@ -15,7 +15,7 @@ public:
 	LevelGrid(const int width, const int height);
 	~LevelGrid();
 
-	vector<vector<Tile>> GetTileLayout() { return _tilesArr; }
+	vector<vector<Tile>>& GetTileLayout() { return _tilesArr; }
 	
 	// Tile manipulation functions
 	void SetFilled(const int x, const int y, const bool isFilled = false);
@@ -27,12 +27,17 @@ public:
 
 	vector<FVector2D> GetAdjacentPositions(const FVector2D pos);
 	vector<FVector2D> GetAdjacentPositions(const int x, const int y);
-	vector<FVector2D> GetIsolatedAdjacentPositions(const FVector2D pos);
-	vector<FVector2D> GetIsolatedAdjacentPositions(const int x, const int y);
+	vector<FVector2D> GetAllAdjacentPositions(const FVector2D pos);
+	vector<FVector2D> GetAllAdjacentPositions(const int x, const int y);
+
+	vector<FVector2D> GetIsolatedPositions(const vector<FVector2D> positions);
+	vector<FVector2D> GetIsolatedPositionsException(const vector<FVector2D> positions, const FVector2D exception);
 
 	// Tile checks
 	bool IsIsolated(const FVector2D pos);
 	bool IsIsolated(const int x, const int y);
+	bool IsIsolatedException(const FVector2D pos, const FVector2D exception);
+	// TODO: IsCompletelyIsolated
 	bool IsWithinBounds(const FVector2D pos);
 	bool IsWithinBounds(const int x, const int y);
 
