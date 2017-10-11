@@ -82,12 +82,26 @@ vector<FVector2D> LevelGrid::GetAdjacentPositions(const FVector2D pos)
 	return adjacentPositions;
 }
 
+vector<FVector2D> LevelGrid::GetEmptyAdjacentPositions(const FVector2D pos)
+{
+	vector<FVector2D> adjacentPositions;
+	if (pos.X > 0 && _tilesArr[pos.X - 1][pos.Y]._isFilled)
+		adjacentPositions.push_back(FVector2D(pos.X - 1, pos.Y));
+	if (pos.X < _width - 1 && _tilesArr[pos.X + 1][pos.Y]._isFilled)
+		adjacentPositions.push_back(FVector2D(pos.X + 1, pos.Y));
+	if (pos.Y > 0 && _tilesArr[pos.X][pos.Y - 1]._isFilled)
+		adjacentPositions.push_back(FVector2D(pos.X, pos.Y - 1));
+	if (pos.Y < _height - 1 && _tilesArr[pos.X][pos.Y + 1]._isFilled)
+		adjacentPositions.push_back(FVector2D(pos.X, pos.Y + 1));
+	return adjacentPositions;
+}
+
 vector<FVector2D> LevelGrid::GetAdjacentPositions(const int x, const int y)
 {
 	return GetAdjacentPositions(FVector2D(x, y));
 }
 
-vector<FVector2D> LevelGrid::GetAllAdjacentPositions(const FVector2D pos)
+vector<FVector2D> LevelGrid::GetSurroundingPositions(const FVector2D pos)
 {
 	vector<FVector2D> adjacentPositions;
 	FVector2D adjPos;
@@ -101,9 +115,9 @@ vector<FVector2D> LevelGrid::GetAllAdjacentPositions(const FVector2D pos)
 	return adjacentPositions;
 }
 
-vector<FVector2D> LevelGrid::GetAllAdjacentPositions(const int x, const int y)
+vector<FVector2D> LevelGrid::GetSurroundingPositions(const int x, const int y)
 {
-	return GetAllAdjacentPositions(FVector2D(x,y));
+	return GetSurroundingPositions(FVector2D(x,y));
 }
 
 vector<FVector2D> LevelGrid::GetIsolatedPositions(vector<FVector2D> positions)
@@ -117,23 +131,37 @@ vector<FVector2D> LevelGrid::GetIsolatedPositions(vector<FVector2D> positions)
 	return isolated;
 }
 
-vector<FVector2D> LevelGrid::GetIsolatedPositionsException(const vector<FVector2D> positions, const FVector2D exception)
+vector<FVector2D> LevelGrid::GetIsolatedPositionsExclusion(const vector<FVector2D> positions, const FVector2D exclusion)
 {
+	//UE_LOG(LogTemp, Warning, TEXT("===== CURRENT: %f, %f ====="), exclusion.X, exclusion.Y);
+
 	vector<FVector2D> isolated;
 	for (auto pos : positions)
 	{
-		if (IsIsolatedException(pos,exception))
+		//UE_LOG(LogTemp, Warning, TEXT("=== ISOLATION CHECK POSITION: %f, %f ==="), pos.X, pos.Y);
+		if (IsIsolatedExclusion(pos,exclusion))
 			isolated.push_back(pos);
 	}
 	return isolated;
 }
 
+int LevelGrid::GetEmptyCount(const vector<FVector2D> positions)
+{
+	int count = 0;
+	for (auto p : positions)
+	{
+		if (!_tilesArr[p.X][p.Y]._isFilled)
+			count += 1;
+	}
+	return count;
+}
+
 bool LevelGrid::IsIsolated(const FVector2D pos)
 {
-	vector<FVector2D> adjacentPositions = GetAllAdjacentPositions(pos);
-	for (size_t i = 0; i < adjacentPositions.size(); i++)
+	vector<FVector2D> adjacentPositions = GetSurroundingPositions(pos);
+	for (auto p : adjacentPositions)
 	{
-		if (!_tilesArr[adjacentPositions[i].X][adjacentPositions[i].Y]._isFilled)
+		if (!_tilesArr[p.X][p.Y]._isFilled)
 			return false;
 	}
 	return true;
@@ -144,15 +172,13 @@ bool LevelGrid::IsIsolated(const int x, const int y)
 	return IsIsolated(FVector2D(x, y));
 }
 
-bool LevelGrid::IsIsolatedException(const FVector2D pos, const FVector2D exception)
+bool LevelGrid::IsIsolatedExclusion(const FVector2D pos, const FVector2D exclusion)
 {
-	vector<FVector2D> adjacentPositions = GetAllAdjacentPositions(pos);
-	for (auto p: adjacentPositions)
-	{
-		if (p != exception && !_tilesArr[p.X][p.Y]._isFilled)
-			return false;
-	}
-	return true;
+	int emptyCountNearPos = GetEmptyCount(GetSurroundingPositions(pos)) - 1;
+	int emptyCountExclusion = GetEmptyCount(GetAdjacentPositions(exclusion));
+	if (emptyCountNearPos <= emptyCountExclusion)
+		return true;
+	return false;
 }
 
 bool LevelGrid::IsWithinBounds(const FVector2D pos)
@@ -161,7 +187,7 @@ bool LevelGrid::IsWithinBounds(const FVector2D pos)
 		pos.Y >= 0 && pos.Y < _height)
 		return true;
 
-	// TODO: Error message
+	UE_LOG(LogTemp, Error, TEXT("Position out of grid bounds."));
 	return false;
 }
 

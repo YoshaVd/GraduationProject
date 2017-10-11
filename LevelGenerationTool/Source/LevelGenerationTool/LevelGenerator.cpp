@@ -29,26 +29,33 @@ void ALevelGenerator::PerfectMaze()
 	visited.push(current);
 
 	_pGrid->GetTileLayout()[current.X][current.Y]._isFilled = false;
-
+	//int loopCount = 0;
 	while (!visited.empty())
 	{
-		vector<FVector2D> adjacentTiles = _pGrid->GetAdjacentPositions(current);
-		vector<FVector2D> isolatedAdjTiles = _pGrid->GetIsolatedPositionsException(adjacentTiles, current);
+		//loopCount++;
+		//if (loopCount > 10)
+		//	break;
+
+		vector<FVector2D> adjacentTiles = _pGrid->GetEmptyAdjacentPositions(current);
+		vector<FVector2D> isolatedAdjTiles = _pGrid->GetIsolatedPositionsExclusion(adjacentTiles, current);
 		while (isolatedAdjTiles.size() == 0 && !visited.empty())
 		{
+			//UE_LOG(LogTemp, Warning, TEXT("-----[[POP]]-----"));
+
 			visited.pop();
 			if (visited.empty())
 				break;
 
 			current = visited.top();
-			adjacentTiles = _pGrid->GetAdjacentPositions(current);
-			isolatedAdjTiles = _pGrid->GetIsolatedPositionsException(adjacentTiles, current);
+			adjacentTiles = _pGrid->GetEmptyAdjacentPositions(current);
+			isolatedAdjTiles = _pGrid->GetIsolatedPositionsExclusion(adjacentTiles, current);
 		}
 
 		if (visited.empty())
 			break;
 
 		current = isolatedAdjTiles[rand() % isolatedAdjTiles.size()];
+		//UE_LOG(LogTemp, Warning, TEXT("-----[[PUSH]]-----"));
 		visited.push(current);
 		_pGrid->GetTileLayout()[current.X][current.Y]._isFilled = false;
 	}
@@ -58,12 +65,12 @@ void ALevelGenerator::GenerateBlockout()
 {
 	if (!_pGrid)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("No valid grid object."));
+		UE_LOG(LogTemp, Error, TEXT("No valid grid object."));
 		return;
 	}
 	if (!_pBasicBlock)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("No valid block object."));
+		UE_LOG(LogTemp, Error, TEXT("No valid block object."));
 		return;
 	}
 	auto tiles = _pGrid->GetTileLayout();
@@ -87,4 +94,22 @@ void ALevelGenerator::GenerateBlockout()
 	//_pLevelBlockout->SetLayout(_pGrid->GetTileLayout());
 	//_pLevelBlockout->SetBasicBlock(_pBasicBlock);
 	//_pLevelBlockout->GenerateBlockout();
+}
+
+void ALevelGenerator::EmptyAdjacent(int x, int y)
+{
+	auto adj = _pGrid->GetAdjacentPositions(x, y);
+	for (auto a : adj)
+	{
+		_pGrid->SetFilled(a.X, a.Y);
+	}
+}
+
+void ALevelGenerator::EmptySurround(int x, int y)
+{
+	auto sur = _pGrid->GetSurroundingPositions(x, y);
+	for (auto s : sur)
+	{
+		_pGrid->SetFilled(s.X, s.Y);
+	}
 }

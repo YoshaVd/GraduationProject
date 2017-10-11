@@ -14,8 +14,10 @@ PRAGMA_DISABLE_OPTIMIZATION
 PRAGMA_DISABLE_DEPRECATION_WARNINGS
 void EmptyLinkFunctionForGeneratedCodeLevelGenerator() {}
 // Cross Module References
-	LEVELGENERATIONTOOL_API UFunction* Z_Construct_UFunction_ALevelGenerator_GenerateBlockout();
+	LEVELGENERATIONTOOL_API UFunction* Z_Construct_UFunction_ALevelGenerator_EmptyAdjacent();
 	LEVELGENERATIONTOOL_API UClass* Z_Construct_UClass_ALevelGenerator();
+	LEVELGENERATIONTOOL_API UFunction* Z_Construct_UFunction_ALevelGenerator_EmptySurround();
+	LEVELGENERATIONTOOL_API UFunction* Z_Construct_UFunction_ALevelGenerator_GenerateBlockout();
 	LEVELGENERATIONTOOL_API UFunction* Z_Construct_UFunction_ALevelGenerator_NewGrid();
 	LEVELGENERATIONTOOL_API UFunction* Z_Construct_UFunction_ALevelGenerator_PerfectMaze();
 	LEVELGENERATIONTOOL_API UFunction* Z_Construct_UFunction_ALevelGenerator_ResetLevel();
@@ -29,6 +31,8 @@ void EmptyLinkFunctionForGeneratedCodeLevelGenerator() {}
 	{
 		UClass* Class = ALevelGenerator::StaticClass();
 		static const TNameNativePtrPair<ANSICHAR> AnsiFuncs[] = {
+			{ "EmptyAdjacent", (Native)&ALevelGenerator::execEmptyAdjacent },
+			{ "EmptySurround", (Native)&ALevelGenerator::execEmptySurround },
 			{ "GenerateBlockout", (Native)&ALevelGenerator::execGenerateBlockout },
 			{ "NewGrid", (Native)&ALevelGenerator::execNewGrid },
 			{ "PerfectMaze", (Native)&ALevelGenerator::execPerfectMaze },
@@ -36,6 +40,55 @@ void EmptyLinkFunctionForGeneratedCodeLevelGenerator() {}
 			{ "SetBasicBlock", (Native)&ALevelGenerator::execSetBasicBlock },
 		};
 		FNativeFunctionRegistrar::RegisterFunctions(Class, AnsiFuncs, ARRAY_COUNT(AnsiFuncs));
+	}
+	UFunction* Z_Construct_UFunction_ALevelGenerator_EmptyAdjacent()
+	{
+		struct LevelGenerator_eventEmptyAdjacent_Parms
+		{
+			int32 x;
+			int32 y;
+		};
+		UObject* Outer = Z_Construct_UClass_ALevelGenerator();
+		static UFunction* ReturnFunction = nullptr;
+		if (!ReturnFunction)
+		{
+			ReturnFunction = new(EC_InternalUseOnlyConstructor, Outer, TEXT("EmptyAdjacent"), RF_Public|RF_Transient|RF_MarkAsNative) UFunction(FObjectInitializer(), nullptr, (EFunctionFlags)0x04020401, 65535, sizeof(LevelGenerator_eventEmptyAdjacent_Parms));
+			UProperty* NewProp_y = new(EC_InternalUseOnlyConstructor, ReturnFunction, TEXT("y"), RF_Public|RF_Transient|RF_MarkAsNative) UUnsizedIntProperty(CPP_PROPERTY_BASE(y, LevelGenerator_eventEmptyAdjacent_Parms), 0x0010000000000080);
+			UProperty* NewProp_x = new(EC_InternalUseOnlyConstructor, ReturnFunction, TEXT("x"), RF_Public|RF_Transient|RF_MarkAsNative) UUnsizedIntProperty(CPP_PROPERTY_BASE(x, LevelGenerator_eventEmptyAdjacent_Parms), 0x0010000000000080);
+			ReturnFunction->Bind();
+			ReturnFunction->StaticLink();
+#if WITH_METADATA
+			UMetaData* MetaData = ReturnFunction->GetOutermost()->GetMetaData();
+			MetaData->SetValue(ReturnFunction, TEXT("Category"), TEXT("Level Actions"));
+			MetaData->SetValue(ReturnFunction, TEXT("ModuleRelativePath"), TEXT("LevelGenerator.h"));
+			MetaData->SetValue(ReturnFunction, TEXT("ToolTip"), TEXT("test grid functionality"));
+#endif
+		}
+		return ReturnFunction;
+	}
+	UFunction* Z_Construct_UFunction_ALevelGenerator_EmptySurround()
+	{
+		struct LevelGenerator_eventEmptySurround_Parms
+		{
+			int32 x;
+			int32 y;
+		};
+		UObject* Outer = Z_Construct_UClass_ALevelGenerator();
+		static UFunction* ReturnFunction = nullptr;
+		if (!ReturnFunction)
+		{
+			ReturnFunction = new(EC_InternalUseOnlyConstructor, Outer, TEXT("EmptySurround"), RF_Public|RF_Transient|RF_MarkAsNative) UFunction(FObjectInitializer(), nullptr, (EFunctionFlags)0x04020401, 65535, sizeof(LevelGenerator_eventEmptySurround_Parms));
+			UProperty* NewProp_y = new(EC_InternalUseOnlyConstructor, ReturnFunction, TEXT("y"), RF_Public|RF_Transient|RF_MarkAsNative) UUnsizedIntProperty(CPP_PROPERTY_BASE(y, LevelGenerator_eventEmptySurround_Parms), 0x0010000000000080);
+			UProperty* NewProp_x = new(EC_InternalUseOnlyConstructor, ReturnFunction, TEXT("x"), RF_Public|RF_Transient|RF_MarkAsNative) UUnsizedIntProperty(CPP_PROPERTY_BASE(x, LevelGenerator_eventEmptySurround_Parms), 0x0010000000000080);
+			ReturnFunction->Bind();
+			ReturnFunction->StaticLink();
+#if WITH_METADATA
+			UMetaData* MetaData = ReturnFunction->GetOutermost()->GetMetaData();
+			MetaData->SetValue(ReturnFunction, TEXT("Category"), TEXT("Level Actions"));
+			MetaData->SetValue(ReturnFunction, TEXT("ModuleRelativePath"), TEXT("LevelGenerator.h"));
+#endif
+		}
+		return ReturnFunction;
 	}
 	UFunction* Z_Construct_UFunction_ALevelGenerator_GenerateBlockout()
 	{
@@ -153,12 +206,16 @@ void EmptyLinkFunctionForGeneratedCodeLevelGenerator() {}
 				UObjectForceRegistration(OuterClass);
 				OuterClass->ClassFlags |= (EClassFlags)0x20900080u;
 
+				OuterClass->LinkChild(Z_Construct_UFunction_ALevelGenerator_EmptyAdjacent());
+				OuterClass->LinkChild(Z_Construct_UFunction_ALevelGenerator_EmptySurround());
 				OuterClass->LinkChild(Z_Construct_UFunction_ALevelGenerator_GenerateBlockout());
 				OuterClass->LinkChild(Z_Construct_UFunction_ALevelGenerator_NewGrid());
 				OuterClass->LinkChild(Z_Construct_UFunction_ALevelGenerator_PerfectMaze());
 				OuterClass->LinkChild(Z_Construct_UFunction_ALevelGenerator_ResetLevel());
 				OuterClass->LinkChild(Z_Construct_UFunction_ALevelGenerator_SetBasicBlock());
 
+				OuterClass->AddFunctionToFunctionMapWithOverriddenName(Z_Construct_UFunction_ALevelGenerator_EmptyAdjacent(), "EmptyAdjacent"); // 2501434887
+				OuterClass->AddFunctionToFunctionMapWithOverriddenName(Z_Construct_UFunction_ALevelGenerator_EmptySurround(), "EmptySurround"); // 2803584985
 				OuterClass->AddFunctionToFunctionMapWithOverriddenName(Z_Construct_UFunction_ALevelGenerator_GenerateBlockout(), "GenerateBlockout"); // 3395057221
 				OuterClass->AddFunctionToFunctionMapWithOverriddenName(Z_Construct_UFunction_ALevelGenerator_NewGrid(), "NewGrid"); // 1297228795
 				OuterClass->AddFunctionToFunctionMapWithOverriddenName(Z_Construct_UFunction_ALevelGenerator_PerfectMaze(), "PerfectMaze"); // 1001929933
@@ -177,7 +234,7 @@ void EmptyLinkFunctionForGeneratedCodeLevelGenerator() {}
 		check(OuterClass->GetClass());
 		return OuterClass;
 	}
-	IMPLEMENT_CLASS(ALevelGenerator, 176774438);
+	IMPLEMENT_CLASS(ALevelGenerator, 2222920106);
 	static FCompiledInDefer Z_CompiledInDefer_UClass_ALevelGenerator(Z_Construct_UClass_ALevelGenerator, &ALevelGenerator::StaticClass, TEXT("/Script/LevelGenerationTool"), TEXT("ALevelGenerator"), false, nullptr, nullptr, nullptr);
 	DEFINE_VTABLE_PTR_HELPER_CTOR(ALevelGenerator);
 PRAGMA_ENABLE_DEPRECATION_WARNINGS

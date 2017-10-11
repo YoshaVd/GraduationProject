@@ -34,6 +34,12 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Level Actions")
 		void SetBasicBlock(UStaticMesh* mesh) { _pBasicBlock = mesh; }
 
+	/* test grid functionality*/
+	UFUNCTION(BlueprintCallable, Category = "Level Actions")
+		void EmptyAdjacent(int x, int y);
+	UFUNCTION(BlueprintCallable, Category = "Level Actions")
+		void EmptySurround(int x, int y);
+
 private:
 	LevelGrid* _pGrid = nullptr;
 	ALevelBlockout* _pLevelBlockout = nullptr;

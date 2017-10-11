@@ -4,7 +4,7 @@
 	<ItemGroup>
 		<None Include="..\..\LevelGenerationTool.uproject" />
 		<Filter Include="Source">
-			<UniqueIdentifier>{EA3C9CDF-BB04-4866-988B-704D586F5EF6}</UniqueIdentifier>
+			<UniqueIdentifier>{3E982FB2-A08B-4204-9431-FFEA034FDDB0}</UniqueIdentifier>
 		</Filter>
 		<None Include="..\..\Source\LevelGenerationTool.Target.cs">
 			<Filter>Source</Filter>
@@ -13,7 +13,7 @@
 			<Filter>Source</Filter>
 		</None >
 		<Filter Include="Config">
-			<UniqueIdentifier>{038B5DD4-96B4-4A69-92FB-3172D7AE3BFA}</UniqueIdentifier>
+			<UniqueIdentifier>{3122113C-7550-4079-9856-9D3C32E65115}</UniqueIdentifier>
 		</Filter>
 		<None Include="..\..\Config\DefaultEditor.ini">
 			<Filter>Config</Filter>
@@ -25,7 +25,7 @@
 			<Filter>Config</Filter>
 		</None >
 		<Filter Include="Source\LevelGenerationTool">
-			<UniqueIdentifier>{49063555-8FF4-480D-9082-42885C709269}</UniqueIdentifier>
+			<UniqueIdentifier>{B6B237B0-C1E4-483F-B0DC-3F6E131AD991}</UniqueIdentifier>
 		</Filter>
 		<ClCompile Include="..\..\Source\LevelGenerationTool\LevelBlockout.cpp">
 			<Filter>Source\LevelGenerationTool</Filter>

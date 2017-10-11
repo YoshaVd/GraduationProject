@@ -16,6 +16,26 @@ class UStaticMesh;
 
 #define LevelGenerationTool_Source_LevelGenerationTool_LevelGenerator_h_14_RPC_WRAPPERS \
  \
+	DECLARE_FUNCTION(execEmptySurround) \
+	{ \
+		P_GET_PROPERTY(UIntProperty,Z_Param_x); \
+		P_GET_PROPERTY(UIntProperty,Z_Param_y); \
+		P_FINISH; \
+		P_NATIVE_BEGIN; \
+		this->EmptySurround(Z_Param_x,Z_Param_y); \
+		P_NATIVE_END; \
+	} \
+ \
+	DECLARE_FUNCTION(execEmptyAdjacent) \
+	{ \
+		P_GET_PROPERTY(UIntProperty,Z_Param_x); \
+		P_GET_PROPERTY(UIntProperty,Z_Param_y); \
+		P_FINISH; \
+		P_NATIVE_BEGIN; \
+		this->EmptyAdjacent(Z_Param_x,Z_Param_y); \
+		P_NATIVE_END; \
+	} \
+ \
 	DECLARE_FUNCTION(execSetBasicBlock) \
 	{ \
 		P_GET_OBJECT(UStaticMesh,Z_Param_mesh); \
@@ -61,6 +81,26 @@ class UStaticMesh;
 
 
 #define LevelGenerationTool_Source_LevelGenerationTool_LevelGenerator_h_14_RPC_WRAPPERS_NO_PURE_DECLS \
+ \
+	DECLARE_FUNCTION(execEmptySurround) \
+	{ \
+		P_GET_PROPERTY(UIntProperty,Z_Param_x); \
+		P_GET_PROPERTY(UIntProperty,Z_Param_y); \
+		P_FINISH; \
+		P_NATIVE_BEGIN; \
+		this->EmptySurround(Z_Param_x,Z_Param_y); \
+		P_NATIVE_END; \
+	} \
+ \
+	DECLARE_FUNCTION(execEmptyAdjacent) \
+	{ \
+		P_GET_PROPERTY(UIntProperty,Z_Param_x); \
+		P_GET_PROPERTY(UIntProperty,Z_Param_y); \
+		P_FINISH; \
+		P_NATIVE_BEGIN; \
+		this->EmptyAdjacent(Z_Param_x,Z_Param_y); \
+		P_NATIVE_END; \
+	} \
  \
 	DECLARE_FUNCTION(execSetBasicBlock) \
 	{ \
