@@ -152,17 +152,24 @@ void ALevelGenerator::RandomWalkBiased(const int steps, const FVector2D start, c
 
 void ALevelGenerator::PartitionSpace(const int granularity)
 {
+	/* quick partition test code */
 	_pGrid->Split();
-	auto children = _pGrid->GetChildren();
-	for (auto c : children)
-	{
+	vector<LevelGrid*> level1Children = _pGrid->GetChildren();
+
+	for (auto &c : level1Children)
 		c->Split();
-		auto kids = c->GetChildren();
-		for (auto k : kids)
-		{
-			k->SetFilledArea(k->GetHeight() - 2, k->GetHeight() - 2, 1, 1, false);
-		}
-	}
+	vector<LevelGrid*> level2Children;
+	for (auto &c : level1Children)
+		level2Children.push_back(c);
+
+	for (auto &c : level2Children)
+		c->Split();
+	vector<LevelGrid*> level3Children;
+	for (auto &c : level2Children)
+		level3Children.push_back(c);
+
+	for (auto &c : level3Children)
+		c->SetFilledArea(c->GetHeight() - 2, c->GetHeight() - 2, 1, 1, false);
 }
 
 void ALevelGenerator::GenerateBlockout()
@@ -195,11 +202,6 @@ void ALevelGenerator::GenerateBlockout()
 			}
 		}
 	}
-	//_pLevelBlockout = NewObject<ALevelBlockout>();
-	//_pLevelBlockout->AttachToActor(this, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, false));
-	//_pLevelBlockout->SetLayout(_pGrid->GetTiles());
-	//_pLevelBlockout->SetBasicBlock(_pBasicBlock);
-	//_pLevelBlockout->GenerateBlockout();
 }
 
 void ALevelGenerator::EmptyAdjacent(int x, int y)

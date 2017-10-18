@@ -1,6 +1,8 @@
 #include "LevelBlockout.h"
 #include "LevelGrid.h"
 
+/* LEVELBLOCKOUT CURRENTLY NOT USED */
+
 ALevelBlockout::ALevelBlockout()
 {
 	PrimaryActorTick.bCanEverTick = true;

@@ -14,6 +14,8 @@
 
 using namespace std;
 
+/* LEVELBLOCKOUT CURRENTLY NOT USED */
+
 UCLASS()
 class LEVELGENERATIONTOOL_API ALevelBlockout : public AActor
 {

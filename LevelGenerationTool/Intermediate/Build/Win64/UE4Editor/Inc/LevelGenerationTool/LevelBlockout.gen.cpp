@@ -99,13 +99,14 @@ void EmptyLinkFunctionForGeneratedCodeLevelBlockout() {}
 				UMetaData* MetaData = OuterClass->GetOutermost()->GetMetaData();
 				MetaData->SetValue(OuterClass, TEXT("IncludePath"), TEXT("LevelBlockout.h"));
 				MetaData->SetValue(OuterClass, TEXT("ModuleRelativePath"), TEXT("LevelBlockout.h"));
+				MetaData->SetValue(OuterClass, TEXT("ToolTip"), TEXT("LEVELBLOCKOUT CURRENTLY NOT USED"));
 #endif
 			}
 		}
 		check(OuterClass->GetClass());
 		return OuterClass;
 	}
-	IMPLEMENT_CLASS(ALevelBlockout, 830536886);
+	IMPLEMENT_CLASS(ALevelBlockout, 4082697041);
 	static FCompiledInDefer Z_CompiledInDefer_UClass_ALevelBlockout(Z_Construct_UClass_ALevelBlockout, &ALevelBlockout::StaticClass, TEXT("/Script/LevelGenerationTool"), TEXT("ALevelBlockout"), false, nullptr, nullptr, nullptr);
 	DEFINE_VTABLE_PTR_HELPER_CTOR(ALevelBlockout);
 PRAGMA_ENABLE_DEPRECATION_WARNINGS

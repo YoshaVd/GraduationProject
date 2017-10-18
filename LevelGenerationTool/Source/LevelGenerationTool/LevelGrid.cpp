@@ -160,7 +160,6 @@ LevelGrid * LevelGrid::CreateSubGrid(const int top, const int right, const int b
 	return new LevelGrid(newTiles);
 }
 
-
 FVector2D LevelGrid::GetRandomPos(const int xOffset, const int yOffset)
 {
 	int randomCol = rand() % (_width - 2 * xOffset) + xOffset;
@@ -178,7 +177,7 @@ FVector2D LevelGrid::GetRandomPos(const bool isFilled, const int xOffset, const 
 	} while (_tiles[pos.X][pos.Y]->_isFilled != isFilled);
 
 	if (pos == FVector2D(-1, -1))
-		UE_LOG(LogTemp, Error, TEXT("GetRandomPos:: no tile with isFilled = %s ws found"), isFilled);
+		UE_LOG(LogTemp, Error, TEXT("LevelGrid::GetRandomPos || No tile with isFilled = %s ws found"), isFilled);
 
 	return pos;
 }
@@ -193,7 +192,7 @@ FVector2D LevelGrid::GetRandomPosFromSetBiased(const vector<FVector2D>& position
 {
 	if (positions.size() == 0)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("GetRandomPosFromSetBiased:: Set is empty"));
+		UE_LOG(LogTemp, Warning, TEXT("LevelGrid::GetRandomPosFromSetBiased || Set is empty"));
 		return FVector2D(0, 0);
 	}
 
@@ -291,12 +290,9 @@ vector<FVector2D> LevelGrid::GetIsolatedPositions(vector<FVector2D> positions)
 
 vector<FVector2D> LevelGrid::GetIsolatedPositionsExclusion(const vector<FVector2D> positions, const FVector2D exclusion)
 {
-	//UE_LOG(LogTemp, Warning, TEXT("===== CURRENT: %f, %f ====="), exclusion.X, exclusion.Y);
-
 	vector<FVector2D> isolated;
 	for (auto pos : positions)
 	{
-		//UE_LOG(LogTemp, Warning, TEXT("=== ISOLATION CHECK POSITION: %f, %f ==="), pos.X, pos.Y);
 		if (IsIsolatedExclusion(pos,exclusion))
 			isolated.push_back(pos);
 	}
@@ -332,28 +328,31 @@ bool LevelGrid::IsIsolated(const int x, const int y)
 
 bool LevelGrid::IsIsolatedExclusion(const FVector2D pos, const FVector2D e)
 {
-	//vector<FVector2D> emptiesNearPos = GetEmpties(GetSurroundingPositions(pos));
-	//vector<FVector2D> emptiesAdjExclusion = GetEmpties(GetSurroundingPositions(e));
-	//if (emptiesNearPos.size() < emptiesAdjExclusion.size() + 1)
-	//	return true;
-	//if (emptiesNearPos.size() == emptiesAdjExclusion.size() + 1) 
-	//{
-	//	int overlapCount = 0;
-	//	if (pos.Y != e.Y)
-	//	{
-	//		if (IsWithinBounds(FVector2D(e.X - 1, e.Y)) && !_tiles[e.X - 1][e.Y]._isFilled) overlapCount++;
-	//		if (IsWithinBounds(FVector2D(e.X + 1, e.Y)) && !_tiles[e.X + 1][e.Y]._isFilled) overlapCount++;
-	//	}
-	//	else if (pos.X != e.X)
-	//	{
-	//		if (IsWithinBounds(FVector2D(e.X, e.Y - 1)) && !_tiles[e.X][e.Y - 1]._isFilled) overlapCount++;
-	//		if (IsWithinBounds(FVector2D(e.X, e.Y + 1)) && !_tiles[e.X][e.Y + 1]._isFilled) overlapCount++;
-	//	}
+	/* [WIP] Fix to avoid diagonal connections in the perfect maze algorithm */
+	/*
+	vector<FVector2D> emptiesNearPos = GetEmpties(GetSurroundingPositions(pos));
+	vector<FVector2D> emptiesAdjExclusion = GetEmpties(GetSurroundingPositions(e));
+	if (emptiesNearPos.size() < emptiesAdjExclusion.size() + 1)
+		return true;
+	if (emptiesNearPos.size() == emptiesAdjExclusion.size() + 1) 
+	{
+		int overlapCount = 0;
+		if (pos.Y != e.Y)
+		{
+			if (IsWithinBounds(FVector2D(e.X - 1, e.Y)) && !_tiles[e.X - 1][e.Y]._isFilled) overlapCount++;
+			if (IsWithinBounds(FVector2D(e.X + 1, e.Y)) && !_tiles[e.X + 1][e.Y]._isFilled) overlapCount++;
+		}
+		else if (pos.X != e.X)
+		{
+			if (IsWithinBounds(FVector2D(e.X, e.Y - 1)) && !_tiles[e.X][e.Y - 1]._isFilled) overlapCount++;
+			if (IsWithinBounds(FVector2D(e.X, e.Y + 1)) && !_tiles[e.X][e.Y + 1]._isFilled) overlapCount++;
+		}
 
-	//	if (overlapCount == emptiesNearPos.size() - 1)
-	//		return true;
-	//}
-	//return false;
+		if (overlapCount == emptiesNearPos.size() - 1)
+			return true;
+	}
+	return false;
+	*/
 
 
 	// If the amount of surrounding empty cells is smaller than 
