@@ -12,6 +12,16 @@ void ALevelGenerator::BeginPlay()
 	Super::BeginPlay();
 }
 
+//void ALevelGenerator::OnConstruction(const FTransform& transform)
+//{
+//	if (updateLevel)
+//	{
+//		PerfectMaze();
+//		GenerateBlockout();
+//		updateLevel = false;
+//	}
+//}
+
 void ALevelGenerator::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -23,43 +33,132 @@ void ALevelGenerator::ResetLevel()
 
 void ALevelGenerator::PerfectMaze()
 {
-	// start stack with random set of tile coordinates
+	LevelGrid* grid = _pGrid->CreateSubGrid(_pGrid->GetHeight() - 1, _pGrid->GetWidth() - 1, 1, 1);
+	/* generates a perfect maze: 2 positions will always have exactly one connection */
+	// start stack with random filled tile and empty it
 	stack<FVector2D> visited;
-	FVector2D current = _pGrid->GetRandomPos();
+	FVector2D current = grid->GetRandomPos(true);
+	if (!grid->IsWithinBounds(current))
+	{
+		UE_LOG(LogTemp, Error, TEXT("PerfectMaze:: current position is out of bounds, terminate function"));
+		return;
+	}
 	visited.push(current);
+	grid->GetTileLayout()[current.X][current.Y]._isFilled = false;
 
-	_pGrid->GetTileLayout()[current.X][current.Y]._isFilled = false;
-	//int loopCount = 0;
+	// continue looking for options as long as the stack is not empty
 	while (!visited.empty())
 	{
-		//loopCount++;
-		//if (loopCount > 10)
-		//	break;
-
-		vector<FVector2D> adjacentTiles = _pGrid->GetEmptyAdjacentPositions(current);
-		vector<FVector2D> isolatedAdjTiles = _pGrid->GetIsolatedPositionsExclusion(adjacentTiles, current);
+		// check for isolated adjacent tiles
+		vector<FVector2D> adjacentTiles = grid->GetEmptyAdjacentPositions(current);
+		vector<FVector2D> isolatedAdjTiles = grid->GetIsolatedPositionsExclusion(adjacentTiles, current);
+		// if there are none, pop the stack and try the next one
 		while (isolatedAdjTiles.size() == 0 && !visited.empty())
 		{
-			//UE_LOG(LogTemp, Warning, TEXT("-----[[POP]]-----"));
-
 			visited.pop();
 			if (visited.empty())
 				break;
 
 			current = visited.top();
-			adjacentTiles = _pGrid->GetEmptyAdjacentPositions(current);
-			isolatedAdjTiles = _pGrid->GetIsolatedPositionsExclusion(adjacentTiles, current);
+			adjacentTiles = grid->GetEmptyAdjacentPositions(current);
+			isolatedAdjTiles = grid->GetIsolatedPositionsExclusion(adjacentTiles, current);
 		}
-
 		if (visited.empty())
 			break;
 
+		// choose a random tile from the adjacent isolated tiles and continue from there
 		current = isolatedAdjTiles[rand() % isolatedAdjTiles.size()];
-		//UE_LOG(LogTemp, Warning, TEXT("-----[[PUSH]]-----"));
+		visited.push(current);
+		grid->GetTileLayout()[current.X][current.Y]._isFilled = false;
+	}
+}
+
+void ALevelGenerator::RandomWalk(const int steps, const FVector2D start)
+{
+	/* generates a random walk area: [steps] amount of adjacent tiles will be emptied */
+	// set the correct starting values and empty the first tile
+	FVector2D current;
+	if (start != FVector2D(-1, -1) && _pGrid->IsWithinBounds(start))
+		current = start;
+	else
+		current = _pGrid->GetRandomPos(true);
+	_pGrid->GetTileLayout()[current.X][current.Y]._isFilled = false;
+
+	stack<FVector2D> visited;
+	visited.push(start);
+
+	// loop over the amount of steps
+	vector<FVector2D> adjacentEmpties;
+	for (size_t i = 1; i < steps; i++)
+	{
+		// get the adjacent empty tiles, if there are none pop the stack and try again
+		adjacentEmpties = _pGrid->GetEmptyAdjacentPositions(current);
+		while (adjacentEmpties.size() == 0 && !visited.empty())
+		{
+			visited.pop();
+			if (visited.empty())
+				break;
+
+			current = visited.top();
+			adjacentEmpties = _pGrid->GetEmptyAdjacentPositions(current);
+		}
+		if (visited.empty())
+			break;
+
+		// get a random position from the adjacent empties, push it on the stack and empty it
+		current = _pGrid->GetRandomPosFromSet(adjacentEmpties);
 		visited.push(current);
 		_pGrid->GetTileLayout()[current.X][current.Y]._isFilled = false;
 	}
 }
+
+void ALevelGenerator::RandomWalkBiased(const int steps, const FVector2D start, const FVector2D target)
+{
+	/* generates a random walk area with a bias: [steps] amount of adjacent tiles will be emptied 
+	with a bias towards the position [target]*/
+	// set the correct starting values and empty the first tile
+	FVector2D current;
+	if (_pGrid->IsWithinBounds(start))
+		current = start;
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Start for biased random walk is out of bounds"));
+		return;
+	}
+	if (!_pGrid->IsWithinBounds(target))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Target for biased random walk is out of bounds"));
+		return;
+	}
+	_pGrid->GetTileLayout()[current.X][current.Y]._isFilled = false;
+
+	stack<FVector2D> visited;
+	visited.push(start);
+
+	vector<FVector2D> adjacentEmpties;
+	for (size_t i = 1; i < steps; i++)
+	{
+		// get the adjacent empty tiles, if there are none pop the stack and try again
+		adjacentEmpties = _pGrid->GetEmptyAdjacentPositions(current);
+		while (adjacentEmpties.size() == 0 && !visited.empty())
+		{
+			visited.pop();
+			if (visited.empty())
+				break;
+
+			current = visited.top();
+			adjacentEmpties = _pGrid->GetEmptyAdjacentPositions(current);
+		}
+		if (visited.empty())
+			break;
+
+		// get a random position from the adjacent empties, push it on the stack and empty it
+		current = _pGrid->GetRandomPosFromSetBiased(adjacentEmpties, target);
+		visited.push(current);
+		_pGrid->GetTileLayout()[current.X][current.Y]._isFilled = false;
+	}
+
+}		
 
 void ALevelGenerator::GenerateBlockout()
 {
@@ -73,6 +172,8 @@ void ALevelGenerator::GenerateBlockout()
 		UE_LOG(LogTemp, Error, TEXT("No valid block object."));
 		return;
 	}
+
+	FVector2D origin = FVector2D(-_pGrid->GetWidth()/2 * 100, -_pGrid->GetHeight()/2 * 100);
 	auto tiles = _pGrid->GetTileLayout();
 	for (size_t c = 0; c < tiles.size(); c++)
 	{
@@ -82,7 +183,7 @@ void ALevelGenerator::GenerateBlockout()
 			{
 				UStaticMeshComponent* Test = NewObject<UStaticMeshComponent>(UStaticMeshComponent::StaticClass());
 				Test->SetStaticMesh(_pBasicBlock);
-				Test->SetWorldLocation(FVector(c * 100, r * 100, 0));
+				Test->SetWorldLocation(FVector(origin.X + c * 100, origin.Y + r * 100, 0));
 				Test->RegisterComponentWithWorld(GetWorld());
 				FAttachmentTransformRules rules = FAttachmentTransformRules(EAttachmentRule::SnapToTarget, false);
 				Test->AttachToComponent(RootComponent, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, false));
@@ -112,4 +213,10 @@ void ALevelGenerator::EmptySurround(int x, int y)
 	{
 		_pGrid->SetFilled(s.X, s.Y);
 	}
+}
+
+void ALevelGenerator::EmptySubGridTest()
+{
+	LevelGrid* grid = _pGrid->CreateSubGrid(_pGrid->GetHeight() - 1, _pGrid->GetWidth() - 1, 1, 1);
+	_pGrid->SetFilledSet(grid->GetTileLayout(), true);
 }

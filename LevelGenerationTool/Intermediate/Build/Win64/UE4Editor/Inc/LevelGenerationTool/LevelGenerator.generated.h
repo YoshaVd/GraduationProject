@@ -9,12 +9,21 @@
 
 PRAGMA_DISABLE_DEPRECATION_WARNINGS
 class UStaticMesh;
+struct FVector2D;
 #ifdef LEVELGENERATIONTOOL_LevelGenerator_generated_h
 #error "LevelGenerator.generated.h already included, missing '#pragma once' in LevelGenerator.h"
 #endif
 #define LEVELGENERATIONTOOL_LevelGenerator_generated_h
 
 #define LevelGenerationTool_Source_LevelGenerationTool_LevelGenerator_h_14_RPC_WRAPPERS \
+ \
+	DECLARE_FUNCTION(execEmptySubGridTest) \
+	{ \
+		P_FINISH; \
+		P_NATIVE_BEGIN; \
+		this->EmptySubGridTest(); \
+		P_NATIVE_END; \
+	} \
  \
 	DECLARE_FUNCTION(execEmptySurround) \
 	{ \
@@ -36,12 +45,49 @@ class UStaticMesh;
 		P_NATIVE_END; \
 	} \
  \
+	DECLARE_FUNCTION(execGenerateBlockout) \
+	{ \
+		P_FINISH; \
+		P_NATIVE_BEGIN; \
+		this->GenerateBlockout(); \
+		P_NATIVE_END; \
+	} \
+ \
 	DECLARE_FUNCTION(execSetBasicBlock) \
 	{ \
 		P_GET_OBJECT(UStaticMesh,Z_Param_mesh); \
 		P_FINISH; \
 		P_NATIVE_BEGIN; \
 		this->SetBasicBlock(Z_Param_mesh); \
+		P_NATIVE_END; \
+	} \
+ \
+	DECLARE_FUNCTION(execRandomWalkBiased) \
+	{ \
+		P_GET_PROPERTY(UIntProperty,Z_Param_steps); \
+		P_GET_STRUCT(FVector2D,Z_Param_start); \
+		P_GET_STRUCT(FVector2D,Z_Param_target); \
+		P_FINISH; \
+		P_NATIVE_BEGIN; \
+		this->RandomWalkBiased(Z_Param_steps,Z_Param_start,Z_Param_target); \
+		P_NATIVE_END; \
+	} \
+ \
+	DECLARE_FUNCTION(execRandomWalk) \
+	{ \
+		P_GET_PROPERTY(UIntProperty,Z_Param_steps); \
+		P_GET_STRUCT(FVector2D,Z_Param_start); \
+		P_FINISH; \
+		P_NATIVE_BEGIN; \
+		this->RandomWalk(Z_Param_steps,Z_Param_start); \
+		P_NATIVE_END; \
+	} \
+ \
+	DECLARE_FUNCTION(execPerfectMaze) \
+	{ \
+		P_FINISH; \
+		P_NATIVE_BEGIN; \
+		this->PerfectMaze(); \
 		P_NATIVE_END; \
 	} \
  \
@@ -52,22 +98,6 @@ class UStaticMesh;
 		P_FINISH; \
 		P_NATIVE_BEGIN; \
 		this->NewGrid(Z_Param_width,Z_Param_height); \
-		P_NATIVE_END; \
-	} \
- \
-	DECLARE_FUNCTION(execGenerateBlockout) \
-	{ \
-		P_FINISH; \
-		P_NATIVE_BEGIN; \
-		this->GenerateBlockout(); \
-		P_NATIVE_END; \
-	} \
- \
-	DECLARE_FUNCTION(execPerfectMaze) \
-	{ \
-		P_FINISH; \
-		P_NATIVE_BEGIN; \
-		this->PerfectMaze(); \
 		P_NATIVE_END; \
 	} \
  \
@@ -82,6 +112,14 @@ class UStaticMesh;
 
 #define LevelGenerationTool_Source_LevelGenerationTool_LevelGenerator_h_14_RPC_WRAPPERS_NO_PURE_DECLS \
  \
+	DECLARE_FUNCTION(execEmptySubGridTest) \
+	{ \
+		P_FINISH; \
+		P_NATIVE_BEGIN; \
+		this->EmptySubGridTest(); \
+		P_NATIVE_END; \
+	} \
+ \
 	DECLARE_FUNCTION(execEmptySurround) \
 	{ \
 		P_GET_PROPERTY(UIntProperty,Z_Param_x); \
@@ -102,12 +140,49 @@ class UStaticMesh;
 		P_NATIVE_END; \
 	} \
  \
+	DECLARE_FUNCTION(execGenerateBlockout) \
+	{ \
+		P_FINISH; \
+		P_NATIVE_BEGIN; \
+		this->GenerateBlockout(); \
+		P_NATIVE_END; \
+	} \
+ \
 	DECLARE_FUNCTION(execSetBasicBlock) \
 	{ \
 		P_GET_OBJECT(UStaticMesh,Z_Param_mesh); \
 		P_FINISH; \
 		P_NATIVE_BEGIN; \
 		this->SetBasicBlock(Z_Param_mesh); \
+		P_NATIVE_END; \
+	} \
+ \
+	DECLARE_FUNCTION(execRandomWalkBiased) \
+	{ \
+		P_GET_PROPERTY(UIntProperty,Z_Param_steps); \
+		P_GET_STRUCT(FVector2D,Z_Param_start); \
+		P_GET_STRUCT(FVector2D,Z_Param_target); \
+		P_FINISH; \
+		P_NATIVE_BEGIN; \
+		this->RandomWalkBiased(Z_Param_steps,Z_Param_start,Z_Param_target); \
+		P_NATIVE_END; \
+	} \
+ \
+	DECLARE_FUNCTION(execRandomWalk) \
+	{ \
+		P_GET_PROPERTY(UIntProperty,Z_Param_steps); \
+		P_GET_STRUCT(FVector2D,Z_Param_start); \
+		P_FINISH; \
+		P_NATIVE_BEGIN; \
+		this->RandomWalk(Z_Param_steps,Z_Param_start); \
+		P_NATIVE_END; \
+	} \
+ \
+	DECLARE_FUNCTION(execPerfectMaze) \
+	{ \
+		P_FINISH; \
+		P_NATIVE_BEGIN; \
+		this->PerfectMaze(); \
 		P_NATIVE_END; \
 	} \
  \
@@ -118,22 +193,6 @@ class UStaticMesh;
 		P_FINISH; \
 		P_NATIVE_BEGIN; \
 		this->NewGrid(Z_Param_width,Z_Param_height); \
-		P_NATIVE_END; \
-	} \
- \
-	DECLARE_FUNCTION(execGenerateBlockout) \
-	{ \
-		P_FINISH; \
-		P_NATIVE_BEGIN; \
-		this->GenerateBlockout(); \
-		P_NATIVE_END; \
-	} \
- \
-	DECLARE_FUNCTION(execPerfectMaze) \
-	{ \
-		P_FINISH; \
-		P_NATIVE_BEGIN; \
-		this->PerfectMaze(); \
 		P_NATIVE_END; \
 	} \
  \

@@ -5,17 +5,25 @@ LevelGrid::LevelGrid(const int width, const int height):
 {
 	for (size_t col = 0; col < width; col++)
 	{
-		_tilesArr.push_back(vector<Tile>());
+		_tiles.push_back(vector<Tile>());
 		for (size_t row = 0; row < height; row++)
 		{
-			_tilesArr[col].push_back(Tile());
+			_tiles[col].push_back(Tile());
 		}
 	}
+
+	_biasFactor = 100 * _width * _height;
+}
+
+LevelGrid::LevelGrid(vector<vector<Tile>>& tiles)
+{
+	_tiles = tiles;
+	_biasFactor = 100 * _width * _height;
 }
 
 LevelGrid::~LevelGrid()
 {
-	_tilesArr.clear();
+	_tiles.clear();
 }
 
 void LevelGrid::SetFilled(const int x, const int y, const bool isFilled)
@@ -24,7 +32,7 @@ void LevelGrid::SetFilled(const int x, const int y, const bool isFilled)
 		return;
 
 	if (x < _width && y < _height)
-		_tilesArr[x][y]._isFilled = isFilled;
+		_tiles[x][y]._isFilled = isFilled;
 }
 
 void LevelGrid::SetFilledArea(const FVector2D center, int width, int height, bool isFilled)
@@ -43,6 +51,44 @@ void LevelGrid::SetFilledArea(const FVector2D center, int width, int height, boo
 	}
 }
 
+void LevelGrid::SetFilledSet(vector<vector<Tile>> tiles, const bool isFilled)
+{
+	int width = tiles.size();
+	if (tiles.size() == 0)
+	{
+		UE_LOG(LogTemp, Error, TEXT("SetFilledSet:: tiles size is 0"));
+		return;
+	}
+	int height = tiles[0].size();
+
+	for (size_t col = 0; col < width; col++)
+	{
+		for (size_t row = 0; row < height; row++)
+		{
+			tiles[col][row]._isFilled = isFilled;
+		}
+	}
+}
+
+LevelGrid * LevelGrid::CreateSubGrid(const int top, const int right, const int bottom, const int left)
+{
+	vector<vector<Tile>> newTiles;
+	for (size_t col = 0; col < _width; col++)
+	{
+		if (col >= left && col <= right)
+			newTiles.push_back(vector<Tile>());
+		for (size_t row = 0; row < _height; row++)
+		{
+			if (col >= bottom && col <= top)
+			{
+				if(IsWithinBounds(FVector2D(col, row)))
+					newTiles[col - left].push_back(_tiles[col][row]);
+			}
+		}
+	}
+	return new LevelGrid(newTiles);
+}
+
 FVector2D LevelGrid::GetRandomPos(const int xOffset, const int yOffset)
 {
 	int randomCol = rand() % (_width - 2 * xOffset) + xOffset;
@@ -53,11 +99,14 @@ FVector2D LevelGrid::GetRandomPos(const int xOffset, const int yOffset)
 
 FVector2D LevelGrid::GetRandomPos(const bool isFilled, const int xOffset, const int yOffset)
 {
-	FVector2D pos;
+	FVector2D pos(-1, -1);
 	do
 	{
 		pos = GetRandomPos(xOffset, yOffset);
-	} while (_tilesArr[pos.X][pos.Y]._isFilled != isFilled);
+	} while (_tiles[pos.X][pos.Y]._isFilled != isFilled);
+
+	if (pos == FVector2D(-1, -1))
+		UE_LOG(LogTemp, Error, TEXT("GetRandomPos:: no tile with isFilled = %s ws found"), isFilled);
 
 	return pos;
 }
@@ -66,6 +115,43 @@ FVector2D LevelGrid::GetRandomPosFromSet(const vector<FVector2D>& positions)
 {
 	int randomNr = rand() % positions.size();
 	return positions[randomNr];
+}
+
+FVector2D LevelGrid::GetRandomPosFromSetBiased(const vector<FVector2D>& positions, const FVector2D biasTarget)
+{
+	if (positions.size() == 0)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("GetRandomPosFromSetBiased:: Set is empty"));
+		return FVector2D(0, 0);
+	}
+
+	vector<int> distancesToTarget;
+	float normalizer = 0;
+	for (auto p : positions)
+	{
+		distancesToTarget.push_back(abs(biasTarget.X - p.X) + abs(biasTarget.Y - p.Y));
+		normalizer += 1.0 / distancesToTarget[distancesToTarget.size() - 1];
+	}
+
+	int randomNr = rand() % 100;
+	int rangeMin = 0;
+	int rangeMax = 0;
+	UE_LOG(LogTemp, Warning, TEXT("Random number: %d"), randomNr);
+	UE_LOG(LogTemp, Warning, TEXT("Normalizer: %f"), normalizer);
+	UE_LOG(LogTemp, Warning, TEXT("Amount of options: %d"), distancesToTarget.size());
+	for (size_t i = 0; i < distancesToTarget.size(); i++)
+	{
+		rangeMin = rangeMax;
+		rangeMax = rangeMin + 100.0 / distancesToTarget[i] / normalizer;
+
+		if (randomNr > rangeMin && randomNr < rangeMax)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Option nr: %d"), i);
+			UE_LOG(LogTemp, Warning, TEXT("Range: %d"), rangeMax - rangeMin);
+			return positions[i];
+		}
+	}
+	return FVector2D(0,0);
 }
 
 vector<FVector2D> LevelGrid::GetAdjacentPositions(const FVector2D pos)
@@ -85,13 +171,13 @@ vector<FVector2D> LevelGrid::GetAdjacentPositions(const FVector2D pos)
 vector<FVector2D> LevelGrid::GetEmptyAdjacentPositions(const FVector2D pos)
 {
 	vector<FVector2D> adjacentPositions;
-	if (pos.X > 0 && _tilesArr[pos.X - 1][pos.Y]._isFilled)
+	if (pos.X > 0 && _tiles[pos.X - 1][pos.Y]._isFilled)
 		adjacentPositions.push_back(FVector2D(pos.X - 1, pos.Y));
-	if (pos.X < _width - 1 && _tilesArr[pos.X + 1][pos.Y]._isFilled)
+	if (pos.X < _width - 1 && _tiles[pos.X + 1][pos.Y]._isFilled)
 		adjacentPositions.push_back(FVector2D(pos.X + 1, pos.Y));
-	if (pos.Y > 0 && _tilesArr[pos.X][pos.Y - 1]._isFilled)
+	if (pos.Y > 0 && _tiles[pos.X][pos.Y - 1]._isFilled)
 		adjacentPositions.push_back(FVector2D(pos.X, pos.Y - 1));
-	if (pos.Y < _height - 1 && _tilesArr[pos.X][pos.Y + 1]._isFilled)
+	if (pos.Y < _height - 1 && _tiles[pos.X][pos.Y + 1]._isFilled)
 		adjacentPositions.push_back(FVector2D(pos.X, pos.Y + 1));
 	return adjacentPositions;
 }
@@ -145,15 +231,15 @@ vector<FVector2D> LevelGrid::GetIsolatedPositionsExclusion(const vector<FVector2
 	return isolated;
 }
 
-int LevelGrid::GetEmptyCount(const vector<FVector2D> positions)
+vector<FVector2D> LevelGrid::GetEmpties(const vector<FVector2D> positions)
 {
-	int count = 0;
+	vector<FVector2D> empties;
 	for (auto p : positions)
 	{
-		if (!_tilesArr[p.X][p.Y]._isFilled)
-			count += 1;
+		if (!_tiles[p.X][p.Y]._isFilled)
+			empties.push_back(p);
 	}
-	return count;
+	return empties;
 }
 
 bool LevelGrid::IsIsolated(const FVector2D pos)
@@ -161,7 +247,7 @@ bool LevelGrid::IsIsolated(const FVector2D pos)
 	vector<FVector2D> adjacentPositions = GetSurroundingPositions(pos);
 	for (auto p : adjacentPositions)
 	{
-		if (!_tilesArr[p.X][p.Y]._isFilled)
+		if (!_tiles[p.X][p.Y]._isFilled)
 			return false;
 	}
 	return true;
@@ -172,10 +258,37 @@ bool LevelGrid::IsIsolated(const int x, const int y)
 	return IsIsolated(FVector2D(x, y));
 }
 
-bool LevelGrid::IsIsolatedExclusion(const FVector2D pos, const FVector2D exclusion)
+bool LevelGrid::IsIsolatedExclusion(const FVector2D pos, const FVector2D e)
 {
-	int emptyCountNearPos = GetEmptyCount(GetSurroundingPositions(pos)) - 1;
-	int emptyCountExclusion = GetEmptyCount(GetAdjacentPositions(exclusion));
+	//vector<FVector2D> emptiesNearPos = GetEmpties(GetSurroundingPositions(pos));
+	//vector<FVector2D> emptiesAdjExclusion = GetEmpties(GetSurroundingPositions(e));
+	//if (emptiesNearPos.size() < emptiesAdjExclusion.size() + 1)
+	//	return true;
+	//if (emptiesNearPos.size() == emptiesAdjExclusion.size() + 1) 
+	//{
+	//	int overlapCount = 0;
+	//	if (pos.Y != e.Y)
+	//	{
+	//		if (IsWithinBounds(FVector2D(e.X - 1, e.Y)) && !_tiles[e.X - 1][e.Y]._isFilled) overlapCount++;
+	//		if (IsWithinBounds(FVector2D(e.X + 1, e.Y)) && !_tiles[e.X + 1][e.Y]._isFilled) overlapCount++;
+	//	}
+	//	else if (pos.X != e.X)
+	//	{
+	//		if (IsWithinBounds(FVector2D(e.X, e.Y - 1)) && !_tiles[e.X][e.Y - 1]._isFilled) overlapCount++;
+	//		if (IsWithinBounds(FVector2D(e.X, e.Y + 1)) && !_tiles[e.X][e.Y + 1]._isFilled) overlapCount++;
+	//	}
+
+	//	if (overlapCount == emptiesNearPos.size() - 1)
+	//		return true;
+	//}
+	//return false;
+
+
+	// If the amount of surrounding empty cells is smaller than 
+	// the amount empty cells adjacent to the exception cell
+	// the cell can be considered "isolated"
+	int emptyCountNearPos = GetEmpties(GetSurroundingPositions(pos)).size() - 1;
+	int emptyCountExclusion = GetEmpties(GetAdjacentPositions(e)).size();
 	if (emptyCountNearPos <= emptyCountExclusion)
 		return true;
 	return false;
@@ -187,7 +300,7 @@ bool LevelGrid::IsWithinBounds(const FVector2D pos)
 		pos.Y >= 0 && pos.Y < _height)
 		return true;
 
-	UE_LOG(LogTemp, Error, TEXT("Position out of grid bounds."));
+	UE_LOG(LogTemp, Error, TEXT("Position[%d,%d] out of grid bounds."), pos.X, pos.Y);
 	return false;
 }
 

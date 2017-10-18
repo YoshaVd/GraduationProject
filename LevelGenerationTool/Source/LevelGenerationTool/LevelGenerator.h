@@ -18,6 +18,7 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+	//virtual void OnConstruction(const FTransform& transform) override;
 
 public:	
 	virtual void Tick(float DeltaTime) override;
@@ -25,20 +26,33 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Level Actions")
 		void ResetLevel();
 	UFUNCTION(BlueprintCallable, Category = "Level Actions")
-		void PerfectMaze();
-	UFUNCTION(BlueprintCallable, Category = "Level Actions")
-		void GenerateBlockout();
-	UFUNCTION(BlueprintCallable, Category = "Level Actions")
 		void NewGrid(const int width, const int height) { _pGrid = new LevelGrid(width, height); }
 
+	/* algorithms */
+	UFUNCTION(BlueprintCallable, Category = "Level Actions")
+		void PerfectMaze();
+	UFUNCTION(BlueprintCallable, Category = "Level Actions")
+		void RandomWalk(const int steps, const FVector2D start = FVector2D(-1,-1));
+	UFUNCTION(BlueprintCallable, Category = "Level Actions")
+		void RandomWalkBiased(const int steps, const FVector2D start, const FVector2D target);
+
+	/* blockout code */
 	UFUNCTION(BlueprintCallable, Category = "Level Actions")
 		void SetBasicBlock(UStaticMesh* mesh) { _pBasicBlock = mesh; }
+	UFUNCTION(BlueprintCallable, Category = "Level Actions")
+		void GenerateBlockout();
+
 
 	/* test grid functionality*/
 	UFUNCTION(BlueprintCallable, Category = "Level Actions")
 		void EmptyAdjacent(int x, int y);
 	UFUNCTION(BlueprintCallable, Category = "Level Actions")
 		void EmptySurround(int x, int y);
+	UFUNCTION(BlueprintCallable, Category = "Level Actions")
+		void EmptySubGridTest();
+
+	//UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	//	bool updateLevel = false;
 
 private:
 	LevelGrid* _pGrid = nullptr;
