@@ -18,7 +18,6 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
-	//virtual void OnConstruction(const FTransform& transform) override;
 
 public:	
 	virtual void Tick(float DeltaTime) override;
@@ -35,6 +34,8 @@ public:
 		void RandomWalk(const int steps, const FVector2D start = FVector2D(-1,-1));
 	UFUNCTION(BlueprintCallable, Category = "Level Actions")
 		void RandomWalkBiased(const int steps, const FVector2D start, const FVector2D target);
+	UFUNCTION(BlueprintCallable, Category = "Level Actions")
+		void PartitionSpace(const int granularity = 5);
 
 	/* blockout code */
 	UFUNCTION(BlueprintCallable, Category = "Level Actions")
@@ -50,9 +51,6 @@ public:
 		void EmptySurround(int x, int y);
 	UFUNCTION(BlueprintCallable, Category = "Level Actions")
 		void EmptySubGridTest();
-
-	//UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	//	bool updateLevel = false;
 
 private:
 	LevelGrid* _pGrid = nullptr;

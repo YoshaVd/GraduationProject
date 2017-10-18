@@ -12,16 +12,6 @@ void ALevelGenerator::BeginPlay()
 	Super::BeginPlay();
 }
 
-//void ALevelGenerator::OnConstruction(const FTransform& transform)
-//{
-//	if (updateLevel)
-//	{
-//		PerfectMaze();
-//		GenerateBlockout();
-//		updateLevel = false;
-//	}
-//}
-
 void ALevelGenerator::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -33,7 +23,7 @@ void ALevelGenerator::ResetLevel()
 
 void ALevelGenerator::PerfectMaze()
 {
-	LevelGrid* grid = _pGrid->CreateSubGrid(_pGrid->GetHeight() - 1, _pGrid->GetWidth() - 1, 1, 1);
+	LevelGrid* grid = _pGrid->CreateSubGrid(_pGrid->GetHeight() - 2, _pGrid->GetWidth() - 2, 1, 1);
 	/* generates a perfect maze: 2 positions will always have exactly one connection */
 	// start stack with random filled tile and empty it
 	stack<FVector2D> visited;
@@ -44,7 +34,7 @@ void ALevelGenerator::PerfectMaze()
 		return;
 	}
 	visited.push(current);
-	grid->GetTileLayout()[current.X][current.Y]._isFilled = false;
+	grid->SetFilled(current, false);
 
 	// continue looking for options as long as the stack is not empty
 	while (!visited.empty())
@@ -69,7 +59,7 @@ void ALevelGenerator::PerfectMaze()
 		// choose a random tile from the adjacent isolated tiles and continue from there
 		current = isolatedAdjTiles[rand() % isolatedAdjTiles.size()];
 		visited.push(current);
-		grid->GetTileLayout()[current.X][current.Y]._isFilled = false;
+		grid->SetFilled(current, false);
 	}
 }
 
@@ -82,7 +72,7 @@ void ALevelGenerator::RandomWalk(const int steps, const FVector2D start)
 		current = start;
 	else
 		current = _pGrid->GetRandomPos(true);
-	_pGrid->GetTileLayout()[current.X][current.Y]._isFilled = false;
+	_pGrid->SetFilled(current, false);
 
 	stack<FVector2D> visited;
 	visited.push(start);
@@ -108,7 +98,7 @@ void ALevelGenerator::RandomWalk(const int steps, const FVector2D start)
 		// get a random position from the adjacent empties, push it on the stack and empty it
 		current = _pGrid->GetRandomPosFromSet(adjacentEmpties);
 		visited.push(current);
-		_pGrid->GetTileLayout()[current.X][current.Y]._isFilled = false;
+		_pGrid->SetFilled(current, false);
 	}
 }
 
@@ -130,7 +120,7 @@ void ALevelGenerator::RandomWalkBiased(const int steps, const FVector2D start, c
 		UE_LOG(LogTemp, Warning, TEXT("Target for biased random walk is out of bounds"));
 		return;
 	}
-	_pGrid->GetTileLayout()[current.X][current.Y]._isFilled = false;
+	_pGrid->SetFilled(current, false);
 
 	stack<FVector2D> visited;
 	visited.push(start);
@@ -155,10 +145,25 @@ void ALevelGenerator::RandomWalkBiased(const int steps, const FVector2D start, c
 		// get a random position from the adjacent empties, push it on the stack and empty it
 		current = _pGrid->GetRandomPosFromSetBiased(adjacentEmpties, target);
 		visited.push(current);
-		_pGrid->GetTileLayout()[current.X][current.Y]._isFilled = false;
+		_pGrid->SetFilled(current, false);
 	}
 
-}		
+}
+
+void ALevelGenerator::PartitionSpace(const int granularity)
+{
+	_pGrid->Split();
+	auto children = _pGrid->GetChildren();
+	for (auto c : children)
+	{
+		c->Split();
+		auto kids = c->GetChildren();
+		for (auto k : kids)
+		{
+			k->SetFilledArea(k->GetHeight() - 2, k->GetHeight() - 2, 1, 1, false);
+		}
+	}
+}
 
 void ALevelGenerator::GenerateBlockout()
 {
@@ -174,12 +179,12 @@ void ALevelGenerator::GenerateBlockout()
 	}
 
 	FVector2D origin = FVector2D(-_pGrid->GetWidth()/2 * 100, -_pGrid->GetHeight()/2 * 100);
-	auto tiles = _pGrid->GetTileLayout();
+	auto tiles = _pGrid->GetTiles();
 	for (size_t c = 0; c < tiles.size(); c++)
 	{
 		for (size_t r = 0; r < tiles[c].size(); r++)
 		{
-			if (tiles[c][r]._isFilled)
+			if (tiles[c][r]->_isFilled)
 			{
 				UStaticMeshComponent* Test = NewObject<UStaticMeshComponent>(UStaticMeshComponent::StaticClass());
 				Test->SetStaticMesh(_pBasicBlock);
@@ -192,7 +197,7 @@ void ALevelGenerator::GenerateBlockout()
 	}
 	//_pLevelBlockout = NewObject<ALevelBlockout>();
 	//_pLevelBlockout->AttachToActor(this, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, false));
-	//_pLevelBlockout->SetLayout(_pGrid->GetTileLayout());
+	//_pLevelBlockout->SetLayout(_pGrid->GetTiles());
 	//_pLevelBlockout->SetBasicBlock(_pBasicBlock);
 	//_pLevelBlockout->GenerateBlockout();
 }
@@ -202,7 +207,7 @@ void ALevelGenerator::EmptyAdjacent(int x, int y)
 	auto adj = _pGrid->GetAdjacentPositions(x, y);
 	for (auto a : adj)
 	{
-		_pGrid->SetFilled(a.X, a.Y);
+		_pGrid->SetFilled(a);
 	}
 }
 
@@ -211,12 +216,16 @@ void ALevelGenerator::EmptySurround(int x, int y)
 	auto sur = _pGrid->GetSurroundingPositions(x, y);
 	for (auto s : sur)
 	{
-		_pGrid->SetFilled(s.X, s.Y);
+		_pGrid->SetFilled(s);
 	}
 }
 
 void ALevelGenerator::EmptySubGridTest()
 {
-	LevelGrid* grid = _pGrid->CreateSubGrid(_pGrid->GetHeight() - 1, _pGrid->GetWidth() - 1, 1, 1);
-	_pGrid->SetFilledSet(grid->GetTileLayout(), true);
+	LevelGrid* grid = _pGrid->CreateSubGrid(_pGrid->GetHeight() - 2, _pGrid->GetWidth() - 2, 1, 1);
+	grid->SetFilledSet(grid->GetTiles(), false);
+	UE_LOG(LogTemp, Warning, TEXT("new grid:"));
+	grid->LogTiles();
+	UE_LOG(LogTemp, Warning, TEXT("original grid:"));
+	_pGrid->LogTiles();
 }

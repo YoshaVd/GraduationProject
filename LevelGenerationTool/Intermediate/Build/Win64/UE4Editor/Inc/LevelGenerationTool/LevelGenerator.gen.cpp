@@ -20,6 +20,7 @@ void EmptyLinkFunctionForGeneratedCodeLevelGenerator() {}
 	LEVELGENERATIONTOOL_API UFunction* Z_Construct_UFunction_ALevelGenerator_EmptySurround();
 	LEVELGENERATIONTOOL_API UFunction* Z_Construct_UFunction_ALevelGenerator_GenerateBlockout();
 	LEVELGENERATIONTOOL_API UFunction* Z_Construct_UFunction_ALevelGenerator_NewGrid();
+	LEVELGENERATIONTOOL_API UFunction* Z_Construct_UFunction_ALevelGenerator_PartitionSpace();
 	LEVELGENERATIONTOOL_API UFunction* Z_Construct_UFunction_ALevelGenerator_PerfectMaze();
 	LEVELGENERATIONTOOL_API UFunction* Z_Construct_UFunction_ALevelGenerator_RandomWalk();
 	COREUOBJECT_API UScriptStruct* Z_Construct_UScriptStruct_FVector2D();
@@ -40,6 +41,7 @@ void EmptyLinkFunctionForGeneratedCodeLevelGenerator() {}
 			{ "EmptySurround", (Native)&ALevelGenerator::execEmptySurround },
 			{ "GenerateBlockout", (Native)&ALevelGenerator::execGenerateBlockout },
 			{ "NewGrid", (Native)&ALevelGenerator::execNewGrid },
+			{ "PartitionSpace", (Native)&ALevelGenerator::execPartitionSpace },
 			{ "PerfectMaze", (Native)&ALevelGenerator::execPerfectMaze },
 			{ "RandomWalk", (Native)&ALevelGenerator::execRandomWalk },
 			{ "RandomWalkBiased", (Native)&ALevelGenerator::execRandomWalkBiased },
@@ -153,6 +155,30 @@ void EmptyLinkFunctionForGeneratedCodeLevelGenerator() {}
 			MetaData->SetValue(ReturnFunction, TEXT("ModuleRelativePath"), TEXT("LevelGenerator.h"));
 			MetaData->SetValue(NewProp_height, TEXT("NativeConst"), TEXT(""));
 			MetaData->SetValue(NewProp_width, TEXT("NativeConst"), TEXT(""));
+#endif
+		}
+		return ReturnFunction;
+	}
+	UFunction* Z_Construct_UFunction_ALevelGenerator_PartitionSpace()
+	{
+		struct LevelGenerator_eventPartitionSpace_Parms
+		{
+			int32 granularity;
+		};
+		UObject* Outer = Z_Construct_UClass_ALevelGenerator();
+		static UFunction* ReturnFunction = nullptr;
+		if (!ReturnFunction)
+		{
+			ReturnFunction = new(EC_InternalUseOnlyConstructor, Outer, TEXT("PartitionSpace"), RF_Public|RF_Transient|RF_MarkAsNative) UFunction(FObjectInitializer(), nullptr, (EFunctionFlags)0x04020401, 65535, sizeof(LevelGenerator_eventPartitionSpace_Parms));
+			UProperty* NewProp_granularity = new(EC_InternalUseOnlyConstructor, ReturnFunction, TEXT("granularity"), RF_Public|RF_Transient|RF_MarkAsNative) UUnsizedIntProperty(CPP_PROPERTY_BASE(granularity, LevelGenerator_eventPartitionSpace_Parms), 0x0010000000000082);
+			ReturnFunction->Bind();
+			ReturnFunction->StaticLink();
+#if WITH_METADATA
+			UMetaData* MetaData = ReturnFunction->GetOutermost()->GetMetaData();
+			MetaData->SetValue(ReturnFunction, TEXT("Category"), TEXT("Level Actions"));
+			MetaData->SetValue(ReturnFunction, TEXT("CPP_Default_granularity"), TEXT("5"));
+			MetaData->SetValue(ReturnFunction, TEXT("ModuleRelativePath"), TEXT("LevelGenerator.h"));
+			MetaData->SetValue(NewProp_granularity, TEXT("NativeConst"), TEXT(""));
 #endif
 		}
 		return ReturnFunction;
@@ -293,6 +319,7 @@ void EmptyLinkFunctionForGeneratedCodeLevelGenerator() {}
 				OuterClass->LinkChild(Z_Construct_UFunction_ALevelGenerator_EmptySurround());
 				OuterClass->LinkChild(Z_Construct_UFunction_ALevelGenerator_GenerateBlockout());
 				OuterClass->LinkChild(Z_Construct_UFunction_ALevelGenerator_NewGrid());
+				OuterClass->LinkChild(Z_Construct_UFunction_ALevelGenerator_PartitionSpace());
 				OuterClass->LinkChild(Z_Construct_UFunction_ALevelGenerator_PerfectMaze());
 				OuterClass->LinkChild(Z_Construct_UFunction_ALevelGenerator_RandomWalk());
 				OuterClass->LinkChild(Z_Construct_UFunction_ALevelGenerator_RandomWalkBiased());
@@ -304,6 +331,7 @@ void EmptyLinkFunctionForGeneratedCodeLevelGenerator() {}
 				OuterClass->AddFunctionToFunctionMapWithOverriddenName(Z_Construct_UFunction_ALevelGenerator_EmptySurround(), "EmptySurround"); // 2803584985
 				OuterClass->AddFunctionToFunctionMapWithOverriddenName(Z_Construct_UFunction_ALevelGenerator_GenerateBlockout(), "GenerateBlockout"); // 3395057221
 				OuterClass->AddFunctionToFunctionMapWithOverriddenName(Z_Construct_UFunction_ALevelGenerator_NewGrid(), "NewGrid"); // 1297228795
+				OuterClass->AddFunctionToFunctionMapWithOverriddenName(Z_Construct_UFunction_ALevelGenerator_PartitionSpace(), "PartitionSpace"); // 1305077289
 				OuterClass->AddFunctionToFunctionMapWithOverriddenName(Z_Construct_UFunction_ALevelGenerator_PerfectMaze(), "PerfectMaze"); // 1284617506
 				OuterClass->AddFunctionToFunctionMapWithOverriddenName(Z_Construct_UFunction_ALevelGenerator_RandomWalk(), "RandomWalk"); // 4051217133
 				OuterClass->AddFunctionToFunctionMapWithOverriddenName(Z_Construct_UFunction_ALevelGenerator_RandomWalkBiased(), "RandomWalkBiased"); // 211378781
@@ -322,7 +350,7 @@ void EmptyLinkFunctionForGeneratedCodeLevelGenerator() {}
 		check(OuterClass->GetClass());
 		return OuterClass;
 	}
-	IMPLEMENT_CLASS(ALevelGenerator, 1344535167);
+	IMPLEMENT_CLASS(ALevelGenerator, 4070191804);
 	static FCompiledInDefer Z_CompiledInDefer_UClass_ALevelGenerator(Z_Construct_UClass_ALevelGenerator, &ALevelGenerator::StaticClass, TEXT("/Script/LevelGenerationTool"), TEXT("ALevelGenerator"), false, nullptr, nullptr, nullptr);
 	DEFINE_VTABLE_PTR_HELPER_CTOR(ALevelGenerator);
 PRAGMA_ENABLE_DEPRECATION_WARNINGS

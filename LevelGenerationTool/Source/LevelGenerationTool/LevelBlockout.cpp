@@ -5,7 +5,7 @@ ALevelBlockout::ALevelBlockout()
 {
 	PrimaryActorTick.bCanEverTick = true;
 	LevelGrid* pGrid = new LevelGrid(5, 8);
-	_tilesArr = pGrid->GetTileLayout();
+	_tilesArr = pGrid->GetTiles();
 }
 
 void ALevelBlockout::BeginPlay()
@@ -24,7 +24,7 @@ void ALevelBlockout::GenerateBlockout()
 	{
 		for (size_t r = 0; r < _tilesArr[c].size(); r++)
 		{
-			if (_tilesArr[c][r]._isFilled)
+			if (_tilesArr[c][r]->_isFilled)
 			{
 				UStaticMeshComponent* Test = NewObject<UStaticMeshComponent>(UStaticMeshComponent::StaticClass());
 				Test->SetStaticMesh(_pBasicBlock);

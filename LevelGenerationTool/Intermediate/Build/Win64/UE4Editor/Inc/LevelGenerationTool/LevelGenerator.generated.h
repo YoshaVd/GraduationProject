@@ -62,6 +62,15 @@ struct FVector2D;
 		P_NATIVE_END; \
 	} \
  \
+	DECLARE_FUNCTION(execPartitionSpace) \
+	{ \
+		P_GET_PROPERTY(UIntProperty,Z_Param_granularity); \
+		P_FINISH; \
+		P_NATIVE_BEGIN; \
+		this->PartitionSpace(Z_Param_granularity); \
+		P_NATIVE_END; \
+	} \
+ \
 	DECLARE_FUNCTION(execRandomWalkBiased) \
 	{ \
 		P_GET_PROPERTY(UIntProperty,Z_Param_steps); \
@@ -154,6 +163,15 @@ struct FVector2D;
 		P_FINISH; \
 		P_NATIVE_BEGIN; \
 		this->SetBasicBlock(Z_Param_mesh); \
+		P_NATIVE_END; \
+	} \
+ \
+	DECLARE_FUNCTION(execPartitionSpace) \
+	{ \
+		P_GET_PROPERTY(UIntProperty,Z_Param_granularity); \
+		P_FINISH; \
+		P_NATIVE_BEGIN; \
+		this->PartitionSpace(Z_Param_granularity); \
 		P_NATIVE_END; \
 	} \
  \

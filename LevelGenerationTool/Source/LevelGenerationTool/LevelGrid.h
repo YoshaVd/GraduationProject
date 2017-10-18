@@ -13,22 +13,26 @@ class LEVELGENERATIONTOOL_API LevelGrid
 {
 public:
 	LevelGrid(const int width, const int height);
-	LevelGrid(vector<vector<Tile>>& tiles);
+	LevelGrid(vector<vector<Tile*>>& tiles);
 	~LevelGrid();
 
-	vector<vector<Tile>>& GetTileLayout() { return _tiles; }
-	void SetTiles(vector<vector<Tile>>& tiles) { _tiles = tiles; }
+	vector<vector<Tile*>>& GetTiles() { return _tiles; }
+	void SetTiles(vector<vector<Tile*>>& tiles) { _tiles = tiles; }
 	int GetWidth() { return _width; }
 	int GetHeight() { return _height; }
 	
 	// Tile manipulation functions
-	void SetFilled(const int x, const int y, const bool isFilled = false);
+	void SetFilled(const FVector2D pos, const bool isFilled = false);
 	void SetFilledArea(const FVector2D center, int width, int height, bool isFilled = false);
-	void SetFilledSet(vector<vector<Tile>> tiles, const bool isFilled = false);
+	void SetFilledArea(const int top, const int right, const int bottom, const int left, bool isFilled = false);
+	void SetFilledSet(vector<vector<Tile*>> tiles, const bool isFilled = false);
 
 	// Subgrid functions
-	//void Split();
+	void AddChild(LevelGrid* grid);
+	void SetParent(LevelGrid* grid);
+	bool Split(const int sizeMin = 5);
 	LevelGrid* CreateSubGrid(const int top, const int right, const int bottom, const int left);
+	vector<LevelGrid*>& GetChildren() { return _childGrids; }
 
 	// Get functions with requirements
 	FVector2D GetRandomPos(const int xOffset = 0, const int yOffset = 0);
@@ -52,11 +56,17 @@ public:
 	bool IsIsolated(const int x, const int y);
 	bool IsIsolatedExclusion(const FVector2D pos, const FVector2D exclusion);
 
-	bool IsWithinBounds(const FVector2D pos);
-	bool IsWithinBounds(const int x, const int y);
+	bool IsWithinBounds(const FVector2D pos, const FString logInfo = "");
+	bool IsWithinBounds(const int x, const int y, const FString logInfo = "");
+
+	// Debugging
+	void LogTiles();
 
 private:
 	int _width, _height;
 	int _biasFactor;
-	vector<vector<Tile>> _tiles;
+
+	LevelGrid* _parentGrid;
+	vector<LevelGrid*> _childGrids;
+	vector<vector<Tile*>> _tiles;
 };

@@ -22,7 +22,7 @@ class LEVELGENERATIONTOOL_API ALevelBlockout : public AActor
 public:	
 	ALevelBlockout();
 
-	void SetLayout(vector<vector<Tile>> tiles) { _tilesArr = tiles; }
+	void SetLayout(vector<vector<Tile*>> tiles) { _tilesArr = tiles; }
 	UFUNCTION(BlueprintCallable, Category = "GridActions")
 	void GenerateBlockout();
 	UFUNCTION(BlueprintCallable, Category = "GridSettings")
@@ -35,5 +35,5 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	UStaticMesh* _pBasicBlock = nullptr;
-	vector<vector<Tile>> _tilesArr;
+	vector<vector<Tile*>> _tilesArr;
 };
