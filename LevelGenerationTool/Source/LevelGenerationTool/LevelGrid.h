@@ -27,6 +27,10 @@ public:
 	void SetFilledArea(const int top, const int right, const int bottom, const int left, bool isFilled = false);
 	void SetFilledSet(vector<vector<Tile*>> tiles, const bool isFilled = false);
 
+	void SetColor(const FVector2D pos, const FColor color);
+	void SetColorArea(const int top, const int right, const int bottom, const int left, const FColor color);
+	void SetColorAll(const FColor color);
+
 	// Subgrid functions
 	void AddChild(LevelGrid* grid);
 	void SetParent(LevelGrid* grid);

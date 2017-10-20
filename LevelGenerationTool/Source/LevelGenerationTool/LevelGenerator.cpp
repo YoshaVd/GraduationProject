@@ -1,6 +1,8 @@
 #include "LevelGenerator.h"
 #include <stack>
 #include "Runtime/Core//Public/Math/Vector2D.h"
+#include "Runtime/Engine/Classes/Engine/StaticMesh.h"
+#include "Runtime/Engine/Classes/Materials/MaterialInstanceDynamic.h"
 
 ALevelGenerator::ALevelGenerator()
 {
@@ -152,24 +154,18 @@ void ALevelGenerator::RandomWalkBiased(const int steps, const FVector2D start, c
 
 void ALevelGenerator::PartitionSpace(const int granularity)
 {
-	/* quick partition test code */
+	/* quick partition test */
 	_pGrid->Split();
-	vector<LevelGrid*> level1Children = _pGrid->GetChildren();
-
-	for (auto &c : level1Children)
+	auto children = _pGrid->GetChildren();
+	for (auto c : children)
+	{
 		c->Split();
-	vector<LevelGrid*> level2Children;
-	for (auto &c : level1Children)
-		level2Children.push_back(c);
-
-	for (auto &c : level2Children)
-		c->Split();
-	vector<LevelGrid*> level3Children;
-	for (auto &c : level2Children)
-		level3Children.push_back(c);
-
-	for (auto &c : level3Children)
-		c->SetFilledArea(c->GetHeight() - 2, c->GetHeight() - 2, 1, 1, false);
+		auto kids = c->GetChildren();
+		for (auto k : kids)
+		{
+			k->SetFilledArea(k->GetHeight() - 2, k->GetHeight() - 2, 1, 1, false);
+		}
+	}
 }
 
 void ALevelGenerator::GenerateBlockout()
@@ -193,12 +189,18 @@ void ALevelGenerator::GenerateBlockout()
 		{
 			if (tiles[c][r]->_isFilled)
 			{
-				UStaticMeshComponent* Test = NewObject<UStaticMeshComponent>(UStaticMeshComponent::StaticClass());
-				Test->SetStaticMesh(_pBasicBlock);
-				Test->SetWorldLocation(FVector(origin.X + c * 100, origin.Y + r * 100, 0));
-				Test->RegisterComponentWithWorld(GetWorld());
+				UStaticMeshComponent* test = NewObject<UStaticMeshComponent>(UStaticMeshComponent::StaticClass());
+				test->SetStaticMesh(_pBasicBlock);
+				if (tiles[c][r]->_color != FColor::Black) {
+					UMaterialInstanceDynamic* mat = UMaterialInstanceDynamic::Create(_pBasicBlock->GetMaterial(0), this);
+					mat->SetVectorParameterValue(FName(TEXT("Color")), tiles[c][r]->_color);
+					test->SetMaterial(0, mat);
+				}
+
+				test->SetWorldLocation(FVector(origin.X + c * 100, origin.Y + r * 100, 0));
+				test->RegisterComponentWithWorld(GetWorld());
 				FAttachmentTransformRules rules = FAttachmentTransformRules(EAttachmentRule::SnapToTarget, false);
-				Test->AttachToComponent(RootComponent, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, false));
+				test->AttachToComponent(RootComponent, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, false));
 			}
 		}
 	}
@@ -225,9 +227,10 @@ void ALevelGenerator::EmptySurround(int x, int y)
 void ALevelGenerator::EmptySubGridTest()
 {
 	LevelGrid* grid = _pGrid->CreateSubGrid(_pGrid->GetHeight() - 2, _pGrid->GetWidth() - 2, 1, 1);
-	grid->SetFilledSet(grid->GetTiles(), false);
-	UE_LOG(LogTemp, Warning, TEXT("new grid:"));
-	grid->LogTiles();
-	UE_LOG(LogTemp, Warning, TEXT("original grid:"));
-	_pGrid->LogTiles();
+	grid->SetColorAll(FColor::Blue);
+	//grid->SetFilledSet(grid->GetTiles(), false);
+	//UE_LOG(LogTemp, Warning, TEXT("new grid:"));
+	//grid->LogTiles();
+	//UE_LOG(LogTemp, Warning, TEXT("original grid:"));
+	//_pGrid->LogTiles();
 }

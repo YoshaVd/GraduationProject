@@ -32,9 +32,7 @@ void LevelGrid::SetFilled(const FVector2D pos, const bool isFilled)
 {
 	if (!IsWithinBounds(pos, FString("LevelGrid::SetFilled ||")))
 		return;
-
-	if (pos.X < _width && pos.Y < _height)
-		_tiles[pos.X][pos.Y]->_isFilled = isFilled;
+	_tiles[pos.X][pos.Y]->_isFilled = isFilled;
 }
 
 void LevelGrid::SetFilledArea(const FVector2D center, int width, int height, bool isFilled)
@@ -55,9 +53,7 @@ void LevelGrid::SetFilledArea(const FVector2D center, int width, int height, boo
 
 void LevelGrid::SetFilledArea(const int top, const int right, const int bottom, const int left, bool isFilled)
 {
-	if (top < bottom || top >= _height || bottom < 0
-		|| right < left || right >= _width || left < 0)
-	{
+	if (top < bottom || top >= _height || bottom < 0 || right < left || right >= _width || left < 0) {
 		UE_LOG(LogTemp, Error, TEXT("LevelGrid::SetFilledArea || Dimensions are out of bounds!"));
 		return;
 	}
@@ -89,6 +85,41 @@ void LevelGrid::SetFilledSet(vector<vector<Tile*>> tiles, const bool isFilled)
 		for (size_t row = 0; row < height; row++)
 		{
 			tiles[col][row]->_isFilled = isFilled;
+		}
+	}
+}
+
+void LevelGrid::SetColor(const FVector2D pos, const FColor color)
+{
+	if (!IsWithinBounds(pos, FString("LevelGrid::SetFilled ||")))
+		return;
+	_tiles[pos.X][pos.Y]->_color = color;
+}
+
+void LevelGrid::SetColorArea(const int top, const int right, const int bottom, const int left, const FColor color)
+{
+	if (top < bottom || top >= _height || bottom < 0 || right < left || right >= _width || left < 0) {
+		UE_LOG(LogTemp, Error, TEXT("LevelGrid::SetColorArea || Dimensions are out of bounds!"));
+		return;
+	}
+
+	for (size_t col = 0; col < _width; col++)
+	{
+		for (size_t row = 0; row < _height; row++)
+		{
+			if (row >= bottom && row <= top && col >= left && col <= right)
+				_tiles[col][row]->_color = color;
+		}
+	}
+}
+
+void LevelGrid::SetColorAll(const FColor color)
+{
+	for (size_t col = 0; col < _width; col++)
+	{
+		for (size_t row = 0; row < _height; row++)
+		{
+			_tiles[col][row]->_color = color;
 		}
 	}
 }

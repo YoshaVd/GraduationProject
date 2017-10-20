@@ -10,6 +10,7 @@ public:
 	~Tile() {}
 
 	bool _isFilled = true;
+	FColor _color = FColor::Black;
 	// TODO: self aware of position?
 	// TODO: states for gameplay elements on tile
 };
