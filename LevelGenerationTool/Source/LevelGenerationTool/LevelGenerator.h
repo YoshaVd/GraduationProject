@@ -56,4 +56,6 @@ private:
 	LevelGrid* _pGrid = nullptr;
 	ALevelBlockout* _pLevelBlockout = nullptr;
 	UStaticMesh* _pBasicBlock = nullptr;
+
+	vector<UStaticMeshComponent*> _pMeshes;
 };

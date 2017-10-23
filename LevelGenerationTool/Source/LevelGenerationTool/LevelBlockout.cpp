@@ -1,5 +1,6 @@
 #include "LevelBlockout.h"
 #include "LevelGrid.h"
+#include "Runtime/Engine/Classes/Engine/World.h"
 
 /* LEVELBLOCKOUT CURRENTLY NOT USED */
 
@@ -20,20 +21,25 @@ void ALevelBlockout::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-void ALevelBlockout::GenerateBlockout()
+void ALevelBlockout::Generate()
 {
-	for (size_t c = 0; c < _tilesArr.size(); c++)
+	for (size_t col = 0; col < _tilesArr.size(); col++)
 	{
-		for (size_t r = 0; r < _tilesArr[c].size(); r++)
+		for (size_t row = 0; row < _tilesArr[col].size(); row++)
 		{
-			if (_tilesArr[c][r]->_isFilled)
+			if (_tilesArr[col][row]->_isFilled)
 			{
-				UStaticMeshComponent* Test = NewObject<UStaticMeshComponent>(UStaticMeshComponent::StaticClass());
-				Test->SetStaticMesh(_pBasicBlock);
-				Test->SetWorldLocation(FVector(c * 100, r * 100, 0));
-				Test->RegisterComponentWithWorld(GetWorld());
-				FAttachmentTransformRules rules = FAttachmentTransformRules(EAttachmentRule::SnapToTarget, false);
-				Test->AttachToComponent(RootComponent,rules);
+				FVector location(col * 100, row * 100, 0);
+				FRotator rotation(0.0f, 0.0f, 0.0f);
+				FActorSpawnParameters SpawnInfo;
+				_pMeshes.push_back(GetWorld()->SpawnActor<UStaticMesh>(location, rotation, SpawnInfo));
+
+				//UStaticMeshComponent* Test = NewObject<UStaticMeshComponent>(UStaticMeshComponent::StaticClass());
+				//Test->SetStaticMesh(_pBasicBlock);
+				//Test->SetWorldLocation(FVector(col * 100, row * 100, 0));
+				//Test->RegisterComponentWithWorld(GetWorld());
+				//FAttachmentTransformRules rules = FAttachmentTransformRules(EAttachmentRule::SnapToTarget, false);
+				//Test->AttachToComponent(RootComponent,rules);
 			}
 		}
 	}

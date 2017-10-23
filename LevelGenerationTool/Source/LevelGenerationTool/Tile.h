@@ -2,6 +2,15 @@
 
 #include "CoreMinimal.h"
 
+enum TileState 
+{
+	EMPTY,
+	FILLED,
+	DOOR_NONE,
+	DOOR_OPEN,
+	DOOR_LOCKED,
+};
+
 struct LEVELGENERATIONTOOL_API Tile
 {
 public:

@@ -1,70 +1,79 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-
 <Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-	<ItemGroup>
-		<None Include="..\..\LevelGenerationTool.uproject" />
-		<Filter Include="Source">
-			<UniqueIdentifier>{3E982FB2-A08B-4204-9431-FFEA034FDDB0}</UniqueIdentifier>
-		</Filter>
-		<None Include="..\..\Source\LevelGenerationTool.Target.cs">
-			<Filter>Source</Filter>
-		</None >
-		<None Include="..\..\Source\LevelGenerationToolEditor.Target.cs">
-			<Filter>Source</Filter>
-		</None >
-		<Filter Include="Config">
-			<UniqueIdentifier>{3122113C-7550-4079-9856-9D3C32E65115}</UniqueIdentifier>
-		</Filter>
-		<None Include="..\..\Config\DefaultEditor.ini">
-			<Filter>Config</Filter>
-		</None >
-		<None Include="..\..\Config\DefaultEngine.ini">
-			<Filter>Config</Filter>
-		</None >
-		<None Include="..\..\Config\DefaultGame.ini">
-			<Filter>Config</Filter>
-		</None >
-		<Filter Include="Source\LevelGenerationTool">
-			<UniqueIdentifier>{B6B237B0-C1E4-483F-B0DC-3F6E131AD991}</UniqueIdentifier>
-		</Filter>
-		<ClCompile Include="..\..\Source\LevelGenerationTool\LevelBlockout.cpp">
-			<Filter>Source\LevelGenerationTool</Filter>
-		</ClCompile >
-		<ClInclude Include="..\..\Source\LevelGenerationTool\LevelBlockout.h">
-			<Filter>Source\LevelGenerationTool</Filter>
-		</ClInclude >
-		<None Include="..\..\Source\LevelGenerationTool\LevelGenerationTool.Build.cs">
-			<Filter>Source\LevelGenerationTool</Filter>
-		</None >
-		<ClCompile Include="..\..\Source\LevelGenerationTool\LevelGenerationTool.cpp">
-			<Filter>Source\LevelGenerationTool</Filter>
-		</ClCompile >
-		<ClInclude Include="..\..\Source\LevelGenerationTool\LevelGenerationTool.h">
-			<Filter>Source\LevelGenerationTool</Filter>
-		</ClInclude >
-		<ClCompile Include="..\..\Source\LevelGenerationTool\LevelGenerationToolGameModeBase.cpp">
-			<Filter>Source\LevelGenerationTool</Filter>
-		</ClCompile >
-		<ClInclude Include="..\..\Source\LevelGenerationTool\LevelGenerationToolGameModeBase.h">
-			<Filter>Source\LevelGenerationTool</Filter>
-		</ClInclude >
-		<ClCompile Include="..\..\Source\LevelGenerationTool\LevelGenerator.cpp">
-			<Filter>Source\LevelGenerationTool</Filter>
-		</ClCompile >
-		<ClInclude Include="..\..\Source\LevelGenerationTool\LevelGenerator.h">
-			<Filter>Source\LevelGenerationTool</Filter>
-		</ClInclude >
-		<ClCompile Include="..\..\Source\LevelGenerationTool\LevelGrid.cpp">
-			<Filter>Source\LevelGenerationTool</Filter>
-		</ClCompile >
-		<ClInclude Include="..\..\Source\LevelGenerationTool\LevelGrid.h">
-			<Filter>Source\LevelGenerationTool</Filter>
-		</ClInclude >
-		<ClCompile Include="..\..\Source\LevelGenerationTool\Tile.cpp">
-			<Filter>Source\LevelGenerationTool</Filter>
-		</ClCompile >
-		<ClInclude Include="..\..\Source\LevelGenerationTool\Tile.h">
-			<Filter>Source\LevelGenerationTool</Filter>
-		</ClInclude >
-	</ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\LevelGenerationTool.uproject" />
+    <Filter Include="Source">
+      <UniqueIdentifier>{F804CC3B-FFF5-4A46-B3CE-BF93B37F3A67}</UniqueIdentifier>
+    </Filter>
+    <None Include="..\..\Source\LevelGenerationTool.Target.cs">
+      <Filter>Source</Filter>
+    </None>
+    <None Include="..\..\Source\LevelGenerationToolEditor.Target.cs">
+      <Filter>Source</Filter>
+    </None>
+    <Filter Include="Config">
+      <UniqueIdentifier>{5E6EBA10-3FE4-41F9-9EBD-E9BD14762CCE}</UniqueIdentifier>
+    </Filter>
+    <None Include="..\..\Config\DefaultEditor.ini">
+      <Filter>Config</Filter>
+    </None>
+    <None Include="..\..\Config\DefaultEngine.ini">
+      <Filter>Config</Filter>
+    </None>
+    <None Include="..\..\Config\DefaultGame.ini">
+      <Filter>Config</Filter>
+    </None>
+    <Filter Include="Source\LevelGenerationTool">
+      <UniqueIdentifier>{99923F19-4F6A-4F51-9C30-C8440B4E26A4}</UniqueIdentifier>
+    </Filter>
+    <ClCompile Include="..\..\Source\LevelGenerationTool\LevelBlockout.cpp">
+      <Filter>Source\LevelGenerationTool</Filter>
+    </ClCompile>
+    <ClInclude Include="..\..\Source\LevelGenerationTool\LevelBlockout.h">
+      <Filter>Source\LevelGenerationTool</Filter>
+    </ClInclude>
+    <None Include="..\..\Source\LevelGenerationTool\LevelGenerationTool.Build.cs">
+      <Filter>Source\LevelGenerationTool</Filter>
+    </None>
+    <ClCompile Include="..\..\Source\LevelGenerationTool\LevelGenerationTool.cpp">
+      <Filter>Source\LevelGenerationTool</Filter>
+    </ClCompile>
+    <ClInclude Include="..\..\Source\LevelGenerationTool\LevelGenerationTool.h">
+      <Filter>Source\LevelGenerationTool</Filter>
+    </ClInclude>
+    <ClCompile Include="..\..\Source\LevelGenerationTool\LevelGenerationToolGameModeBase.cpp">
+      <Filter>Source\LevelGenerationTool</Filter>
+    </ClCompile>
+    <ClInclude Include="..\..\Source\LevelGenerationTool\LevelGenerationToolGameModeBase.h">
+      <Filter>Source\LevelGenerationTool</Filter>
+    </ClInclude>
+    <ClCompile Include="..\..\Source\LevelGenerationTool\LevelGenerator.cpp">
+      <Filter>Source\LevelGenerationTool</Filter>
+    </ClCompile>
+    <ClInclude Include="..\..\Source\LevelGenerationTool\LevelGenerator.h">
+      <Filter>Source\LevelGenerationTool</Filter>
+    </ClInclude>
+    <ClCompile Include="..\..\Source\LevelGenerationTool\LevelGrid.cpp">
+      <Filter>Source\LevelGenerationTool</Filter>
+    </ClCompile>
+    <ClInclude Include="..\..\Source\LevelGenerationTool\LevelGrid.h">
+      <Filter>Source\LevelGenerationTool</Filter>
+    </ClInclude>
+    <ClCompile Include="..\..\Source\LevelGenerationTool\Tile.cpp">
+      <Filter>Source\LevelGenerationTool</Filter>
+    </ClCompile>
+    <ClInclude Include="..\..\Source\LevelGenerationTool\Tile.h">
+      <Filter>Source\LevelGenerationTool</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\Source\LevelGenerationTool\Room.h">
+      <Filter>Source\LevelGenerationTool</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\Source\LevelGenerationTool\Room.cpp">
+      <Filter>Source\LevelGenerationTool</Filter>
+    </ClCompile>
+  </ItemGroup>
 </Project>

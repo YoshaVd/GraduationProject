@@ -25,11 +25,11 @@ class UStaticMesh;
 		P_NATIVE_END; \
 	} \
  \
-	DECLARE_FUNCTION(execGenerateBlockout) \
+	DECLARE_FUNCTION(execGenerate) \
 	{ \
 		P_FINISH; \
 		P_NATIVE_BEGIN; \
-		this->GenerateBlockout(); \
+		this->Generate(); \
 		P_NATIVE_END; \
 	}
 
@@ -45,11 +45,11 @@ class UStaticMesh;
 		P_NATIVE_END; \
 	} \
  \
-	DECLARE_FUNCTION(execGenerateBlockout) \
+	DECLARE_FUNCTION(execGenerate) \
 	{ \
 		P_FINISH; \
 		P_NATIVE_BEGIN; \
-		this->GenerateBlockout(); \
+		this->Generate(); \
 		P_NATIVE_END; \
 	}
 

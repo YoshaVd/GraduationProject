@@ -26,7 +26,7 @@ public:
 
 	void SetLayout(vector<vector<Tile*>> tiles) { _tilesArr = tiles; }
 	UFUNCTION(BlueprintCallable, Category = "GridActions")
-	void GenerateBlockout();
+	void Generate();
 	UFUNCTION(BlueprintCallable, Category = "GridSettings")
 	void SetBasicBlock(UStaticMesh* mesh) { _pBasicBlock = mesh; }
 
@@ -38,4 +38,5 @@ public:
 
 	UStaticMesh* _pBasicBlock = nullptr;
 	vector<vector<Tile*>> _tilesArr;
+	vector<UStaticMesh*> _pMeshes;
 };

@@ -21,16 +21,28 @@ void ALevelGenerator::Tick(float DeltaTime)
 
 void ALevelGenerator::ResetLevel()
 {
+	int width = _pGrid->GetWidth();
+	int height = _pGrid->GetHeight();
+
+	for (auto mesh : _pMeshes)
+	{
+		if(mesh->IsValidLowLevel())
+			mesh->DestroyComponent();
+	}
+	_pMeshes.clear();
+
+	delete _pGrid;
+	_pGrid = new LevelGrid(width, height);
 }
 
 void ALevelGenerator::PerfectMaze()
 {
-	LevelGrid* grid = _pGrid->CreateSubGrid(_pGrid->GetHeight() - 2, _pGrid->GetWidth() - 2, 1, 1);
-	/* generates a perfect maze: 2 positions will always have exactly one connection */
+	/*	generates a perfect maze: 2 positions will always have exactly one connection	*/
 	// start stack with random filled tile and empty it
+	LevelGrid* grid = _pGrid->CreateSubGrid(1, 1, _pGrid->GetHeight() - 2, _pGrid->GetWidth() - 2);
 	stack<FVector2D> visited;
 	FVector2D current = grid->GetRandomPos(true);
-	if (!grid->IsWithinBounds(current))
+	if (!grid->IsWithinBounds(current, "ALevelGenerator::PerfectMaze"))
 	{
 		UE_LOG(LogTemp, Error, TEXT("PerfectMaze:: current position is out of bounds, terminate function"));
 		return;
@@ -67,10 +79,10 @@ void ALevelGenerator::PerfectMaze()
 
 void ALevelGenerator::RandomWalk(const int steps, const FVector2D start)
 {
-	/* generates a random walk area: [steps] amount of adjacent tiles will be emptied */
+	/*	generates a random walk area: [steps] amount of adjacent tiles will be emptied	*/
 	// set the correct starting values and empty the first tile
 	FVector2D current;
-	if (start != FVector2D(-1, -1) && _pGrid->IsWithinBounds(start))
+	if (start != FVector2D(-1, -1) && _pGrid->IsWithinBounds(start, "ALevelGenerator::RandomWalk"))
 		current = start;
 	else
 		current = _pGrid->GetRandomPos(true);
@@ -106,18 +118,18 @@ void ALevelGenerator::RandomWalk(const int steps, const FVector2D start)
 
 void ALevelGenerator::RandomWalkBiased(const int steps, const FVector2D start, const FVector2D target)
 {
-	/* generates a random walk area with a bias: [steps] amount of adjacent tiles will be emptied 
-	with a bias towards the position [target]*/
+	/*	generates a random walk area with a bias: [steps] amount of adjacent tiles will be emptied 
+		with a bias towards the position [target]	*/
 	// set the correct starting values and empty the first tile
 	FVector2D current;
-	if (_pGrid->IsWithinBounds(start))
+	if (_pGrid->IsWithinBounds(start, "ALevelGenerator::RandomWalkBiased"))
 		current = start;
 	else
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Start for biased random walk is out of bounds"));
 		return;
 	}
-	if (!_pGrid->IsWithinBounds(target))
+	if (!_pGrid->IsWithinBounds(target, "ALevelGenerator::RandomWalkBiased"))
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Target for biased random walk is out of bounds"));
 		return;
@@ -154,18 +166,37 @@ void ALevelGenerator::RandomWalkBiased(const int steps, const FVector2D start, c
 
 void ALevelGenerator::PartitionSpace(const int granularity)
 {
+	LevelGrid * grid = _pGrid;
+	grid->SplitDeep(5);
+	grid->AddRoomToChildrenDeep();
+
 	/* quick partition test */
-	_pGrid->Split();
-	auto children = _pGrid->GetChildren();
-	for (auto c : children)
+	/*if (_pGrid->Split())
 	{
-		c->Split();
-		auto kids = c->GetChildren();
-		for (auto k : kids)
+		auto children = _pGrid->GetChildren();
+		if (children.size() > 0)
 		{
-			k->SetFilledArea(k->GetHeight() - 2, k->GetHeight() - 2, 1, 1, false);
+			children[0]->SetColorAll(FColor::Red);
+			if(children[0]->Split())
+			{
+				auto childrenRed = children[0]->GetChildren();
+				childrenRed[0]->SetColorArea(1, 1, childrenRed[0]->GetHeight() - 2, childrenRed[0]->GetWidth() - 2, FColor(127, 0, 0));
+				childrenRed[1]->SetColorArea(1, 1, childrenRed[1]->GetHeight() - 2, childrenRed[1]->GetWidth() - 2, FColor(127, 0, 0));
+			}
 		}
-	}
+
+		if (children.size() > 1)
+		{
+			children[1]->SetColorAll(FColor::Blue);
+			if (children[1]->Split())
+			{
+				auto childrenBlue = children[1]->GetChildren();
+				childrenBlue[0]->SetColorArea(1, 1, childrenBlue[0]->GetHeight() - 2, childrenBlue[0]->GetWidth() - 2, FColor(0, 0, 127));
+				childrenBlue[1]->SetColorArea(1, 1, childrenBlue[1]->GetHeight() - 2, childrenBlue[1]->GetWidth() - 2, FColor(0, 0, 127));
+			}
+		}
+
+	}*/
 }
 
 void ALevelGenerator::GenerateBlockout()
@@ -196,11 +227,12 @@ void ALevelGenerator::GenerateBlockout()
 					mat->SetVectorParameterValue(FName(TEXT("Color")), tiles[c][r]->_color);
 					test->SetMaterial(0, mat);
 				}
+				_pMeshes.push_back(test);
 
 				test->SetWorldLocation(FVector(origin.X + c * 100, origin.Y + r * 100, 0));
 				test->RegisterComponentWithWorld(GetWorld());
-				FAttachmentTransformRules rules = FAttachmentTransformRules(EAttachmentRule::SnapToTarget, false);
-				test->AttachToComponent(RootComponent, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, false));
+				FAttachmentTransformRules rules = FAttachmentTransformRules(EAttachmentRule::KeepWorld, false);
+				test->AttachToComponent(RootComponent, rules);
 			}
 		}
 	}
@@ -226,11 +258,16 @@ void ALevelGenerator::EmptySurround(int x, int y)
 
 void ALevelGenerator::EmptySubGridTest()
 {
-	LevelGrid* grid = _pGrid->CreateSubGrid(_pGrid->GetHeight() - 2, _pGrid->GetWidth() - 2, 1, 1);
-	grid->SetColorAll(FColor::Blue);
-	//grid->SetFilledSet(grid->GetTiles(), false);
-	//UE_LOG(LogTemp, Warning, TEXT("new grid:"));
+	LevelGrid* grid = _pGrid->CreateSubGrid(1, 1, _pGrid->GetHeight() - 2, _pGrid->GetWidth() - 2);
+	//grid->SetColorAll(FColor::Blue);
 	//grid->LogTiles();
-	//UE_LOG(LogTemp, Warning, TEXT("original grid:"));
-	//_pGrid->LogTiles();
+	//grid = grid->CreateSubGrid(1, 1, grid->GetHeight() - 2, grid->GetWidth() - 2);
+	//grid->SetColorAll(FColor::Red);
+	//grid->LogTiles();
+
+	grid->SetFilledSet(grid->GetTiles(), false);
+	UE_LOG(LogTemp, Warning, TEXT("new grid:"));
+	grid->LogTiles();
+	UE_LOG(LogTemp, Warning, TEXT("original grid:"));
+	_pGrid->LogTiles();
 }
