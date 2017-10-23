@@ -164,12 +164,14 @@ void EmptyLinkFunctionForGeneratedCodeLevelGenerator() {}
 		struct LevelGenerator_eventPartitionSpace_Parms
 		{
 			int32 granularity;
+			int32 roomInset;
 		};
 		UObject* Outer = Z_Construct_UClass_ALevelGenerator();
 		static UFunction* ReturnFunction = nullptr;
 		if (!ReturnFunction)
 		{
 			ReturnFunction = new(EC_InternalUseOnlyConstructor, Outer, TEXT("PartitionSpace"), RF_Public|RF_Transient|RF_MarkAsNative) UFunction(FObjectInitializer(), nullptr, (EFunctionFlags)0x04020401, 65535, sizeof(LevelGenerator_eventPartitionSpace_Parms));
+			UProperty* NewProp_roomInset = new(EC_InternalUseOnlyConstructor, ReturnFunction, TEXT("roomInset"), RF_Public|RF_Transient|RF_MarkAsNative) UUnsizedIntProperty(CPP_PROPERTY_BASE(roomInset, LevelGenerator_eventPartitionSpace_Parms), 0x0010000000000082);
 			UProperty* NewProp_granularity = new(EC_InternalUseOnlyConstructor, ReturnFunction, TEXT("granularity"), RF_Public|RF_Transient|RF_MarkAsNative) UUnsizedIntProperty(CPP_PROPERTY_BASE(granularity, LevelGenerator_eventPartitionSpace_Parms), 0x0010000000000082);
 			ReturnFunction->Bind();
 			ReturnFunction->StaticLink();
@@ -177,7 +179,9 @@ void EmptyLinkFunctionForGeneratedCodeLevelGenerator() {}
 			UMetaData* MetaData = ReturnFunction->GetOutermost()->GetMetaData();
 			MetaData->SetValue(ReturnFunction, TEXT("Category"), TEXT("Level Actions"));
 			MetaData->SetValue(ReturnFunction, TEXT("CPP_Default_granularity"), TEXT("5"));
+			MetaData->SetValue(ReturnFunction, TEXT("CPP_Default_roomInset"), TEXT("0"));
 			MetaData->SetValue(ReturnFunction, TEXT("ModuleRelativePath"), TEXT("LevelGenerator.h"));
+			MetaData->SetValue(NewProp_roomInset, TEXT("NativeConst"), TEXT(""));
 			MetaData->SetValue(NewProp_granularity, TEXT("NativeConst"), TEXT(""));
 #endif
 		}
@@ -331,7 +335,7 @@ void EmptyLinkFunctionForGeneratedCodeLevelGenerator() {}
 				OuterClass->AddFunctionToFunctionMapWithOverriddenName(Z_Construct_UFunction_ALevelGenerator_EmptySurround(), "EmptySurround"); // 2803584985
 				OuterClass->AddFunctionToFunctionMapWithOverriddenName(Z_Construct_UFunction_ALevelGenerator_GenerateBlockout(), "GenerateBlockout"); // 3395057221
 				OuterClass->AddFunctionToFunctionMapWithOverriddenName(Z_Construct_UFunction_ALevelGenerator_NewGrid(), "NewGrid"); // 1297228795
-				OuterClass->AddFunctionToFunctionMapWithOverriddenName(Z_Construct_UFunction_ALevelGenerator_PartitionSpace(), "PartitionSpace"); // 1305077289
+				OuterClass->AddFunctionToFunctionMapWithOverriddenName(Z_Construct_UFunction_ALevelGenerator_PartitionSpace(), "PartitionSpace"); // 4117621945
 				OuterClass->AddFunctionToFunctionMapWithOverriddenName(Z_Construct_UFunction_ALevelGenerator_PerfectMaze(), "PerfectMaze"); // 1284617506
 				OuterClass->AddFunctionToFunctionMapWithOverriddenName(Z_Construct_UFunction_ALevelGenerator_RandomWalk(), "RandomWalk"); // 4051217133
 				OuterClass->AddFunctionToFunctionMapWithOverriddenName(Z_Construct_UFunction_ALevelGenerator_RandomWalkBiased(), "RandomWalkBiased"); // 211378781
@@ -350,7 +354,7 @@ void EmptyLinkFunctionForGeneratedCodeLevelGenerator() {}
 		check(OuterClass->GetClass());
 		return OuterClass;
 	}
-	IMPLEMENT_CLASS(ALevelGenerator, 4070191804);
+	IMPLEMENT_CLASS(ALevelGenerator, 2057790366);
 	static FCompiledInDefer Z_CompiledInDefer_UClass_ALevelGenerator(Z_Construct_UClass_ALevelGenerator, &ALevelGenerator::StaticClass, TEXT("/Script/LevelGenerationTool"), TEXT("ALevelGenerator"), false, nullptr, nullptr, nullptr);
 	DEFINE_VTABLE_PTR_HELPER_CTOR(ALevelGenerator);
 PRAGMA_ENABLE_DEPRECATION_WARNINGS

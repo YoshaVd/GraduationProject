@@ -1,0 +1,24 @@
+/NOLOGO
+/errorReport:prompt
+/MACHINE:x64
+/SUBSYSTEM:WINDOWS
+/DEF
+/NAME:"UE4Editor-LevelGenerationTool-3823.dll"
+/IGNORE:4221
+/NODEFAULTLIB
+"C:\Program Files\Epic Games\UE_4.17\Engine\Intermediate\Build\Win64\UE4Editor\Development\Engine\SharedPCH.Engine.h.obj"
+"C:\Users\Yosha\Documents\DAE\Graduation Project\Repository\LevelGenerationTool\Intermediate\Build\Win64\UE4Editor\Development\LevelGenerationTool\BaseGrid.cpp.obj"
+"C:\Users\Yosha\Documents\DAE\Graduation Project\Repository\LevelGenerationTool\Intermediate\Build\Win64\UE4Editor\Development\LevelGenerationTool\LevelBlockout.cpp.obj"
+"C:\Users\Yosha\Documents\DAE\Graduation Project\Repository\LevelGenerationTool\Intermediate\Build\Win64\UE4Editor\Development\LevelGenerationTool\LevelGenerationTool.cpp.obj"
+"C:\Users\Yosha\Documents\DAE\Graduation Project\Repository\LevelGenerationTool\Intermediate\Build\Win64\UE4Editor\Development\LevelGenerationTool\LevelGenerationToolGameModeBase.cpp.obj"
+"C:\Users\Yosha\Documents\DAE\Graduation Project\Repository\LevelGenerationTool\Intermediate\Build\Win64\UE4Editor\Development\LevelGenerationTool\LevelGenerator.cpp.obj"
+"C:\Users\Yosha\Documents\DAE\Graduation Project\Repository\LevelGenerationTool\Intermediate\Build\Win64\UE4Editor\Development\LevelGenerationTool\LevelGrid.cpp.obj"
+"C:\Users\Yosha\Documents\DAE\Graduation Project\Repository\LevelGenerationTool\Intermediate\Build\Win64\UE4Editor\Development\LevelGenerationTool\Room.cpp.obj"
+"C:\Users\Yosha\Documents\DAE\Graduation Project\Repository\LevelGenerationTool\Intermediate\Build\Win64\UE4Editor\Development\LevelGenerationTool\Tile.cpp.obj"
+"C:\Users\Yosha\Documents\DAE\Graduation Project\Repository\LevelGenerationTool\Intermediate\Build\Win64\UE4Editor\Development\LevelGenerationTool\LevelBlockout.gen.cpp.obj"
+"C:\Users\Yosha\Documents\DAE\Graduation Project\Repository\LevelGenerationTool\Intermediate\Build\Win64\UE4Editor\Development\LevelGenerationTool\LevelGenerationTool.init.gen.cpp.obj"
+"C:\Users\Yosha\Documents\DAE\Graduation Project\Repository\LevelGenerationTool\Intermediate\Build\Win64\UE4Editor\Development\LevelGenerationTool\LevelGenerationToolGameModeBase.gen.cpp.obj"
+"C:\Users\Yosha\Documents\DAE\Graduation Project\Repository\LevelGenerationTool\Intermediate\Build\Win64\UE4Editor\Development\LevelGenerationTool\LevelGenerator.gen.cpp.obj"
+"C:\Program Files\Epic Games\UE_4.17\Engine\Intermediate\Build\Win64\UE4Editor\Development\LevelGenerationTool\PCLaunch.rc.res"
+"C:\Program Files\Epic Games\UE_4.17\Engine\Intermediate\Build\Win64\UE4Editor\Development\ModuleVersionResource.rc.inl.res"
+/OUT:"C:\Users\Yosha\Documents\DAE\Graduation Project\Repository\LevelGenerationTool\Intermediate\Build\Win64\UE4Editor\Development\UE4Editor-LevelGenerationTool-3823.lib"

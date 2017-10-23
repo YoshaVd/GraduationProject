@@ -1,6 +1,15 @@
 #include "Room.h"
 
-Room::Room(vector<vector<Tile*>>& tiles) : LevelGrid(tiles)
+Room::Room(vector<vector<Tile*>> tiles) 
+	: BaseGrid(tiles)
+{
+	SetFilledArea(1, 1, _height - 2, _width - 2);
+	_baseColor = FColor::Blue;
+	SetColorAll(_baseColor);
+}
+
+Room::Room(const Room & other) 
+	: BaseGrid(other)
 {
 	SetFilledArea(1, 1, _height - 2, _width - 2);
 	_baseColor = FColor::Blue;
@@ -20,9 +29,9 @@ vector<FVector2D> Room::GetWalls()
 	{
 		for (size_t row = 0; row < _height; row++)
 		{
-			if (row == 0 || row == _height)
+			if (row == 0 || row == _height - 1)
 				walls.push_back(FVector2D(col, row));
-			if (col == 0 || col == _width)
+			if (col == 0 || col == _width - 1)
 				walls.push_back(FVector2D(col, row));
 		}
 	}

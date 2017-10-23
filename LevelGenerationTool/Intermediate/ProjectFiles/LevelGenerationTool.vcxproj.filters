@@ -70,9 +70,15 @@
     <ClInclude Include="..\..\Source\LevelGenerationTool\Room.h">
       <Filter>Source\LevelGenerationTool</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Source\LevelGenerationTool\BaseGrid.h">
+      <Filter>Source\LevelGenerationTool</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Source\LevelGenerationTool\Room.cpp">
+      <Filter>Source\LevelGenerationTool</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\LevelGenerationTool\BaseGrid.cpp">
       <Filter>Source\LevelGenerationTool</Filter>
     </ClCompile>
   </ItemGroup>

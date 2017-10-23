@@ -164,39 +164,12 @@ void ALevelGenerator::RandomWalkBiased(const int steps, const FVector2D start, c
 
 }
 
-void ALevelGenerator::PartitionSpace(const int granularity)
+void ALevelGenerator::PartitionSpace(const int granularity, const int roomInset)
 {
 	LevelGrid * grid = _pGrid;
-	grid->SplitDeep(5);
-	grid->AddRoomToChildrenDeep();
-
-	/* quick partition test */
-	/*if (_pGrid->Split())
-	{
-		auto children = _pGrid->GetChildren();
-		if (children.size() > 0)
-		{
-			children[0]->SetColorAll(FColor::Red);
-			if(children[0]->Split())
-			{
-				auto childrenRed = children[0]->GetChildren();
-				childrenRed[0]->SetColorArea(1, 1, childrenRed[0]->GetHeight() - 2, childrenRed[0]->GetWidth() - 2, FColor(127, 0, 0));
-				childrenRed[1]->SetColorArea(1, 1, childrenRed[1]->GetHeight() - 2, childrenRed[1]->GetWidth() - 2, FColor(127, 0, 0));
-			}
-		}
-
-		if (children.size() > 1)
-		{
-			children[1]->SetColorAll(FColor::Blue);
-			if (children[1]->Split())
-			{
-				auto childrenBlue = children[1]->GetChildren();
-				childrenBlue[0]->SetColorArea(1, 1, childrenBlue[0]->GetHeight() - 2, childrenBlue[0]->GetWidth() - 2, FColor(0, 0, 127));
-				childrenBlue[1]->SetColorArea(1, 1, childrenBlue[1]->GetHeight() - 2, childrenBlue[1]->GetWidth() - 2, FColor(0, 0, 127));
-			}
-		}
-
-	}*/
+	grid->SplitDeep(granularity);
+	grid->AddRoomToChildrenDeep(roomInset);
+	grid->ConnectRoomsDeep();
 }
 
 void ALevelGenerator::GenerateBlockout()
@@ -258,16 +231,23 @@ void ALevelGenerator::EmptySurround(int x, int y)
 
 void ALevelGenerator::EmptySubGridTest()
 {
-	LevelGrid* grid = _pGrid->CreateSubGrid(1, 1, _pGrid->GetHeight() - 2, _pGrid->GetWidth() - 2);
+	//LevelGrid* grid = _pGrid->CreateSubGrid(1, 1, _pGrid->GetHeight() - 2, _pGrid->GetWidth() - 2);
 	//grid->SetColorAll(FColor::Blue);
 	//grid->LogTiles();
 	//grid = grid->CreateSubGrid(1, 1, grid->GetHeight() - 2, grid->GetWidth() - 2);
 	//grid->SetColorAll(FColor::Red);
 	//grid->LogTiles();
 
-	grid->SetFilledSet(grid->GetTiles(), false);
-	UE_LOG(LogTemp, Warning, TEXT("new grid:"));
-	grid->LogTiles();
-	UE_LOG(LogTemp, Warning, TEXT("original grid:"));
-	_pGrid->LogTiles();
+	//grid->SetFilledSet(grid->GetTiles(), false);
+	//UE_LOG(LogTemp, Warning, TEXT("new grid:"));
+	//grid->LogTiles();
+	//UE_LOG(LogTemp, Warning, TEXT("original grid:"));
+	//_pGrid->LogTiles();
+
+	auto path = _pGrid->FindPath(FVector2D(0, 0), FVector2D(2, 5));
+	for (auto p : path)
+	{
+		_pGrid->SetColor(p, FColor::Yellow);
+	}
+	_pGrid->SetColor(FVector2D(2, 5), FColor::Red);
 }

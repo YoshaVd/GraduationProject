@@ -35,14 +35,13 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Level Actions")
 		void RandomWalkBiased(const int steps, const FVector2D start, const FVector2D target);
 	UFUNCTION(BlueprintCallable, Category = "Level Actions")
-		void PartitionSpace(const int granularity = 5);
+		void PartitionSpace(const int granularity = 5, const int roomInset = 0);
 
 	/* blockout code */
 	UFUNCTION(BlueprintCallable, Category = "Level Actions")
 		void SetBasicBlock(UStaticMesh* mesh) { _pBasicBlock = mesh; }
 	UFUNCTION(BlueprintCallable, Category = "Level Actions")
 		void GenerateBlockout();
-
 
 	/* test grid functionality*/
 	UFUNCTION(BlueprintCallable, Category = "Level Actions")

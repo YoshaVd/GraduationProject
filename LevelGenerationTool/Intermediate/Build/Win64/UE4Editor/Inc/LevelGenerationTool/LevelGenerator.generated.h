@@ -65,9 +65,10 @@ struct FVector2D;
 	DECLARE_FUNCTION(execPartitionSpace) \
 	{ \
 		P_GET_PROPERTY(UIntProperty,Z_Param_granularity); \
+		P_GET_PROPERTY(UIntProperty,Z_Param_roomInset); \
 		P_FINISH; \
 		P_NATIVE_BEGIN; \
-		this->PartitionSpace(Z_Param_granularity); \
+		this->PartitionSpace(Z_Param_granularity,Z_Param_roomInset); \
 		P_NATIVE_END; \
 	} \
  \
@@ -169,9 +170,10 @@ struct FVector2D;
 	DECLARE_FUNCTION(execPartitionSpace) \
 	{ \
 		P_GET_PROPERTY(UIntProperty,Z_Param_granularity); \
+		P_GET_PROPERTY(UIntProperty,Z_Param_roomInset); \
 		P_FINISH; \
 		P_NATIVE_BEGIN; \
-		this->PartitionSpace(Z_Param_granularity); \
+		this->PartitionSpace(Z_Param_granularity,Z_Param_roomInset); \
 		P_NATIVE_END; \
 	} \
  \
