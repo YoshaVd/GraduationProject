@@ -22,6 +22,7 @@ public:
 	vector<vector<Tile*>>& GetTiles() { return _tiles; }
 	vector<vector<Tile*>> GetTilesArea(const int bottom, const int left, const int top, const int right);
 	void SetTiles(vector<vector<Tile*>>& tiles) { _tiles = tiles; }
+	Tile* GetTopLeftTile() { return _tiles[0][_height - 1]; }
 
 	int GetWidth() { return _width; }
 	int GetHeight() { return _height; }
@@ -30,7 +31,9 @@ public:
 	void SetFilled(const FVector2D pos, const bool isFilled = false);
 	void SetFilledArea(const FVector2D center, int width, int height, bool isFilled = false);
 	void SetFilledArea(const int bottom, const int left, const int top, const int right, bool isFilled = false);
-	void SetFilledSet(vector<vector<Tile*>>& tiles, const bool isFilled = false);
+	void SetFilledTiles(vector<vector<Tile*>>& tiles, const bool isFilled = false);
+	void SetFilledTiles(vector<Tile*>& tiles, const bool isFilled = false);
+	void SetFilledPositions(vector<FVector2D> positions, const bool isFilled = false);
 
 	void SetColor(const FVector2D pos, const FColor color);
 	void SetColorArea(const int bottom, const int left, const int top, const int right, const FColor color);
@@ -52,6 +55,19 @@ public:
 	vector<FVector2D> GetIsolatedPositionsExclusion(const vector<FVector2D> positions, const FVector2D exclusion);
 
 	vector<FVector2D> GetEmpties(const vector<FVector2D> positions);
+
+	// Get Tiles
+	Tile* GetRandomTileFromSet(const vector<Tile*> positions);
+	Tile* GetLeftTile(Tile* t);
+	Tile* GetRightTile(Tile* t);
+	Tile* GetTopTile(Tile* t);
+	Tile* GetBottomTile(Tile* t);
+	Tile* GetHorTile(Tile* t, const int offset);
+	Tile* GetVertTile(Tile* t, const int offset);
+
+	// Get pairs
+	Pair* GetClosestStraightPair(vector<Tile*> setA, vector<Tile*> setB);
+	int GetShortestDistanceStraight(vector<Tile*> setA, vector<Tile*> setB);
 
 	// Tile checks
 	bool IsIsolated(const FVector2D pos);

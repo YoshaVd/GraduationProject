@@ -16,23 +16,24 @@ Room::Room(const Room & other)
 	SetColorAll(_baseColor);
 }
 
-FVector2D Room::GetRandomWall()
+Tile* Room::GetRandomWall()
 {
-	vector<FVector2D> walls = GetWalls();
-	return GetRandomPosFromSet(walls);
+	vector<Tile*> walls = GetWalls();
+	return GetRandomTileFromSet(walls);
 }
 
-vector<FVector2D> Room::GetWalls()
+vector<Tile*> Room::GetWalls()
 {
-	vector<FVector2D> walls;
+	vector<Tile*> walls;
 	for (size_t col = 0; col < _width; col++)
 	{
 		for (size_t row = 0; row < _height; row++)
 		{
-			if (row == 0 || row == _height - 1)
-				walls.push_back(FVector2D(col, row));
-			if (col == 0 || col == _width - 1)
-				walls.push_back(FVector2D(col, row));
+			// don't return corners
+			if(IsCorner(col, row))
+				continue;
+			if (col == 0 || col == _width - 1 || row == 0 || row == _height - 1)
+				walls.push_back(_tiles[col][row]);
 		}
 	}
 
@@ -47,4 +48,10 @@ bool Room::IsConnectedTo(const FVector2D pos)
 bool Room::IsConnectedTo(const Room & room)
 {
 	return false;
+}
+
+bool Room::IsCorner(const int x, const int y)
+{
+	return (x == 0 && y == 0) || (x == 0 && y == _height - 1) ||
+		(x == _width - 1 && y == _height - 1) || (x == _width - 1 && y == 0);
 }

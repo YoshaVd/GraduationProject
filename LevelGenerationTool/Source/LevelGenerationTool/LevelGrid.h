@@ -37,16 +37,18 @@ public:
 	// Room functions
 	void AddRoom(const int inset = 0);
 	void AddRoomToChildrenDeep(const int inset = 0);
-
 	void ConnectRooms();
+	void ConnectRoomsStraight();
 	void ConnectRoomsDeep();
 
 	// Pathing functions
+	vector<Tile*> StraightPath(Tile* start, Tile* target);
 	vector<FVector2D> FindPath(const FVector2D start, const FVector2D target);
 	int CalculateFcost(const FVector2D start,const FVector2D adj, const FVector2D target);
+	vector<Connection*> GetConnections(FVector2D pos);
 
 private:
-	LevelGrid* _parentGrid;
+	LevelGrid* _parentGrid = nullptr;
 	vector<LevelGrid*> _childGrids;
 	vector<Room*> _rooms;
 };

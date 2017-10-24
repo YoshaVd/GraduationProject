@@ -18,7 +18,7 @@ void LevelGrid::AddChild(LevelGrid * grid)
 
 void LevelGrid::SetParent(LevelGrid * grid)
 {
-	_parentGrid = this;
+	_parentGrid = grid;
 }
 
 LevelGrid * LevelGrid::GetParentDeep()
@@ -159,13 +159,36 @@ void LevelGrid::ConnectRooms()
 	}
 	for (size_t i = 0; i < rooms.size(); i += 2)
 	{
-		FVector2D start = ToParentCoordinates(rooms[i]->GetRandomWall());
-		FVector2D target = ToParentCoordinates(rooms[i + 1]->GetRandomWall());
+		FVector2D start = FVector2D(rooms[i]->GetRandomWall()->_x, rooms[i]->GetRandomWall()->_y);
+		FVector2D target = FVector2D(rooms[i + 1]->GetRandomWall()->_x, rooms[i + 1]->GetRandomWall()->_y);
 		vector<FVector2D> path = FindPath(start, target);
 		for (auto p : path)
 		{
 			SetFilled(p, false);
 		}
+	}
+}
+
+void LevelGrid::ConnectRoomsStraight()
+{
+	vector<Room*> rooms;
+	for (auto c : _childGrids)
+	{
+		for (auto r : c->_rooms)
+			rooms.push_back(r);
+	}
+
+	if (rooms.size() < 2)
+		return;
+
+	for (size_t i = 0; i < rooms.size(); i += 2)
+	{
+		Pair* closest = GetClosestStraightPair(rooms[0 + i]->GetWalls(), rooms[1 + i]->GetWalls());
+		if (closest == nullptr)
+			continue;
+
+		auto path = StraightPath(closest->_a, closest->_b);
+		SetFilledTiles(path);
 	}
 }
 
@@ -176,7 +199,7 @@ void LevelGrid::ConnectRoomsDeep()
 	{
 		if (_childGrids[0]->_rooms.size() > 0)
 		{
-			ConnectRooms();
+			ConnectRoomsStraight();
 			return;
 		}
 	}
@@ -185,63 +208,129 @@ void LevelGrid::ConnectRoomsDeep()
 		c->ConnectRoomsDeep();
 }
 
+vector<Tile*> LevelGrid::StraightPath(Tile* start, Tile* target)
+{
+	vector<Tile*> path;
+	int direction = 1;
+	path.push_back(start);
+	LevelGrid* superParent = GetParentDeep();
+	if (start->_x == target->_x)
+	{
+		if (start->_y > target->_y)
+			direction = -1;
+
+		int distance = abs(start->_y - target->_y);
+		for (size_t i = 0; i < distance; i++)
+		{
+			path.push_back(superParent->GetVertTile(start, i * direction));
+		}
+	}
+	else if (start->_y == target->_y)
+	{
+		if (start->_x > target->_x)
+			direction = -1;
+
+		int distance = abs(start->_x - target->_x);
+		for (size_t i = 0; i < distance; i++)
+		{
+			path.push_back(superParent->GetHorTile(start, i * direction));
+		}
+	}
+	else
+	{
+		UE_LOG(LOG_LevelGenerator, Log, TEXT("LevelGrid::StraightPath || No straight path can be formed."));
+		return vector<Tile*>();
+	}
+	path.push_back(target);
+	return path;
+}
+
 vector<FVector2D> LevelGrid::FindPath(const FVector2D start, const FVector2D target)
 {
-	stack<FVector2D> visited;
-	FVector2D current = start;
-	if (!IsWithinBounds(current, "ALevelGenerator::FindPath"))
-		return vector<FVector2D>();
+	//vector<Connection*> openList;
+	//vector<Connection*> closedList;
+	//Connection* currentConnection;
 
-	visited.push(current);
+	//// Initial nodes
+	//for (auto c : GetConnections(start)) {
+	//	c->_cost = CalculateFcost(start, c->_target, target);
+	//	openList.push_back(c);
+	//}
 
-	// continue looking for options as long as the stack is not empty
-	while (!visited.empty())
-	{
-		// check for isolated adjacent tiles
-		vector<FVector2D> adjacentTiles = GetEmptyAdjacentPositions(current);
-		vector<FVector2D> isolatedAdjTiles = GetIsolatedPositionsExclusion(adjacentTiles, current);
-		// if there are none, pop the stack and try the next one
-		while (isolatedAdjTiles.size() == 0 && !visited.empty())
-		{
-			visited.pop();
-			if (visited.empty())
-				break;
+	//while (openList.size() != 0)
+	//{
+	//	// Get tile with lowest F cost
+	//	int lowestF = std::numeric_limits<int>::max();
+	//	for (auto i : isolatedAdjTiles)
+	//	{
+	//		int cost = CalculateFcost(start, i, target);
+	//		if (cost <= lowestF) 
+	//		{
+	//			if (cost == lowestF && rand() % 2 == 1)
+	//				continue;
+	//			lowestF = cost;
+	//			current = i;
+	//		}
+	//	}
+	//}
 
-			current = visited.top();
-			adjacentTiles = GetEmptyAdjacentPositions(current);
-			isolatedAdjTiles = GetIsolatedPositionsExclusion(adjacentTiles, current);
-		}
-		if (visited.empty())
-			break;
+	//stack<FVector2D> visited;
+	//FVector2D current = start;
+	//if (!IsWithinBounds(current, "ALevelGenerator::FindPath"))
+	//	return vector<FVector2D>();
 
-		// Get tile with lowest F cost
-		int lowestF = std::numeric_limits<int>::max();
-		for (auto i : isolatedAdjTiles)
-		{
-			int cost = CalculateFcost(start, i, target);
-			if (cost <= lowestF) 
-			{
-				if (cost == lowestF && rand() % 2 == 1)
-					continue;
-				lowestF = cost;
-				current = i;
-			}
-		}
+	//visited.push(current);
 
-		visited.push(current);
-		if (current == target)
-			break;
-	}
+	//// continue looking for options as long as the stack is not empty
+	//while (!visited.empty())
+	//{
+	//	// check for isolated adjacent tiles
+	//	vector<FVector2D> adjacentTiles = GetEmptyAdjacentPositions(current);
+	//	vector<FVector2D> isolatedAdjTiles = GetIsolatedPositionsExclusion(adjacentTiles, current);
+	//	// if there are none, pop the stack and try the next one
+	//	while (isolatedAdjTiles.size() == 0 && !visited.empty())
+	//	{
+	//		visited.pop();
+	//		if (visited.empty())
+	//			break;
 
-	// Reconstruct path
-	vector<FVector2D> path;
-	while (!visited.empty())
-	{
-		path.push_back(current);
-		current = visited.top();
-		visited.pop();
-	}
-	return path;
+	//		current = visited.top();
+	//		adjacentTiles = GetEmptyAdjacentPositions(current);
+	//		isolatedAdjTiles = GetIsolatedPositionsExclusion(adjacentTiles, current);
+	//	}
+	//	if (visited.empty())
+	//		break;
+
+	//	// Get tile with lowest F cost
+	//	int lowestF = std::numeric_limits<int>::max();
+	//	for (auto i : isolatedAdjTiles)
+	//	{
+	//		int cost = CalculateFcost(start, i, target);
+	//		if (cost <= lowestF) 
+	//		{
+	//			if (cost == lowestF && rand() % 2 == 1)
+	//				continue;
+	//			lowestF = cost;
+	//			current = i;
+	//		}
+	//	}
+
+	//	visited.push(current);
+	//	if (current == target)
+	//		break;
+	//}
+
+	//// Reconstruct path
+	//vector<FVector2D> path;
+	//while (!visited.empty())
+	//{
+	//	path.push_back(current);
+	//	current = visited.top();
+	//	visited.pop();
+	//}
+	//return path;
+
+	return vector<FVector2D>();
 }
 
 int LevelGrid::CalculateFcost(const FVector2D start, const FVector2D adj, const FVector2D target)
@@ -249,4 +338,14 @@ int LevelGrid::CalculateFcost(const FVector2D start, const FVector2D adj, const 
 	int gCost = abs(start.X - adj.X) + abs(start.Y - adj.Y);
 	int hCost = abs(target.X - adj.X) + abs(target.Y - adj.Y);
 	return gCost + hCost * 10;
+}
+
+vector<Connection*> LevelGrid::GetConnections(FVector2D pos)
+{
+	vector<Connection*> cons;
+	for (auto a : GetAdjacentPositions(pos))
+	{
+		cons.push_back(new Connection(pos, a));
+	}
+	return cons;
 }

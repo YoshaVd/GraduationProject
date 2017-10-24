@@ -9,7 +9,7 @@ BaseGrid::BaseGrid(const int width, const int height) :
 		_tiles.push_back(vector<Tile*>());
 		for (size_t row = 0; row < height; row++)
 		{
-			_tiles[col].push_back(new Tile());
+			_tiles[col].push_back(new Tile(FVector2D(col, row)));
 		}
 	}
 
@@ -108,7 +108,7 @@ void BaseGrid::SetFilledArea(const int bottom, const int left, const int top, co
 	}
 }
 
-void BaseGrid::SetFilledSet(vector<vector<Tile*>>& tiles, const bool isFilled)
+void BaseGrid::SetFilledTiles(vector<vector<Tile*>>& tiles, const bool isFilled)
 {
 	int width = tiles.size();
 	if (tiles.size() == 0)
@@ -124,6 +124,24 @@ void BaseGrid::SetFilledSet(vector<vector<Tile*>>& tiles, const bool isFilled)
 		{
 			tiles[col][row]->_isFilled = isFilled;
 		}
+	}
+}
+
+void BaseGrid::SetFilledTiles(vector<Tile*>& tiles, const bool isFilled)
+{
+	for (auto t : tiles)
+	{
+		if (t != nullptr)
+			t->_isFilled = isFilled;
+	}
+}
+
+void BaseGrid::SetFilledPositions(vector<FVector2D> positions, const bool isFilled)
+{
+	for (auto p : positions)
+	{
+		if (IsWithinBounds(p, " BaseGrid::SetFilledPositions"))
+			_tiles[p.X][p.Y]->_isFilled = isFilled;
 	}
 }
 
@@ -157,7 +175,8 @@ void BaseGrid::SetColorAll(const FColor color)
 	{
 		for (size_t row = 0; row < _height; row++)
 		{
-			_tiles[col][row]->_color = color;
+			if(IsWithinBounds(FVector2D(col, row), "BaseGrid::SetColorAll"))
+				_tiles[col][row]->_color = color;
 		}
 	}
 }
@@ -310,6 +329,110 @@ vector<FVector2D> BaseGrid::GetEmpties(const vector<FVector2D> positions)
 			empties.push_back(p);
 	}
 	return empties;
+}
+
+Tile * BaseGrid::GetRandomTileFromSet(const vector<Tile*> tiles)
+{
+	int randomNr = rand() % tiles.size();
+	return tiles[randomNr];
+}
+
+Tile * BaseGrid::GetLeftTile(Tile * t)
+{
+	if (t->_x <= 0) {
+		UE_LOG(LogTemp, Warning, TEXT("BaseGrid::GetLeftTile || Out of bounds."),);
+		return t;
+	}
+	return _tiles[t->_x - 1][t->_y];
+}
+
+Tile * BaseGrid::GetRightTile(Tile * t)
+{
+	if (t->_x >= _width - 1) {
+		UE_LOG(LogTemp, Warning, TEXT("BaseGrid::GetRightTile || Out of bounds."), );
+		return t;
+	}
+	return _tiles[t->_x + 1][t->_y];
+}
+
+Tile * BaseGrid::GetTopTile(Tile * t)
+{
+	if (t->_y >= _height - 1) {
+		UE_LOG(LogTemp, Warning, TEXT("BaseGrid::GetTopTile || Out of bounds."), );
+		return t;
+	}
+	return _tiles[t->_x][t->_y + 1];
+}
+
+Tile * BaseGrid::GetBottomTile(Tile * t)
+{
+	if (t->_y <= 0) {
+		UE_LOG(LogTemp, Warning, TEXT("BaseGrid::GetBottomTile || Out of bounds."), );
+		return t;
+	}
+	return _tiles[t->_x][t->_y - 1];
+}
+
+Tile * BaseGrid::GetHorTile(Tile * t, const int offset)
+{
+	if (t->_x + offset > _width - 1 || t->_x + offset < 0) {
+		UE_LOG(LogTemp, Warning, TEXT("BaseGrid::GetHorTile || Out of bounds."), );
+		return t;
+	}
+	return _tiles[t->_x + offset][t->_y];
+}
+
+Tile * BaseGrid::GetVertTile(Tile * t, const int offset)
+{
+	if (t->_y + offset > _height - 1 || t->_x + offset < 0) {
+		UE_LOG(LogTemp, Warning, TEXT("BaseGrid::GetVertTile || Out of bounds."), );
+		return t;
+	}
+	return _tiles[t->_x][t->_y + offset];
+}
+
+Pair* BaseGrid::GetClosestStraightPair(vector<Tile*> setA, vector<Tile*> setB)
+{
+	int closestDistance = GetShortestDistanceStraight(setA, setB);
+	vector<Pair*> closestPairs;
+	for (auto a : setA)
+	{
+		for (auto b : setB)
+		{
+			if (a->_x == b->_x || a->_y == b->_y)
+			{
+				int distance = (a->_coordinates - b->_coordinates).Size();
+				if (distance == closestDistance)
+					closestPairs.push_back(new Pair(a, b));
+			}
+		}
+	}
+	if (closestPairs.size() == 0) {
+		UE_LOG(LogTemp, Warning, TEXT("BaseGrid::GetClosestStraightPair || No straight pair available."), );
+		return nullptr;
+	}
+	int randomNr = rand() % closestPairs.size();
+	return closestPairs[randomNr];
+}
+
+int BaseGrid::GetShortestDistanceStraight(vector<Tile*> setA, vector<Tile*> setB)
+{
+	int closestDistance = std::numeric_limits<int>::max();
+	for (auto a : setA)
+	{
+		for (auto b : setB)
+		{
+			int distance = (a->_coordinates - b->_coordinates).Size();
+			if (distance < closestDistance)
+			{
+				if (a->_x == b->_x || a->_y == b->_y)
+				{
+					closestDistance = distance;
+				}
+			}
+		}
+	}
+	return closestDistance;
 }
 
 bool BaseGrid::IsIsolated(const FVector2D pos)
