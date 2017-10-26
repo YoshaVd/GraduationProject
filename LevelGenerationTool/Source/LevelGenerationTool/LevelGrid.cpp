@@ -131,8 +131,33 @@ LevelGrid * LevelGrid::CreateSubGrid(const int bottom, const int left, const int
 	return new LevelGrid(newTiles);
 }
 
+vector<LevelGrid*> LevelGrid::GetChildrenDeep()
+{
+	vector<LevelGrid*> children;
+	// if this grid has children -> look for more children
+	if (_childGrids.size() != 0)
+	{
+		for (auto c : _childGrids)
+		{
+			for (auto cc : c->GetChildrenDeep())
+			{
+				children.push_back(cc);
+			}
+		}
+	}
+	// else add this child
+	else
+		children.push_back(this);
+
+	return children;
+}
+
 void LevelGrid::AddRoom(const int inset)
 {
+	if (2 * inset + 3 > _width || 2 * inset + 3 > _height) {
+		UE_LOG(LogTemp, Error, TEXT("LevelGrid::AddRoom || Inset is too high for this room size"));
+		return;
+	}
 	_rooms.push_back(new Room(GetTilesArea(inset, inset, _height - (inset + 1), _width - (inset + 1))));
 }
 
@@ -192,20 +217,85 @@ void LevelGrid::ConnectRoomsStraight()
 	}
 }
 
+void LevelGrid::ConnectRoomsStraight(Room * roomA, Room * roomB)
+{
+	Pair* closest = GetClosestStraightPair(roomA->GetWalls(), roomB->GetWalls());
+	if (closest == nullptr)
+		return;
+
+	auto path = StraightPath(closest->_a, closest->_b);
+	SetFilledTiles(path);
+}
+
 void LevelGrid::ConnectRoomsDeep()
 {
-	// if there are no children create a path
-	if (_childGrids.size() > 0)
+	if (_childGrids.size() != 0)
 	{
-		if (_childGrids[0]->_rooms.size() > 0)
+		for (auto c : _childGrids)
 		{
-			ConnectRoomsStraight();
-			return;
+			c->ConnectRoomsDeep();
+		}
+
+		// get child rooms on both sides
+		vector<Room*> roomsLeft = _childGrids[0]->GetChildRoomsDeep();
+		vector<Room*> roomsRight = _childGrids[1]->GetChildRoomsDeep();
+		// get the closest pair of rooms between both sides
+		vector<Room*> closestPair = GetClosestRoomPair(roomsLeft, roomsRight);
+		
+		ConnectRoomsStraight(closestPair[0], closestPair[1]);
+	}
+}
+
+vector<Room*> LevelGrid::GetChildRoomsDeep()
+{
+	vector<Room*> childRooms;
+	vector<LevelGrid*> childGrids;
+	childGrids = GetChildrenDeep();
+	for (auto grid : childGrids)
+	{
+		for (auto room : grid->_rooms)
+			childRooms.push_back(room);
+	}
+
+	return childRooms;
+}
+
+Room* LevelGrid::GetClosestRoom(vector<Room*> rooms, Room * targetRoom)
+{
+	Room* closestRoom = nullptr;
+	int shortestDistance = std::numeric_limits<int>::max();
+	for (auto r : rooms)
+	{
+		FVector2D centerA = targetRoom->GetCenterTile()->_coordinates;
+		FVector2D centerB = r->GetCenterTile()->_coordinates;
+		if ((centerA - centerB).Size() < shortestDistance)
+		{
+			closestRoom = r;
+			shortestDistance = (centerA - centerB).Size();
 		}
 	}
-	// else continue to children
-	for (auto c : _childGrids)
-		c->ConnectRoomsDeep();
+	return closestRoom;
+}
+
+vector<Room*> LevelGrid::GetClosestRoomPair(vector<Room*> roomsA, vector<Room*> roomsB)
+{
+	vector<Room*> closestPair;
+	int shortestDistance = std::numeric_limits<int>::max();
+
+	for (auto a : roomsA)
+	{
+		Room* closestToA = GetClosestRoom(roomsB, a);
+		int distance = GetShortestDistanceStraight(a->GetWalls(), closestToA->GetWalls());
+		if (distance < shortestDistance)
+		{
+			shortestDistance = distance;
+			closestPair.clear();
+			closestPair.push_back(a);
+			closestPair.push_back(closestToA);
+		}
+	}
+
+	return closestPair;
 }
 
 vector<Tile*> LevelGrid::StraightPath(Tile* start, Tile* target)
@@ -214,27 +304,24 @@ vector<Tile*> LevelGrid::StraightPath(Tile* start, Tile* target)
 	int direction = 1;
 	path.push_back(start);
 	LevelGrid* superParent = GetParentDeep();
-	if (start->_x == target->_x)
+	if (start->_x == target->_x) // if at same width -> vertical path
 	{
-		if (start->_y > target->_y)
+		if (start->_y > target->_y) // determine whether path goes up or down
 			direction = -1;
 
 		int distance = abs(start->_y - target->_y);
 		for (size_t i = 0; i < distance; i++)
-		{
 			path.push_back(superParent->GetVertTile(start, i * direction));
-		}
 	}
-	else if (start->_y == target->_y)
+
+	else if (start->_y == target->_y) // if at same height -> horizontal path
 	{
-		if (start->_x > target->_x)
+		if (start->_x > target->_x) // determine whether path goes left or right
 			direction = -1;
 
 		int distance = abs(start->_x - target->_x);
 		for (size_t i = 0; i < distance; i++)
-		{
 			path.push_back(superParent->GetHorTile(start, i * direction));
-		}
 	}
 	else
 	{

@@ -33,13 +33,19 @@ public:
 
 	LevelGrid * CreateSubGrid(const int bottom, const int left, const int top, const int right);
 	vector<LevelGrid*>& GetChildren() { return _childGrids; }
+	vector<LevelGrid*> GetChildrenDeep();
 
 	// Room functions
 	void AddRoom(const int inset = 0);
 	void AddRoomToChildrenDeep(const int inset = 0);
 	void ConnectRooms();
 	void ConnectRoomsStraight();
+	void ConnectRoomsStraight(Room* roomA, Room* roomB);
 	void ConnectRoomsDeep();
+
+	vector<Room*> GetChildRoomsDeep();
+	Room* GetClosestRoom(vector<Room*> rooms, Room* targetRoom);
+	vector<Room*> GetClosestRoomPair(vector<Room*> roomsA, vector<Room*> roomsB);
 
 	// Pathing functions
 	vector<Tile*> StraightPath(Tile* start, Tile* target);

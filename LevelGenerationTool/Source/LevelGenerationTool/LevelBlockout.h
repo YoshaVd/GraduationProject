@@ -14,8 +14,6 @@
 
 using namespace std;
 
-/* LEVELBLOCKOUT CURRENTLY NOT USED */
-
 UCLASS()
 class LEVELGENERATIONTOOL_API ALevelBlockout : public AActor
 {
@@ -24,11 +22,13 @@ class LEVELGENERATIONTOOL_API ALevelBlockout : public AActor
 public:	
 	ALevelBlockout();
 
-	void SetLayout(vector<vector<Tile*>> tiles) { _tilesArr = tiles; }
+	void SetLayout(vector<vector<Tile*>> tiles, const int width, const int height);
 	UFUNCTION(BlueprintCallable, Category = "GridActions")
 	void Generate();
 	UFUNCTION(BlueprintCallable, Category = "GridSettings")
 	void SetBasicBlock(UStaticMesh* mesh) { _pBasicBlock = mesh; }
+
+	void DestroyBlocks();
 
 protected:
 	virtual void BeginPlay() override;
@@ -36,7 +36,9 @@ protected:
 public:	
 	virtual void Tick(float DeltaTime) override;
 
+	 
 	UStaticMesh* _pBasicBlock = nullptr;
-	vector<vector<Tile*>> _tilesArr;
-	vector<UStaticMesh*> _pMeshes;
+	vector<vector<Tile*>> _tiles;
+	vector<UStaticMeshComponent*> _pMeshes;
+	int _width, _height;
 };

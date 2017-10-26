@@ -166,49 +166,42 @@ void ALevelGenerator::RandomWalkBiased(const int steps, const FVector2D start, c
 
 void ALevelGenerator::PartitionSpace(const int granularity, const int roomInset)
 {
+	if (granularity < 1 + roomInset * 2) {
+		UE_LOG(LogTemp, Error, TEXT("ALevelGenerator::PartitionSpace || Granularity/inset ratio too low."));
+		return;
+	}
 	LevelGrid * grid = _pGrid;
 	grid->SplitDeep(granularity);
 	grid->AddRoomToChildrenDeep(roomInset);
 	grid->ConnectRoomsDeep();
 }
 
+void ALevelGenerator::DelaunayTriangulation()
+{
+	LevelGrid * grid = _pGrid;
+	grid->SplitDeep(6);
+	grid->AddRoomToChildrenDeep(2);
+}
+
 void ALevelGenerator::GenerateBlockout()
 {
-	if (!_pGrid)
-	{
+	if (!_pGrid) {
 		UE_LOG(LogTemp, Error, TEXT("No valid grid object."));
 		return;
 	}
-	if (!_pBasicBlock)
-	{
+	if (!_pBasicBlock) {
 		UE_LOG(LogTemp, Error, TEXT("No valid block object."));
 		return;
 	}
 
-	FVector2D origin = FVector2D(-_pGrid->GetWidth()/2 * 100, -_pGrid->GetHeight()/2 * 100);
-	auto tiles = _pGrid->GetTiles();
-	for (size_t c = 0; c < tiles.size(); c++)
-	{
-		for (size_t r = 0; r < tiles[c].size(); r++)
-		{
-			if (tiles[c][r]->_isFilled)
-			{
-				UStaticMeshComponent* test = NewObject<UStaticMeshComponent>(UStaticMeshComponent::StaticClass());
-				test->SetStaticMesh(_pBasicBlock);
-				if (tiles[c][r]->_color != FColor::Black) {
-					UMaterialInstanceDynamic* mat = UMaterialInstanceDynamic::Create(_pBasicBlock->GetMaterial(0), this);
-					mat->SetVectorParameterValue(FName(TEXT("Color")), tiles[c][r]->_color);
-					test->SetMaterial(0, mat);
-				}
-				_pMeshes.push_back(test);
-
-				test->SetWorldLocation(FVector(origin.X + c * 100, origin.Y + r * 100, 0));
-				test->RegisterComponentWithWorld(GetWorld());
-				FAttachmentTransformRules rules = FAttachmentTransformRules(EAttachmentRule::KeepWorld, false);
-				test->AttachToComponent(RootComponent, rules);
-			}
-		}
+	if (_pLevelBlockout) {
+		_pLevelBlockout->DestroyBlocks();
+		_pLevelBlockout->Destroy();
 	}
+	_pLevelBlockout = GetWorld()->SpawnActor<ALevelBlockout>();
+	_pLevelBlockout->SetLayout(_pGrid->GetTiles(), _pGrid->GetWidth(), _pGrid->GetHeight());
+	_pLevelBlockout->SetBasicBlock(_pBasicBlock);
+	_pLevelBlockout->Generate();
 }
 
 void ALevelGenerator::EmptyAdjacent(int x, int y)

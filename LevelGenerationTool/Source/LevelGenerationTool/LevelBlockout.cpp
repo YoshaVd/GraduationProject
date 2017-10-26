@@ -1,14 +1,21 @@
 #include "LevelBlockout.h"
 #include "LevelGrid.h"
-#include "Runtime/Engine/Classes/Engine/World.h"
-
-/* LEVELBLOCKOUT CURRENTLY NOT USED */
+#include "Runtime/Engine/Classes/Engine/StaticMesh.h"
+#include "Runtime/Engine/Classes/Materials/MaterialInstanceDynamic.h"
 
 ALevelBlockout::ALevelBlockout()
 {
 	PrimaryActorTick.bCanEverTick = true;
 	LevelGrid* pGrid = new LevelGrid(5, 8);
-	_tilesArr = pGrid->GetTiles();
+	_tiles = pGrid->GetTiles();
+}
+
+void ALevelBlockout::DestroyBlocks()
+{
+	for (auto m : _pMeshes)
+	{
+		m->DestroyComponent();
+	}
 }
 
 void ALevelBlockout::BeginPlay()
@@ -21,25 +28,42 @@ void ALevelBlockout::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
+void ALevelBlockout::SetLayout(vector<vector<Tile*>> tiles, const int width, const int height)
+{
+	_tiles = tiles;
+	_width = width;
+	_height = height;
+}
+
 void ALevelBlockout::Generate()
 {
-	for (size_t col = 0; col < _tilesArr.size(); col++)
+	FVector2D origin = FVector2D(-_width / 2 * 100, -_height / 2 * 100);
+	for (size_t col = 0; col < _tiles.size(); col++)
 	{
-		for (size_t row = 0; row < _tilesArr[col].size(); row++)
+		for (size_t row = 0; row < _tiles[col].size(); row++)
 		{
-			if (_tilesArr[col][row]->_isFilled)
+			if (_tiles[col][row]->_isFilled)
 			{
-				FVector location(col * 100, row * 100, 0);
-				FRotator rotation(0.0f, 0.0f, 0.0f);
-				FActorSpawnParameters SpawnInfo;
-				_pMeshes.push_back(GetWorld()->SpawnActor<UStaticMesh>(location, rotation, SpawnInfo));
+				// create mesh component
+				UStaticMeshComponent* meshComp = NewObject<UStaticMeshComponent>(this);
+				meshComp->SetStaticMesh(_pBasicBlock);
 
-				//UStaticMeshComponent* Test = NewObject<UStaticMeshComponent>(UStaticMeshComponent::StaticClass());
-				//Test->SetStaticMesh(_pBasicBlock);
-				//Test->SetWorldLocation(FVector(col * 100, row * 100, 0));
-				//Test->RegisterComponentWithWorld(GetWorld());
-				//FAttachmentTransformRules rules = FAttachmentTransformRules(EAttachmentRule::SnapToTarget, false);
-				//Test->AttachToComponent(RootComponent,rules);
+				// set color according to tiles
+				if (_tiles[col][row]->_color != FColor::Black) {
+					UMaterialInstanceDynamic* mat = UMaterialInstanceDynamic::Create(_pBasicBlock->GetMaterial(0), this);
+					mat->SetVectorParameterValue(FName(TEXT("Color")), _tiles[col][row]->_color);
+					meshComp->SetMaterial(0, mat);
+				}
+
+				// set location depending on array indices
+				meshComp->SetWorldLocation(FVector(origin.X + col * 300, origin.Y + row * 300, 0));
+				//meshComp->SetRelativeScale3D(FVector(1.5, 15, 1.5));
+
+				// attach/register and add to vector
+				FAttachmentTransformRules rules = FAttachmentTransformRules(EAttachmentRule::SnapToTarget, false);
+				meshComp->AttachToComponent(RootComponent,rules);
+				meshComp->RegisterComponentWithWorld(GetWorld());
+				_pMeshes.push_back(meshComp);
 			}
 		}
 	}

@@ -36,6 +36,8 @@ public:
 		void RandomWalkBiased(const int steps, const FVector2D start, const FVector2D target);
 	UFUNCTION(BlueprintCallable, Category = "Level Actions")
 		void PartitionSpace(const int granularity = 5, const int roomInset = 0);
+	UFUNCTION(BlueprintCallable, Category = "Level Actions")
+		void DelaunayTriangulation();
 
 	/* blockout code */
 	UFUNCTION(BlueprintCallable, Category = "Level Actions")

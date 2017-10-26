@@ -14,8 +14,9 @@ PRAGMA_DISABLE_OPTIMIZATION
 PRAGMA_DISABLE_DEPRECATION_WARNINGS
 void EmptyLinkFunctionForGeneratedCodeLevelGenerator() {}
 // Cross Module References
-	LEVELGENERATIONTOOL_API UFunction* Z_Construct_UFunction_ALevelGenerator_EmptyAdjacent();
+	LEVELGENERATIONTOOL_API UFunction* Z_Construct_UFunction_ALevelGenerator_DelaunayTriangulation();
 	LEVELGENERATIONTOOL_API UClass* Z_Construct_UClass_ALevelGenerator();
+	LEVELGENERATIONTOOL_API UFunction* Z_Construct_UFunction_ALevelGenerator_EmptyAdjacent();
 	LEVELGENERATIONTOOL_API UFunction* Z_Construct_UFunction_ALevelGenerator_EmptySubGridTest();
 	LEVELGENERATIONTOOL_API UFunction* Z_Construct_UFunction_ALevelGenerator_EmptySurround();
 	LEVELGENERATIONTOOL_API UFunction* Z_Construct_UFunction_ALevelGenerator_GenerateBlockout();
@@ -36,6 +37,7 @@ void EmptyLinkFunctionForGeneratedCodeLevelGenerator() {}
 	{
 		UClass* Class = ALevelGenerator::StaticClass();
 		static const TNameNativePtrPair<ANSICHAR> AnsiFuncs[] = {
+			{ "DelaunayTriangulation", (Native)&ALevelGenerator::execDelaunayTriangulation },
 			{ "EmptyAdjacent", (Native)&ALevelGenerator::execEmptyAdjacent },
 			{ "EmptySubGridTest", (Native)&ALevelGenerator::execEmptySubGridTest },
 			{ "EmptySurround", (Native)&ALevelGenerator::execEmptySurround },
@@ -49,6 +51,23 @@ void EmptyLinkFunctionForGeneratedCodeLevelGenerator() {}
 			{ "SetBasicBlock", (Native)&ALevelGenerator::execSetBasicBlock },
 		};
 		FNativeFunctionRegistrar::RegisterFunctions(Class, AnsiFuncs, ARRAY_COUNT(AnsiFuncs));
+	}
+	UFunction* Z_Construct_UFunction_ALevelGenerator_DelaunayTriangulation()
+	{
+		UObject* Outer = Z_Construct_UClass_ALevelGenerator();
+		static UFunction* ReturnFunction = nullptr;
+		if (!ReturnFunction)
+		{
+			ReturnFunction = new(EC_InternalUseOnlyConstructor, Outer, TEXT("DelaunayTriangulation"), RF_Public|RF_Transient|RF_MarkAsNative) UFunction(FObjectInitializer(), nullptr, (EFunctionFlags)0x04020401, 65535);
+			ReturnFunction->Bind();
+			ReturnFunction->StaticLink();
+#if WITH_METADATA
+			UMetaData* MetaData = ReturnFunction->GetOutermost()->GetMetaData();
+			MetaData->SetValue(ReturnFunction, TEXT("Category"), TEXT("Level Actions"));
+			MetaData->SetValue(ReturnFunction, TEXT("ModuleRelativePath"), TEXT("LevelGenerator.h"));
+#endif
+		}
+		return ReturnFunction;
 	}
 	UFunction* Z_Construct_UFunction_ALevelGenerator_EmptyAdjacent()
 	{
@@ -318,6 +337,7 @@ void EmptyLinkFunctionForGeneratedCodeLevelGenerator() {}
 				UObjectForceRegistration(OuterClass);
 				OuterClass->ClassFlags |= (EClassFlags)0x20900080u;
 
+				OuterClass->LinkChild(Z_Construct_UFunction_ALevelGenerator_DelaunayTriangulation());
 				OuterClass->LinkChild(Z_Construct_UFunction_ALevelGenerator_EmptyAdjacent());
 				OuterClass->LinkChild(Z_Construct_UFunction_ALevelGenerator_EmptySubGridTest());
 				OuterClass->LinkChild(Z_Construct_UFunction_ALevelGenerator_EmptySurround());
@@ -330,6 +350,7 @@ void EmptyLinkFunctionForGeneratedCodeLevelGenerator() {}
 				OuterClass->LinkChild(Z_Construct_UFunction_ALevelGenerator_ResetLevel());
 				OuterClass->LinkChild(Z_Construct_UFunction_ALevelGenerator_SetBasicBlock());
 
+				OuterClass->AddFunctionToFunctionMapWithOverriddenName(Z_Construct_UFunction_ALevelGenerator_DelaunayTriangulation(), "DelaunayTriangulation"); // 604294816
 				OuterClass->AddFunctionToFunctionMapWithOverriddenName(Z_Construct_UFunction_ALevelGenerator_EmptyAdjacent(), "EmptyAdjacent"); // 2501434887
 				OuterClass->AddFunctionToFunctionMapWithOverriddenName(Z_Construct_UFunction_ALevelGenerator_EmptySubGridTest(), "EmptySubGridTest"); // 3042447433
 				OuterClass->AddFunctionToFunctionMapWithOverriddenName(Z_Construct_UFunction_ALevelGenerator_EmptySurround(), "EmptySurround"); // 2803584985
@@ -354,7 +375,7 @@ void EmptyLinkFunctionForGeneratedCodeLevelGenerator() {}
 		check(OuterClass->GetClass());
 		return OuterClass;
 	}
-	IMPLEMENT_CLASS(ALevelGenerator, 2057790366);
+	IMPLEMENT_CLASS(ALevelGenerator, 1864251332);
 	static FCompiledInDefer Z_CompiledInDefer_UClass_ALevelGenerator(Z_Construct_UClass_ALevelGenerator, &ALevelGenerator::StaticClass, TEXT("/Script/LevelGenerationTool"), TEXT("ALevelGenerator"), false, nullptr, nullptr, nullptr);
 	DEFINE_VTABLE_PTR_HELPER_CTOR(ALevelGenerator);
 PRAGMA_ENABLE_DEPRECATION_WARNINGS

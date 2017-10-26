@@ -62,6 +62,14 @@ struct FVector2D;
 		P_NATIVE_END; \
 	} \
  \
+	DECLARE_FUNCTION(execDelaunayTriangulation) \
+	{ \
+		P_FINISH; \
+		P_NATIVE_BEGIN; \
+		this->DelaunayTriangulation(); \
+		P_NATIVE_END; \
+	} \
+ \
 	DECLARE_FUNCTION(execPartitionSpace) \
 	{ \
 		P_GET_PROPERTY(UIntProperty,Z_Param_granularity); \
@@ -164,6 +172,14 @@ struct FVector2D;
 		P_FINISH; \
 		P_NATIVE_BEGIN; \
 		this->SetBasicBlock(Z_Param_mesh); \
+		P_NATIVE_END; \
+	} \
+ \
+	DECLARE_FUNCTION(execDelaunayTriangulation) \
+	{ \
+		P_FINISH; \
+		P_NATIVE_BEGIN; \
+		this->DelaunayTriangulation(); \
 		P_NATIVE_END; \
 	} \
  \
