@@ -413,8 +413,10 @@
     <None Include="..\..\Config\DefaultEngine.ini" />
     <None Include="..\..\Config\DefaultGame.ini" />
     <ClCompile Include="..\..\Source\LevelGenerationTool\BaseGrid.cpp" />
+    <ClCompile Include="..\..\Source\LevelGenerationTool\Entity.cpp" />
     <ClCompile Include="..\..\Source\LevelGenerationTool\LevelBlockout.cpp" />
     <ClInclude Include="..\..\Source\LevelGenerationTool\BaseGrid.h" />
+    <ClInclude Include="..\..\Source\LevelGenerationTool\Entity.h" />
     <ClInclude Include="..\..\Source\LevelGenerationTool\LevelBlockout.h" />
     <None Include="..\..\Source\LevelGenerationTool\LevelGenerationTool.Build.cs" />
     <ClCompile Include="..\..\Source\LevelGenerationTool\LevelGenerationTool.cpp" />

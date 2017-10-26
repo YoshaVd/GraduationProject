@@ -181,6 +181,44 @@ void BaseGrid::SetColorAll(const FColor color)
 	}
 }
 
+void BaseGrid::SetTileStatesArea(const int bottom, const int left, const int top, const int right, const TileState state)
+{
+	if (top < bottom || top >= _height || bottom < 0 || right < left || right >= _width || left < 0) {
+		UE_LOG(LogTemp, Error, TEXT("BaseGrid::SetTileStatesArea || Dimensions are out of bounds!"));
+		return;
+	}
+
+	for (size_t col = 0; col < _width; col++)
+	{
+		for (size_t row = 0; row < _height; row++)
+		{
+			if (row >= bottom && row <= top && col >= left && col <= right)
+				_tiles[col][row]->_state = state;
+		}
+	}
+}
+
+vector<Tile*> BaseGrid::GetTilesWithState(const vector<Tile*> tiles, const TileState state)
+{
+	vector<Tile*> tilesWithState;
+	for (auto t : tiles)
+	{
+		if (t->_state == state)
+			tilesWithState.push_back(t);
+	}
+	return tilesWithState;
+}
+
+bool BaseGrid::IsAdjTileWithState(Tile * tile, TileState state)
+{
+	for (auto a : GetAdjacentTiles(tile))
+	{
+		if (a->_state == state)
+			return true;
+	}
+	return false;
+}
+
 FVector2D BaseGrid::GetRandomPos(const int xOffset, const int yOffset)
 {
 	int randomCol = rand() % (_width - 2 * xOffset) + xOffset;
@@ -329,6 +367,20 @@ vector<FVector2D> BaseGrid::GetEmpties(const vector<FVector2D> positions)
 			empties.push_back(p);
 	}
 	return empties;
+}
+
+vector<Tile*> BaseGrid::GetAdjacentTiles(Tile * tile)
+{
+	vector<Tile*> adjacentTiles;
+	if (tile->_x > 0 && tile->_x < _width)
+		adjacentTiles.push_back(GetLeftTile(tile));
+	if (tile->_x < _width - 1 && tile->_x >= 0)
+		adjacentTiles.push_back(GetRightTile(tile));
+	if (tile->_y > 0 && tile->_y < _height)
+		adjacentTiles.push_back(GetBottomTile(tile));
+	if (tile->_y < _height - 1 && tile->_y >=0)
+		adjacentTiles.push_back(GetTopTile(tile));
+	return adjacentTiles;
 }
 
 Tile * BaseGrid::GetRandomTileFromSet(const vector<Tile*> tiles)

@@ -174,6 +174,17 @@ void ALevelGenerator::PartitionSpace(const int granularity, const int roomInset)
 	grid->SplitDeep(granularity);
 	grid->AddRoomToChildrenDeep(roomInset);
 	grid->ConnectRoomsDeep();
+	vector<Room*> rooms = grid->GetChildRoomsDeep();
+
+	if(rooms.size() > 2)
+		rooms[2]->AddLevelStart();
+	if (rooms[rooms.size() > 1])
+		rooms[rooms.size() - 1]->AddLevelEnd();
+	//for (auto r : rooms)
+	//{
+	//	for (auto e : r->GetEdges())
+	//		e->_state = PICKUP;
+	//}
 }
 
 void ALevelGenerator::DelaunayTriangulation()

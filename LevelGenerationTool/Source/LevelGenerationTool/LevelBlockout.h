@@ -36,9 +36,15 @@ protected:
 public:	
 	virtual void Tick(float DeltaTime) override;
 
-	 
+private:
+	void SpawnFloor();
+	void SpawnBlock(const Tile* tile, const int x, const int y);
+
+private:
 	UStaticMesh* _pBasicBlock = nullptr;
 	vector<vector<Tile*>> _tiles;
 	vector<UStaticMeshComponent*> _pMeshes;
 	int _width, _height;
+	const int BLOCK_SCALE = 2;
+	const int BLOCK_SIZE = 100;
 };

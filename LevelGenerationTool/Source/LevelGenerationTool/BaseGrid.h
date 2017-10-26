@@ -39,6 +39,13 @@ public:
 	void SetColorArea(const int bottom, const int left, const int top, const int right, const FColor color);
 	void SetColorAll(const FColor color);
 
+	// Tile state
+	void SetTileState(Tile* tile, const TileState state) { tile->_state = state; }
+	void SetTileStates(vector<Tile*> tiles, const TileState state) { for (auto t : tiles) t->_state = state; }
+	void SetTileStatesArea(const int bottom, const int left, const int top, const int right, const TileState state);
+	vector<Tile*> GetTilesWithState(const vector<Tile*> tiles, const TileState state);
+	bool IsAdjTileWithState(Tile* tile, TileState state);
+
 	// Get pos functions with requirements
 	FVector2D GetRandomPos(const int xOffset = 0, const int yOffset = 0);
 	FVector2D GetRandomPos(const bool isFilled, const int xOffset = 0, const int yOffset = 0);
@@ -57,6 +64,7 @@ public:
 	vector<FVector2D> GetEmpties(const vector<FVector2D> positions);
 
 	// Get Tiles
+	vector<Tile*> GetAdjacentTiles(Tile* tile);
 	Tile* GetRandomTileFromSet(const vector<Tile*> positions);
 	Tile* GetLeftTile(Tile* t);
 	Tile* GetRightTile(Tile* t);

@@ -4,11 +4,15 @@
 
 enum TileState 
 {
-	EMPTY,
-	FILLED,
+	NONE,
+	ROOM,
+	CORRIDOR,
+	START_POS,
+	END_POS,
 	DOOR_NONE,
 	DOOR_OPEN,
 	DOOR_LOCKED,
+	PICKUP,
 };
 
 struct LEVELGENERATIONTOOL_API Tile
@@ -27,7 +31,7 @@ public:
 	FVector2D _coordinates;
 	int _x;
 	int _y;
-	// TODO: states for gameplay elements on tile
+	TileState _state = NONE;
 };
 
 struct LEVELGENERATIONTOOL_API Connection

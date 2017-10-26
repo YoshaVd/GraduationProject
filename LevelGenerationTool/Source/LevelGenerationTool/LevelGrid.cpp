@@ -28,21 +28,6 @@ LevelGrid * LevelGrid::GetParentDeep()
 	return this;
 }
 
-FVector2D LevelGrid::ToParentCoordinates(const FVector2D pos)
-{
-	auto parentTiles = _parentGrid->GetTiles();
-
-	for (size_t col = 0; col < _parentGrid->GetWidth(); col++)
-	{
-		for (size_t row = 0; row < _parentGrid->GetHeight(); row++)
-		{
-			if (parentTiles[col][row] == _tiles[pos.X][pos.Y])
-				return FVector2D(col, row);
-		}
-	}
-	return FVector2D();
-}
-
 bool LevelGrid::Split(const int sizeMin)
 {
 	/*	50% chance to split vertically or horizontally
@@ -154,7 +139,7 @@ vector<LevelGrid*> LevelGrid::GetChildrenDeep()
 
 void LevelGrid::AddRoom(const int inset)
 {
-	if (2 * inset + 3 > _width || 2 * inset + 3 > _height) {
+	if (2 * inset + 4 > _width || 2 * inset + 4 > _height) {
 		UE_LOG(LogTemp, Error, TEXT("LevelGrid::AddRoom || Inset is too high for this room size"));
 		return;
 	}
@@ -194,37 +179,20 @@ void LevelGrid::ConnectRooms()
 	}
 }
 
-void LevelGrid::ConnectRoomsStraight()
-{
-	vector<Room*> rooms;
-	for (auto c : _childGrids)
-	{
-		for (auto r : c->_rooms)
-			rooms.push_back(r);
-	}
-
-	if (rooms.size() < 2)
-		return;
-
-	for (size_t i = 0; i < rooms.size(); i += 2)
-	{
-		Pair* closest = GetClosestStraightPair(rooms[0 + i]->GetWalls(), rooms[1 + i]->GetWalls());
-		if (closest == nullptr)
-			continue;
-
-		auto path = StraightPath(closest->_a, closest->_b);
-		SetFilledTiles(path);
-	}
-}
-
 void LevelGrid::ConnectRoomsStraight(Room * roomA, Room * roomB)
 {
+	if (roomA == nullptr || roomB == nullptr) {
+		UE_LOG(LOG_LevelGenerator, Log, TEXT("LevelGrid::ConnectRoomsStraight || Invalid room."));
+		return;
+	}
+
 	Pair* closest = GetClosestStraightPair(roomA->GetWalls(), roomB->GetWalls());
 	if (closest == nullptr)
 		return;
 
 	auto path = StraightPath(closest->_a, closest->_b);
 	SetFilledTiles(path);
+	SetTileStates(path, CORRIDOR);
 }
 
 void LevelGrid::ConnectRoomsDeep()
@@ -240,9 +208,12 @@ void LevelGrid::ConnectRoomsDeep()
 		vector<Room*> roomsLeft = _childGrids[0]->GetChildRoomsDeep();
 		vector<Room*> roomsRight = _childGrids[1]->GetChildRoomsDeep();
 		// get the closest pair of rooms between both sides
-		vector<Room*> closestPair = GetClosestRoomPair(roomsLeft, roomsRight);
-		
-		ConnectRoomsStraight(closestPair[0], closestPair[1]);
+		vector<Room*> closestPair;
+		if(roomsLeft.size() > 0 && roomsRight.size() > 0)
+			closestPair = GetClosestRoomPair(roomsLeft, roomsRight);
+
+		if(closestPair.size() == 2)
+			ConnectRoomsStraight(closestPair[0], closestPair[1]);
 	}
 }
 

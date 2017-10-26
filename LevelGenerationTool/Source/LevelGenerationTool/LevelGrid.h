@@ -24,22 +24,20 @@ public:
 	void SetParent(LevelGrid* grid);
 	LevelGrid* GetParentDeep();
 
-	FVector2D ToParentCoordinates(const FVector2D pos);
+	LevelGrid * CreateSubGrid(const int bottom, const int left, const int top, const int right);
+	vector<LevelGrid*>& GetChildren() { return _childGrids; }
+	vector<LevelGrid*> GetChildrenDeep();
 
+	// Binary partitioning functions
 	bool Split(const int sizeMin = 5);
 	bool SplitDeep(const int sizeMin = 5);
 	bool SplitHorizontal(const int sizeMin, LevelGrid& subLeft, LevelGrid& subRight);
 	bool SplitVertical(const int sizeMin, LevelGrid& subLeft, LevelGrid& subRight);
 
-	LevelGrid * CreateSubGrid(const int bottom, const int left, const int top, const int right);
-	vector<LevelGrid*>& GetChildren() { return _childGrids; }
-	vector<LevelGrid*> GetChildrenDeep();
-
 	// Room functions
 	void AddRoom(const int inset = 0);
 	void AddRoomToChildrenDeep(const int inset = 0);
 	void ConnectRooms();
-	void ConnectRoomsStraight();
 	void ConnectRoomsStraight(Room* roomA, Room* roomB);
 	void ConnectRoomsDeep();
 
