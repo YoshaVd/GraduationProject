@@ -17,25 +17,31 @@ public:
 	// Space
 	Tile* GetRandomWall();
 	vector<Tile*> GetWalls();
+	vector<FVector2D> GetWallPositions();
 	vector<Tile*> GetEdges();
-	void PlaceOnEdges(vector<Entity*> entities);
 
 	int GetLeft() { return _tiles[0][0]->_x; }
 	int GetBottom() { return _tiles[0][0]->_y; }
 	int GetRight() { return _tiles[_width - 1][0]->_x; }
 	int GetTop() { return _tiles[0][_height - 1]->_y; }
 	Tile* GetCenterTile();
+	FVector2D GetCenterPos();
 
-	bool IsConnectedTo(const FVector2D pos);
-	bool IsConnectedTo(const Room& room);
+	int GetRoomSize() { return _width * _height; }
 	bool IsCorner(const int x, const int y);
 
 	// Connect
-	void ConnectToRoom(Room* room) { _connectedRooms.push_back(room); }
+	void AddConnection(Room* room) { _connectedRooms.push_back(room); }
+	vector<Room*> GetConnectedRooms() { return _connectedRooms; }
+
+	// Inter room functions
+	int GetShortestDistance(Room* other, int& distance);
 
 	// Fill
 	void AddLevelStart();
 	void AddLevelEnd();
+	void PlaceEntitiesOnEdges(vector<Entity*> entities);
+	void AddAlcove(Entity* entity);
 
 private:
 	vector<Room*> _connectedRooms;

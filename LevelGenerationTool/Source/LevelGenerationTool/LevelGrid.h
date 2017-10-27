@@ -48,8 +48,9 @@ public:
 	// Pathing functions
 	vector<Tile*> StraightPath(Tile* start, Tile* target);
 	vector<FVector2D> FindPath(const FVector2D start, const FVector2D target);
+	vector<FVector2D> FindShortestPathBFS(const FVector2D start, const FVector2D goal, const bool onFilledTiles);
+
 	int CalculateFcost(const FVector2D start,const FVector2D adj, const FVector2D target);
-	vector<Connection*> GetConnections(FVector2D pos);
 
 private:
 	LevelGrid* _parentGrid = nullptr;

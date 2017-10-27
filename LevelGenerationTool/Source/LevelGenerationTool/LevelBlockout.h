@@ -30,6 +30,8 @@ public:
 
 	void DestroyBlocks();
 
+	FVector GetSpawnLocation() { return _spawnLocation; }
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -39,6 +41,7 @@ public:
 private:
 	void SpawnFloor();
 	void SpawnBlock(const Tile* tile, const int x, const int y);
+	void SpawnDoorTop(const Tile* tile, const int x, const int y);
 
 private:
 	UStaticMesh* _pBasicBlock = nullptr;
@@ -47,4 +50,6 @@ private:
 	int _width, _height;
 	const int BLOCK_SCALE = 2;
 	const int BLOCK_SIZE = 100;
+
+	FVector _spawnLocation;
 };

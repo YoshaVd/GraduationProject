@@ -17,15 +17,15 @@
 	"BuildProducts" :
 	[
 		{
-			"Path" : "$(ProjectDir)/Binaries/Win64/UE4Editor-LevelGenerationTool-7006-Win64-DebugGame.dll",
+			"Path" : "$(ProjectDir)/Binaries/Win64/UE4Editor-LevelGenerationTool-6679-Win64-DebugGame.dll",
 			"Type" : "DynamicLibrary"
 		},
 		{
-			"Path" : "$(ProjectDir)/Binaries/Win64/UE4Editor-LevelGenerationTool-7006-Win64-DebugGame.pdb",
+			"Path" : "$(ProjectDir)/Binaries/Win64/UE4Editor-LevelGenerationTool-6679-Win64-DebugGame.pdb",
 			"Type" : "SymbolFile"
 		},
 		{
-			"Path" : "$(ProjectDir)/Intermediate/Build/Win64/UE4Editor/DebugGame/UE4Editor-LevelGenerationTool-7006-Win64-DebugGame.lib",
+			"Path" : "$(ProjectDir)/Intermediate/Build/Win64/UE4Editor/DebugGame/UE4Editor-LevelGenerationTool-6679-Win64-DebugGame.lib",
 			"Type" : "ImportLibrary"
 		},
 		{

@@ -2,6 +2,11 @@
 #include "LevelGenerationTool.h"
 #include <algorithm>
 #include <stack>
+#include <unordered_set>
+#include <queue>
+#include <map>
+#include "Runtime/Core/Public/Containers/Map.h"
+#include "Runtime/Core/Public/Containers/Queue.h"
 
 LevelGrid::LevelGrid(const LevelGrid & other)
 	: BaseGrid(other)
@@ -161,22 +166,22 @@ void LevelGrid::AddRoomToChildrenDeep(const int inset)
 
 void LevelGrid::ConnectRooms()
 {
-	vector<Room*> rooms;
-	for (auto c : _childGrids)
-	{
-		for (auto r : c->_rooms)
-			rooms.push_back(r);
-	}
-	for (size_t i = 0; i < rooms.size(); i += 2)
-	{
-		FVector2D start = FVector2D(rooms[i]->GetRandomWall()->_x, rooms[i]->GetRandomWall()->_y);
-		FVector2D target = FVector2D(rooms[i + 1]->GetRandomWall()->_x, rooms[i + 1]->GetRandomWall()->_y);
-		vector<FVector2D> path = FindPath(start, target);
-		for (auto p : path)
-		{
-			SetFilled(p, false);
-		}
-	}
+	//vector<Room*> rooms;
+	//for (auto c : _childGrids)
+	//{
+	//	for (auto r : c->_rooms)
+	//		rooms.push_back(r);
+	//}
+	//for (size_t i = 0; i < rooms.size(); i += 2)
+	//{
+	//	FVector2D start = FVector2D(rooms[i]->GetRandomWall()->_x, rooms[i]->GetRandomWall()->_y);
+	//	FVector2D target = FVector2D(rooms[i + 1]->GetRandomWall()->_x, rooms[i + 1]->GetRandomWall()->_y);
+	//	vector<FVector2D> path = FindPath(start, target);
+	//	for (auto p : path)
+	//	{
+	//		SetFilled(p, false);
+	//	}
+	//}
 }
 
 void LevelGrid::ConnectRoomsStraight(Room * roomA, Room * roomB)
@@ -193,6 +198,10 @@ void LevelGrid::ConnectRoomsStraight(Room * roomA, Room * roomB)
 	auto path = StraightPath(closest->_a, closest->_b);
 	SetFilledTiles(path);
 	SetTileStates(path, CORRIDOR);
+	SetTileState(path[0], DOOR_NONE);
+	SetTileState(path[path.size()-1], DOOR_NONE);
+	roomA->AddConnection(roomB);
+	roomB->AddConnection(roomA);
 }
 
 void LevelGrid::ConnectRoomsDeep()
@@ -391,19 +400,57 @@ vector<FVector2D> LevelGrid::FindPath(const FVector2D start, const FVector2D tar
 	return vector<FVector2D>();
 }
 
+vector<FVector2D> LevelGrid::FindShortestPathBFS(const FVector2D start, const FVector2D goal, const bool onFilledTiles)
+{
+	TQueue<FVector2D> nodeQueue;
+	vector<FVector2D> explored;
+	TMap<FVector2D, FVector2D> connections;
+	nodeQueue.Enqueue(start);
+
+	while (!nodeQueue.IsEmpty())
+	{
+		FVector2D current;
+		nodeQueue.Dequeue(current);
+		//nodeQueue.pop_back();
+		if (current == goal)
+		{
+			vector<FVector2D> path;
+			while (connections[current] != start)
+			{
+				current = connections[current];
+				path.push_back(current);
+			}
+			return path;
+		}
+
+		vector<FVector2D> adjacents = GetAdjacentPositions(current);
+		if (onFilledTiles)
+			adjacents = GetFilleds(adjacents);
+		else
+			adjacents = GetEmpties(adjacents);
+
+		for (FVector2D node : adjacents)
+		{
+			// make sure no explored nodes are checked again
+			if (std::find(explored.begin(), explored.end(), node) != explored.end())
+				continue;
+
+			// mark node as explored
+			explored.push_back(node);
+			// store reference to previous node
+			connections.Add(node, current);
+			// add to queue of nodes to examine
+			nodeQueue.Enqueue(node);
+		}
+			
+	}
+
+	return vector<FVector2D>();
+}
+
 int LevelGrid::CalculateFcost(const FVector2D start, const FVector2D adj, const FVector2D target)
 {
 	int gCost = abs(start.X - adj.X) + abs(start.Y - adj.Y);
 	int hCost = abs(target.X - adj.X) + abs(target.Y - adj.Y);
 	return gCost + hCost * 10;
-}
-
-vector<Connection*> LevelGrid::GetConnections(FVector2D pos)
-{
-	vector<Connection*> cons;
-	for (auto a : GetAdjacentPositions(pos))
-	{
-		cons.push_back(new Connection(pos, a));
-	}
-	return cons;
 }

@@ -175,16 +175,39 @@ void ALevelGenerator::PartitionSpace(const int granularity, const int roomInset)
 	grid->AddRoomToChildrenDeep(roomInset);
 	grid->ConnectRoomsDeep();
 	vector<Room*> rooms = grid->GetChildRoomsDeep();
-
-	if(rooms.size() > 2)
+	
+	/* --- FILL LEVEL --- */
+	// start and end
+	if (rooms.size() > 2)
+	{
 		rooms[2]->AddLevelStart();
-	if (rooms[rooms.size() > 1])
 		rooms[rooms.size() - 1]->AddLevelEnd();
-	//for (auto r : rooms)
-	//{
-	//	for (auto e : r->GetEdges())
-	//		e->_state = PICKUP;
-	//}
+		// int distance = 0;
+		// rooms[2]->GetShortestDistance(rooms[rooms.size() - 1], distance);
+		// UE_LOG(LogTemp, Warning, TEXT("Shortest distance between start and end: [%d]"), distance);
+	}
+
+	// entities
+	vector<Entity*> entities;
+	for (size_t i = 0; i < 3; i++)
+		entities.push_back(new Entity());
+
+	for (auto r : rooms)
+	{
+		//for (auto e : r->GetEdges())
+		//	e->_state = EDGE;
+		if (rand() % 1 == 0)
+			r->AddAlcove(new Entity());
+
+		r->PlaceEntitiesOnEdges(entities);
+	}
+
+	auto path = _pGrid->FindShortestPathBFS(rooms[2]->GetCenterPos(), rooms[rooms.size() - 1]->GetCenterPos(), false);
+	for (auto p : path)
+	{
+		_pGrid->SetColor(p, FColor::Yellow);
+		_pGrid->SetTileState(_pGrid->GetTiles()[p.X][p.Y], EDGE);
+	}
 }
 
 void ALevelGenerator::DelaunayTriangulation()
@@ -215,43 +238,19 @@ void ALevelGenerator::GenerateBlockout()
 	_pLevelBlockout->Generate();
 }
 
-void ALevelGenerator::EmptyAdjacent(int x, int y)
-{
-	auto adj = _pGrid->GetAdjacentPositions(x, y);
-	for (auto a : adj)
-	{
-		_pGrid->SetFilled(a);
-	}
-}
-
-void ALevelGenerator::EmptySurround(int x, int y)
-{
-	auto sur = _pGrid->GetSurroundingPositions(x, y);
-	for (auto s : sur)
-	{
-		_pGrid->SetFilled(s);
-	}
-}
-
 void ALevelGenerator::EmptySubGridTest()
 {
-	//LevelGrid* grid = _pGrid->CreateSubGrid(1, 1, _pGrid->GetHeight() - 2, _pGrid->GetWidth() - 2);
-	//grid->SetColorAll(FColor::Blue);
-	//grid->LogTiles();
-	//grid = grid->CreateSubGrid(1, 1, grid->GetHeight() - 2, grid->GetWidth() - 2);
-	//grid->SetColorAll(FColor::Red);
-	//grid->LogTiles();
+	_pGrid->SplitDeep(7);
+	_pGrid->AddRoomToChildrenDeep(2);
 
-	//grid->SetFilledSet(grid->GetTiles(), false);
-	//UE_LOG(LogTemp, Warning, TEXT("new grid:"));
-	//grid->LogTiles();
-	//UE_LOG(LogTemp, Warning, TEXT("original grid:"));
-	//_pGrid->LogTiles();
+	FVector2D start(1, 1);
+	FVector2D end(rand() % 30, rand() % 30);
 
-	auto path = _pGrid->FindPath(FVector2D(0, 0), FVector2D(2, 5));
+	auto path = _pGrid->FindShortestPathBFS(start, end, true);
 	for (auto p : path)
 	{
 		_pGrid->SetColor(p, FColor::Yellow);
 	}
-	_pGrid->SetColor(FVector2D(2, 5), FColor::Red);
+	_pGrid->SetColor(start, FColor::Green);
+	_pGrid->SetColor(end, FColor::Red);
 }

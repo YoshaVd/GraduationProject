@@ -43,6 +43,24 @@ vector<Tile*> Room::GetWalls()
 	return walls;
 }
 
+vector<FVector2D> Room::GetWallPositions()
+{
+	vector<FVector2D> walls;
+	for (size_t col = 0; col < _width; col++)
+	{
+		for (size_t row = 0; row < _height; row++)
+		{
+			// don't return corners
+			if (IsCorner(col, row))
+				continue;
+			if (col == 0 || col == _width - 1 || row == 0 || row == _height - 1)
+				walls.push_back(FVector2D(col,row));
+		}
+	}
+
+	return walls;
+}
+
 vector<Tile*> Room::GetEdges()
 {
 	vector<Tile*> edges;
@@ -52,7 +70,7 @@ vector<Tile*> Room::GetEdges()
 		{
 			if (col != 0 && col != _width - 1 && row != 0 && row != _height - 1)
 				if (col == 1 || col == _width - 2 || row == 1 || row == _height - 2)
-					if (!IsAdjTileWithState(_tiles[col][row], CORRIDOR))
+					if (!IsAdjTileWithState(FVector2D(col, row), DOOR_NONE))
 						edges.push_back(_tiles[col][row]);
 		}
 	}
@@ -60,14 +78,42 @@ vector<Tile*> Room::GetEdges()
 	return edges;
 }
 
-void Room::PlaceOnEdges(vector<Entity*> entities)
+void Room::PlaceEntitiesOnEdges(vector<Entity*> entities)
 {
 	vector<Tile*> emptyEdges = GetTilesWithState(GetEdges(), ROOM);
-	stack<int> randomIndexes;
+	if (emptyEdges.size() < entities.size()) {
+		UE_LOG(LogTemp, Error, TEXT("Room::PlaceOnEdges || More entities than empty tiles to put them on"));
+		return;
+	}
+
 	for (auto entity : entities)
 	{
+		int randomNr;
+		do
+		{
+			randomNr = rand() % emptyEdges.size();
 
+		} while (!emptyEdges[randomNr]->_state == ROOM);
+
+		emptyEdges[randomNr]->_state = PICKUP;
+		
 	}
+}
+
+void Room::AddAlcove(Entity * entity)
+{
+	vector<FVector2D> walls = GetWallPositions();
+
+	int randomWall = 0;
+	do
+	{
+		randomWall = rand() % walls.size();
+	} while (IsNearTileWithState(walls[randomWall], DOOR_NONE)
+		|| IsNearTileWithState(walls[randomWall], PICKUP)
+		|| _tiles[walls[randomWall].X][walls[randomWall].Y]->_state == DOOR_NONE);
+
+	_tiles[walls[randomWall].X][walls[randomWall].Y]->_state = PICKUP;
+	_tiles[walls[randomWall].X][walls[randomWall].Y]->_isFilled = false;
 }
 
 Tile * Room::GetCenterTile()
@@ -89,6 +135,24 @@ Tile * Room::GetCenterTile()
 	return nullptr;
 }
 
+FVector2D Room::GetCenterPos()
+{
+	if (_tiles[_width / 2][_height / 2])
+		return _tiles[_width / 2][_height / 2]->GetPosition();
+	else
+	{
+		for (size_t col = 0; col < _width; col++)
+		{
+			for (size_t row = 0; row < _height; row++)
+			{
+				if (!_tiles[col][row]->_isFilled)
+					return _tiles[col][row]->GetPosition();
+			}
+		}
+	}
+	return FVector2D(1, 1);
+}
+
 bool Room::IsConnectedTo(const FVector2D pos)
 {
 	return false;
@@ -103,6 +167,28 @@ bool Room::IsCorner(const int x, const int y)
 {
 	return (x == 0 && y == 0) || (x == 0 && y == _height - 1) ||
 		(x == _width - 1 && y == _height - 1) || (x == _width - 1 && y == 0);
+}
+
+int Room::GetShortestDistance(Room * other, int& distance)
+{
+	distance++;
+	stack<int> distances;
+	for (auto r : _connectedRooms)
+	{
+		if (r == other)
+			distances.push(distance);
+		distances.push(r->GetShortestDistance(other, distance));
+	}
+
+	int shortestDistance = std::numeric_limits<int>::max();
+	while (!distances.empty())
+	{
+		if (distances.top() < shortestDistance)
+			shortestDistance = distances.top();
+		distances.pop();
+	}
+
+	return shortestDistance;
 }
 
 void Room::AddLevelStart()

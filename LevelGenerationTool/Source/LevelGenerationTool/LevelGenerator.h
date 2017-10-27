@@ -44,12 +44,10 @@ public:
 		void SetBasicBlock(UStaticMesh* mesh) { _pBasicBlock = mesh; }
 	UFUNCTION(BlueprintCallable, Category = "Level Actions")
 		void GenerateBlockout();
+	UFUNCTION(BlueprintCallable, Category = "Level Actions")
+		FVector GetSpawnLocation() { return _pLevelBlockout->GetSpawnLocation(); }
 
 	/* test grid functionality*/
-	UFUNCTION(BlueprintCallable, Category = "Level Actions")
-		void EmptyAdjacent(int x, int y);
-	UFUNCTION(BlueprintCallable, Category = "Level Actions")
-		void EmptySurround(int x, int y);
 	UFUNCTION(BlueprintCallable, Category = "Level Actions")
 		void EmptySubGridTest();
 

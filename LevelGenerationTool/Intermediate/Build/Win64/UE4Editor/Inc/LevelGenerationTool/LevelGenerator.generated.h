@@ -8,6 +8,7 @@
 #include "ScriptMacros.h"
 
 PRAGMA_DISABLE_DEPRECATION_WARNINGS
+struct FVector;
 class UStaticMesh;
 struct FVector2D;
 #ifdef LEVELGENERATIONTOOL_LevelGenerator_generated_h
@@ -25,23 +26,11 @@ struct FVector2D;
 		P_NATIVE_END; \
 	} \
  \
-	DECLARE_FUNCTION(execEmptySurround) \
+	DECLARE_FUNCTION(execGetSpawnLocation) \
 	{ \
-		P_GET_PROPERTY(UIntProperty,Z_Param_x); \
-		P_GET_PROPERTY(UIntProperty,Z_Param_y); \
 		P_FINISH; \
 		P_NATIVE_BEGIN; \
-		this->EmptySurround(Z_Param_x,Z_Param_y); \
-		P_NATIVE_END; \
-	} \
- \
-	DECLARE_FUNCTION(execEmptyAdjacent) \
-	{ \
-		P_GET_PROPERTY(UIntProperty,Z_Param_x); \
-		P_GET_PROPERTY(UIntProperty,Z_Param_y); \
-		P_FINISH; \
-		P_NATIVE_BEGIN; \
-		this->EmptyAdjacent(Z_Param_x,Z_Param_y); \
+		*(FVector*)Z_Param__Result=this->GetSpawnLocation(); \
 		P_NATIVE_END; \
 	} \
  \
@@ -138,23 +127,11 @@ struct FVector2D;
 		P_NATIVE_END; \
 	} \
  \
-	DECLARE_FUNCTION(execEmptySurround) \
+	DECLARE_FUNCTION(execGetSpawnLocation) \
 	{ \
-		P_GET_PROPERTY(UIntProperty,Z_Param_x); \
-		P_GET_PROPERTY(UIntProperty,Z_Param_y); \
 		P_FINISH; \
 		P_NATIVE_BEGIN; \
-		this->EmptySurround(Z_Param_x,Z_Param_y); \
-		P_NATIVE_END; \
-	} \
- \
-	DECLARE_FUNCTION(execEmptyAdjacent) \
-	{ \
-		P_GET_PROPERTY(UIntProperty,Z_Param_x); \
-		P_GET_PROPERTY(UIntProperty,Z_Param_y); \
-		P_FINISH; \
-		P_NATIVE_BEGIN; \
-		this->EmptyAdjacent(Z_Param_x,Z_Param_y); \
+		*(FVector*)Z_Param__Result=this->GetSpawnLocation(); \
 		P_NATIVE_END; \
 	} \
  \

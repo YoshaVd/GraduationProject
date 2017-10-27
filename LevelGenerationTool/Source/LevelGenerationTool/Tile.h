@@ -12,6 +12,7 @@ enum TileState
 	DOOR_NONE,
 	DOOR_OPEN,
 	DOOR_LOCKED,
+	EDGE,
 	PICKUP,
 };
 
@@ -26,6 +27,8 @@ public:
 	Tile(bool isFilled) : _isFilled(isFilled) {}
 	~Tile() {}
 
+	FVector2D GetPosition() { return FVector2D(_x, _y); }
+
 	bool _isFilled = true;
 	FColor _color = FColor::Black;
 	FVector2D _coordinates;
@@ -34,17 +37,15 @@ public:
 	TileState _state = NONE;
 };
 
-struct LEVELGENERATIONTOOL_API Connection
+struct LEVELGENERATIONTOOL_API TileConnection
 {
 public:
-	Connection(FVector2D start, FVector2D target)
-		: _start(start), _target(target) {}
-	~Connection() {}
+	TileConnection(FVector2D pos, FVector2D parent)
+		: _pos(pos), _parent(parent) {}
+	~TileConnection() {}
 
-	FVector2D _start;
-	FVector2D _target;
-	Connection* _headConnection;
-	int _cost;
+	FVector2D _pos;
+	FVector2D _parent;
 };
 
 struct LEVELGENERATIONTOOL_API Pair

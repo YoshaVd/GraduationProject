@@ -209,11 +209,21 @@ vector<Tile*> BaseGrid::GetTilesWithState(const vector<Tile*> tiles, const TileS
 	return tilesWithState;
 }
 
-bool BaseGrid::IsAdjTileWithState(Tile * tile, TileState state)
+bool BaseGrid::IsAdjTileWithState(const FVector2D pos, const TileState state)
 {
-	for (auto a : GetAdjacentTiles(tile))
+	for (auto adj : GetAdjacentPositions(pos))
 	{
-		if (a->_state == state)
+		if (_tiles[adj.X][adj.Y]->_state == state)
+			return true;
+	}
+	return false;
+}
+
+bool BaseGrid::IsNearTileWithState(const FVector2D pos, const TileState state)
+{
+	for (auto sur : GetSurroundingPositions(pos))
+	{
+		if (_tiles[sur.X][sur.Y]->_state == state)
 			return true;
 	}
 	return false;
@@ -319,16 +329,16 @@ vector<FVector2D> BaseGrid::GetAdjacentPositions(const int x, const int y)
 
 vector<FVector2D> BaseGrid::GetSurroundingPositions(const FVector2D pos)
 {
-	vector<FVector2D> adjacentPositions;
-	FVector2D adjPos;
+	vector<FVector2D> surroundingPositions;
+	FVector2D surPos;
 	for (size_t i = 0; i < 9; i++)
 	{
-		adjPos.X = pos.X + (i % 3) - 1;
-		adjPos.Y = pos.Y + (i / 3) - 1;
-		if (adjPos != pos && IsWithinBounds(adjPos, FString("NULL")))
-			adjacentPositions.push_back(adjPos);
+		surPos.X = pos.X + (i % 3) - 1;
+		surPos.Y = pos.Y + (i / 3) - 1;
+		if (surPos != pos && IsWithinBounds(surPos, FString("NULL")))
+			surroundingPositions.push_back(surPos);
 	}
-	return adjacentPositions;
+	return surroundingPositions;
 }
 
 vector<FVector2D> BaseGrid::GetSurroundingPositions(const int x, const int y)
@@ -367,6 +377,17 @@ vector<FVector2D> BaseGrid::GetEmpties(const vector<FVector2D> positions)
 			empties.push_back(p);
 	}
 	return empties;
+}
+
+vector<FVector2D> BaseGrid::GetFilleds(const vector<FVector2D> positions)
+{
+	vector<FVector2D> filleds;
+	for (auto p : positions)
+	{
+		if (_tiles[p.X][p.Y]->_isFilled)
+			filleds.push_back(p);
+	}
+	return filleds;
 }
 
 vector<Tile*> BaseGrid::GetAdjacentTiles(Tile * tile)
