@@ -153,16 +153,6 @@ FVector2D Room::GetCenterPos()
 	return FVector2D(1, 1);
 }
 
-bool Room::IsConnectedTo(const FVector2D pos)
-{
-	return false;
-}
-
-bool Room::IsConnectedTo(const Room & room)
-{
-	return false;
-}
-
 bool Room::IsCorner(const int x, const int y)
 {
 	return (x == 0 && y == 0) || (x == 0 && y == _height - 1) ||
