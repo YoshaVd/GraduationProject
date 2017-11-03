@@ -186,6 +186,23 @@ void ALevelGenerator::PartitionSpace(const int granularity, const int roomInset)
 	Room* startRoom = _pGrid->GetFurthestRoom(rooms, rooms.back());
 	startRoom->AddLevelStart();
 
+	/* --- door & key test ---*/
+	_pGrid->GetTopTile(startRoom->GetCenterTile())->_state = KEY;
+	vector<Tile*> tiles;
+	for (auto col : rooms.back()->GetTiles())
+	{
+		for (auto tile : col)
+		{
+			tiles.push_back(tile);
+		}
+	}
+	tiles = _pGrid->GetTilesWithState(tiles, DOOR_NONE);
+	for (auto t : tiles)
+	{
+		t->_state = DOOR_LOCKED;
+	}
+	/* ---------------------- */
+
 	// entities
 	vector<Entity*> entities;
 	for (size_t i = 0; i < 3; i++)
@@ -229,6 +246,7 @@ void ALevelGenerator::GenerateBlockout()
 	_pLevelBlockout = GetWorld()->SpawnActor<ALevelBlockout>();
 	_pLevelBlockout->SetLayout(_pGrid->GetTiles(), _pGrid->GetWidth(), _pGrid->GetHeight());
 	_pLevelBlockout->SetBasicBlock(_pBasicBlock);
+	_pLevelBlockout->GenerateSpawnData();
 	_pLevelBlockout->Generate();
 }
 

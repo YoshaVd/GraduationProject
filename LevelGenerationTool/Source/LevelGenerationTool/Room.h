@@ -48,12 +48,8 @@ public:
 	void AddConnection(Room* room) { _connectedRooms.push_back(room); }
 	vector<Room*> GetConnectedRooms() { return _connectedRooms; }
 
-	int GetDistanceToRoomWithType(RoomType type, Room* previousCaller);
 	int GetDepthLevel() { return _depthLevel; }
 	void SetDepthLevel(const int depth) { _depthLevel = depth; }
-
-	// Inter room functions
-	int GetShortestDistance(Room* other, int& distance);
 
 	// Fill
 	void AddLevelStart();

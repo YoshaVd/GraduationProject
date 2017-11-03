@@ -268,54 +268,6 @@ void Room::FlagRoom(RoomType type)
 		for (auto t : _tiles)
 			SetTileStates(GetTilesWithState(t, ROOM), ROOM_ON_PATH);
 	}
-	else if (type == OFF_PATH)
-	{
-		//_depthLevel = GetDistanceToRoomWithType(ON_PATH, this);
-	}
-}
-
-int Room::GetDistanceToRoomWithType(RoomType type, Room* previousCaller)
-{
-	vector<int> distances;
-	for (auto r : _connectedRooms)
-	{
-		if (r == previousCaller) continue;
-
-		if (r->_type == type)
-			return 0;
-		else
-			distances.push_back(r->GetDistanceToRoomWithType(type, this) + 1);
-	}
-
-	int shortestDistance = std::numeric_limits<int>::max();
-	for (auto d : distances)
-	{
-		if (d < shortestDistance)
-			shortestDistance = d;
-	}
-	return shortestDistance;
-}
-
-int Room::GetShortestDistance(Room * other, int& distance)
-{
-	distance++;
-	stack<int> distances;
-	for (auto r : _connectedRooms)
-	{
-		if (r == other)
-			distances.push(distance);
-		distances.push(r->GetShortestDistance(other, distance));
-	}
-
-	int shortestDistance = std::numeric_limits<int>::max();
-	while (!distances.empty())
-	{
-		if (distances.top() < shortestDistance)
-			shortestDistance = distances.top();
-		distances.pop();
-	}
-
-	return shortestDistance;
 }
 
 void Room::AddLevelStart()

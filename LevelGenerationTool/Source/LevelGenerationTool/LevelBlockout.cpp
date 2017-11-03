@@ -3,6 +3,8 @@
 #include "Runtime/Engine/Classes/Engine/StaticMesh.h"
 #include "Runtime/Engine/Classes/Materials/MaterialInstanceDynamic.h"
 
+
+
 ALevelBlockout::ALevelBlockout()
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -15,6 +17,35 @@ void ALevelBlockout::DestroyBlocks()
 	for (auto m : _pMeshes)
 	{
 		m->DestroyComponent();
+	}
+}
+
+void ALevelBlockout::GenerateSpawnData()
+{
+	FVector origin(-_width / 2 * BLOCK_SCALE * BLOCK_SIZE, -_height / 2 * BLOCK_SCALE * BLOCK_SIZE, 0);
+
+	for (size_t col = 0; col < _width; col++)
+	{
+		for (size_t row = 0; row < _height; row++)
+		{
+			FVector pos(origin.X + col * BLOCK_SCALE * BLOCK_SIZE,
+				origin.Y + row * BLOCK_SCALE * BLOCK_SIZE, 0);
+
+			switch (_tiles[col][row]->_state)
+			{
+			case KEY:
+				_spawnData.Add(FSpawnData(pos, EProp::E_KEY));
+				break;
+			case DOOR_LOCKED:
+				_spawnData.Add(FSpawnData(pos, EProp::E_DOOR_LOCKED));
+				break;
+			case DOOR_OPEN:
+				_spawnData.Add(FSpawnData(pos, EProp::E_DOOR_OPEN));
+				break;
+			default:
+				break;
+			}
+		}
 	}
 }
 

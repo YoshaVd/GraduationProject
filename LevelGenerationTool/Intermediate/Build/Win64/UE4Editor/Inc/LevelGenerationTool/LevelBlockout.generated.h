@@ -14,7 +14,12 @@ class UStaticMesh;
 #endif
 #define LEVELGENERATIONTOOL_LevelBlockout_generated_h
 
-#define LevelGenerationTool_Source_LevelGenerationTool_LevelBlockout_h_20_RPC_WRAPPERS \
+#define LevelGenerationTool_Source_LevelGenerationTool_LevelBlockout_h_28_GENERATED_BODY \
+	friend LEVELGENERATIONTOOL_API class UScriptStruct* Z_Construct_UScriptStruct_FSpawnData(); \
+	LEVELGENERATIONTOOL_API static class UScriptStruct* StaticStruct();
+
+
+#define LevelGenerationTool_Source_LevelGenerationTool_LevelBlockout_h_42_RPC_WRAPPERS \
  \
 	DECLARE_FUNCTION(execSetBasicBlock) \
 	{ \
@@ -34,7 +39,7 @@ class UStaticMesh;
 	}
 
 
-#define LevelGenerationTool_Source_LevelGenerationTool_LevelBlockout_h_20_RPC_WRAPPERS_NO_PURE_DECLS \
+#define LevelGenerationTool_Source_LevelGenerationTool_LevelBlockout_h_42_RPC_WRAPPERS_NO_PURE_DECLS \
  \
 	DECLARE_FUNCTION(execSetBasicBlock) \
 	{ \
@@ -54,7 +59,7 @@ class UStaticMesh;
 	}
 
 
-#define LevelGenerationTool_Source_LevelGenerationTool_LevelBlockout_h_20_INCLASS_NO_PURE_DECLS \
+#define LevelGenerationTool_Source_LevelGenerationTool_LevelBlockout_h_42_INCLASS_NO_PURE_DECLS \
 private: \
 	static void StaticRegisterNativesALevelBlockout(); \
 	friend LEVELGENERATIONTOOL_API class UClass* Z_Construct_UClass_ALevelBlockout(); \
@@ -64,7 +69,7 @@ public: \
 	enum {IsIntrinsic=COMPILED_IN_INTRINSIC};
 
 
-#define LevelGenerationTool_Source_LevelGenerationTool_LevelBlockout_h_20_INCLASS \
+#define LevelGenerationTool_Source_LevelGenerationTool_LevelBlockout_h_42_INCLASS \
 private: \
 	static void StaticRegisterNativesALevelBlockout(); \
 	friend LEVELGENERATIONTOOL_API class UClass* Z_Construct_UClass_ALevelBlockout(); \
@@ -74,7 +79,7 @@ public: \
 	enum {IsIntrinsic=COMPILED_IN_INTRINSIC};
 
 
-#define LevelGenerationTool_Source_LevelGenerationTool_LevelBlockout_h_20_STANDARD_CONSTRUCTORS \
+#define LevelGenerationTool_Source_LevelGenerationTool_LevelBlockout_h_42_STANDARD_CONSTRUCTORS \
 	/** Standard constructor, called after all reflected properties have been initialized */ \
 	NO_API ALevelBlockout(const FObjectInitializer& ObjectInitializer); \
 	DEFINE_DEFAULT_OBJECT_INITIALIZER_CONSTRUCTOR_CALL(ALevelBlockout) \
@@ -87,7 +92,7 @@ private: \
 public:
 
 
-#define LevelGenerationTool_Source_LevelGenerationTool_LevelBlockout_h_20_ENHANCED_CONSTRUCTORS \
+#define LevelGenerationTool_Source_LevelGenerationTool_LevelBlockout_h_42_ENHANCED_CONSTRUCTORS \
 private: \
 	/** Private move- and copy-constructors, should never be used */ \
 	NO_API ALevelBlockout(ALevelBlockout&&); \
@@ -98,26 +103,26 @@ DEFINE_VTABLE_PTR_HELPER_CTOR_CALLER(ALevelBlockout); \
 	DEFINE_DEFAULT_CONSTRUCTOR_CALL(ALevelBlockout)
 
 
-#define LevelGenerationTool_Source_LevelGenerationTool_LevelBlockout_h_20_PRIVATE_PROPERTY_OFFSET
-#define LevelGenerationTool_Source_LevelGenerationTool_LevelBlockout_h_17_PROLOG
-#define LevelGenerationTool_Source_LevelGenerationTool_LevelBlockout_h_20_GENERATED_BODY_LEGACY \
+#define LevelGenerationTool_Source_LevelGenerationTool_LevelBlockout_h_42_PRIVATE_PROPERTY_OFFSET
+#define LevelGenerationTool_Source_LevelGenerationTool_LevelBlockout_h_39_PROLOG
+#define LevelGenerationTool_Source_LevelGenerationTool_LevelBlockout_h_42_GENERATED_BODY_LEGACY \
 PRAGMA_DISABLE_DEPRECATION_WARNINGS \
 public: \
-	LevelGenerationTool_Source_LevelGenerationTool_LevelBlockout_h_20_PRIVATE_PROPERTY_OFFSET \
-	LevelGenerationTool_Source_LevelGenerationTool_LevelBlockout_h_20_RPC_WRAPPERS \
-	LevelGenerationTool_Source_LevelGenerationTool_LevelBlockout_h_20_INCLASS \
-	LevelGenerationTool_Source_LevelGenerationTool_LevelBlockout_h_20_STANDARD_CONSTRUCTORS \
+	LevelGenerationTool_Source_LevelGenerationTool_LevelBlockout_h_42_PRIVATE_PROPERTY_OFFSET \
+	LevelGenerationTool_Source_LevelGenerationTool_LevelBlockout_h_42_RPC_WRAPPERS \
+	LevelGenerationTool_Source_LevelGenerationTool_LevelBlockout_h_42_INCLASS \
+	LevelGenerationTool_Source_LevelGenerationTool_LevelBlockout_h_42_STANDARD_CONSTRUCTORS \
 public: \
 PRAGMA_ENABLE_DEPRECATION_WARNINGS
 
 
-#define LevelGenerationTool_Source_LevelGenerationTool_LevelBlockout_h_20_GENERATED_BODY \
+#define LevelGenerationTool_Source_LevelGenerationTool_LevelBlockout_h_42_GENERATED_BODY \
 PRAGMA_DISABLE_DEPRECATION_WARNINGS \
 public: \
-	LevelGenerationTool_Source_LevelGenerationTool_LevelBlockout_h_20_PRIVATE_PROPERTY_OFFSET \
-	LevelGenerationTool_Source_LevelGenerationTool_LevelBlockout_h_20_RPC_WRAPPERS_NO_PURE_DECLS \
-	LevelGenerationTool_Source_LevelGenerationTool_LevelBlockout_h_20_INCLASS_NO_PURE_DECLS \
-	LevelGenerationTool_Source_LevelGenerationTool_LevelBlockout_h_20_ENHANCED_CONSTRUCTORS \
+	LevelGenerationTool_Source_LevelGenerationTool_LevelBlockout_h_42_PRIVATE_PROPERTY_OFFSET \
+	LevelGenerationTool_Source_LevelGenerationTool_LevelBlockout_h_42_RPC_WRAPPERS_NO_PURE_DECLS \
+	LevelGenerationTool_Source_LevelGenerationTool_LevelBlockout_h_42_INCLASS_NO_PURE_DECLS \
+	LevelGenerationTool_Source_LevelGenerationTool_LevelBlockout_h_42_ENHANCED_CONSTRUCTORS \
 private: \
 PRAGMA_ENABLE_DEPRECATION_WARNINGS
 
@@ -126,4 +131,8 @@ PRAGMA_ENABLE_DEPRECATION_WARNINGS
 #define CURRENT_FILE_ID LevelGenerationTool_Source_LevelGenerationTool_LevelBlockout_h
 
 
+#define FOREACH_ENUM_EPROP(op) \
+	op(EProp::E_KEY) \
+	op(EProp::E_DOOR_OPEN) \
+	op(EProp::E_DOOR_LOCKED) 
 PRAGMA_ENABLE_DEPRECATION_WARNINGS

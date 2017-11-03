@@ -34,6 +34,7 @@ void EmptyLinkFunctionForGeneratedCodeLevelGenerator() {}
 	LEVELGENERATIONTOOL_API UClass* Z_Construct_UClass_ALevelGenerator_NoRegister();
 	ENGINE_API UClass* Z_Construct_UClass_AActor();
 	UPackage* Z_Construct_UPackage__Script_LevelGenerationTool();
+	LEVELGENERATIONTOOL_API UClass* Z_Construct_UClass_ALevelBlockout_NoRegister();
 // End Cross Module References
 	void ALevelGenerator::StaticRegisterNativesALevelGenerator()
 	{
@@ -381,6 +382,7 @@ void EmptyLinkFunctionForGeneratedCodeLevelGenerator() {}
 				OuterClass->LinkChild(Z_Construct_UFunction_ALevelGenerator_SetPercentage_DoubleCorridor());
 				OuterClass->LinkChild(Z_Construct_UFunction_ALevelGenerator_SetPercentage_WideCorridor());
 
+				UProperty* NewProp__pLevelBlockout = new(EC_InternalUseOnlyConstructor, OuterClass, TEXT("_pLevelBlockout"), RF_Public|RF_Transient|RF_MarkAsNative) UObjectProperty(CPP_PROPERTY_BASE(_pLevelBlockout, ALevelGenerator), 0x0010000000000005, Z_Construct_UClass_ALevelBlockout_NoRegister());
 				OuterClass->AddFunctionToFunctionMapWithOverriddenName(Z_Construct_UFunction_ALevelGenerator_EmptySubGridTest(), "EmptySubGridTest"); // 616385459
 				OuterClass->AddFunctionToFunctionMapWithOverriddenName(Z_Construct_UFunction_ALevelGenerator_GenerateBlockout(), "GenerateBlockout"); // 3395057221
 				OuterClass->AddFunctionToFunctionMapWithOverriddenName(Z_Construct_UFunction_ALevelGenerator_GetSpawnLocation(), "GetSpawnLocation"); // 970805539
@@ -401,13 +403,15 @@ void EmptyLinkFunctionForGeneratedCodeLevelGenerator() {}
 				UMetaData* MetaData = OuterClass->GetOutermost()->GetMetaData();
 				MetaData->SetValue(OuterClass, TEXT("IncludePath"), TEXT("LevelGenerator.h"));
 				MetaData->SetValue(OuterClass, TEXT("ModuleRelativePath"), TEXT("LevelGenerator.h"));
+				MetaData->SetValue(NewProp__pLevelBlockout, TEXT("Category"), TEXT("LevelGenerator"));
+				MetaData->SetValue(NewProp__pLevelBlockout, TEXT("ModuleRelativePath"), TEXT("LevelGenerator.h"));
 #endif
 			}
 		}
 		check(OuterClass->GetClass());
 		return OuterClass;
 	}
-	IMPLEMENT_CLASS(ALevelGenerator, 1284721826);
+	IMPLEMENT_CLASS(ALevelGenerator, 3187746054);
 	static FCompiledInDefer Z_CompiledInDefer_UClass_ALevelGenerator(Z_Construct_UClass_ALevelGenerator, &ALevelGenerator::StaticClass, TEXT("/Script/LevelGenerationTool"), TEXT("ALevelGenerator"), false, nullptr, nullptr, nullptr);
 	DEFINE_VTABLE_PTR_HELPER_CTOR(ALevelGenerator);
 PRAGMA_ENABLE_DEPRECATION_WARNINGS

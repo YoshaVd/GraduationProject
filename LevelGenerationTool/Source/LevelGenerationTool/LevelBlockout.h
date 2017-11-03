@@ -14,6 +14,28 @@
 
 using namespace std;
 
+UENUM(BlueprintType)
+enum class EProp : uint8
+{
+	E_KEY 	UMETA(DisplayName = "Key"),
+	E_DOOR_OPEN 	UMETA(DisplayName = "Door Open"),
+	E_DOOR_LOCKED UMETA(DisplayName = "Door Locked")
+};
+
+USTRUCT(BlueprintType)
+struct FSpawnData
+{
+	GENERATED_BODY()
+
+	FSpawnData() {}
+	FSpawnData(FVector pos, EProp prop) : _position(pos), _prop(prop) {}
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		FVector _position;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		EProp _prop;
+};
+
 UCLASS()
 class LEVELGENERATIONTOOL_API ALevelBlockout : public AActor
 {
@@ -31,6 +53,12 @@ public:
 	void DestroyBlocks();
 
 	FVector GetSpawnLocation() { return _spawnLocation; }
+	void GenerateSpawnData();
+
+	/* --- Members --- */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		TArray<FSpawnData> _spawnData;
+
 
 protected:
 	virtual void BeginPlay() override;

@@ -57,9 +57,11 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Level parameters")
 		void SetDeviation_Granularity(const int deviation) { _granularityDeviation = deviation; }
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	ALevelBlockout* _pLevelBlockout = nullptr;
+
 private:
 	LevelGrid* _pGrid = nullptr;
-	ALevelBlockout* _pLevelBlockout = nullptr;
 	UStaticMesh* _pBasicBlock = nullptr;
 
 	vector<UStaticMeshComponent*> _pMeshes;

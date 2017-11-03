@@ -17,6 +17,7 @@ enum TileState
 	PATH,
 	PICKUP,
 	ENEMY,
+	KEY,
 };
 
 struct LEVELGENERATIONTOOL_API Tile

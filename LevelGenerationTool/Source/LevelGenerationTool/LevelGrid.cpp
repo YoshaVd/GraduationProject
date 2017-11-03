@@ -95,7 +95,7 @@ bool LevelGrid::SplitDeep(const int sizeMin, int level)
 bool LevelGrid::SplitHorizontal(const int sizeMin, LevelGrid& subLeft, LevelGrid& subRight)
 {
 	if (_width / 2 < sizeMin) {
-		UE_LOG(LogTemp, Warning, TEXT("LevelGrid::Split || Grid is not wide enough to split"));
+		//UE_LOG(LogTemp, Warning, TEXT("LevelGrid::Split || Grid is not wide enough to split"));
 		return false;
 	}
 	int x = rand() % (_width - 2 * sizeMin + 1) + sizeMin;
@@ -108,7 +108,7 @@ bool LevelGrid::SplitHorizontal(const int sizeMin, LevelGrid& subLeft, LevelGrid
 bool LevelGrid::SplitVertical(const int sizeMin, LevelGrid& subLeft, LevelGrid& subRight)
 {
 	if (_height / 2 < sizeMin) {
-		UE_LOG(LogTemp, Warning, TEXT("LevelGrid::Split || Grid is not high enough to split [420 blaze it]"));
+		//UE_LOG(LogTemp, Warning, TEXT("LevelGrid::Split || Grid is not high enough to split [420 blaze it]"));
 		return false;
 	}
 
