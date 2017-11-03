@@ -19,6 +19,7 @@ public:
 	vector<Tile*> GetWalls();
 	vector<FVector2D> GetWallPositions();
 	vector<Tile*> GetEdges();
+	vector<vector<Tile*>> GetMiddle();
 
 	int GetLeft() { return _tiles[0][0]->_x; }
 	int GetBottom() { return _tiles[0][0]->_y; }
@@ -30,6 +31,9 @@ public:
 	int GetRoomSize() { return _width * _height; }
 	bool IsCorner(const int x, const int y);
 
+	// Flagging
+	bool Contains(TileState state);
+
 	// Connect
 	void AddConnection(Room* room) { _connectedRooms.push_back(room); }
 	vector<Room*> GetConnectedRooms() { return _connectedRooms; }
@@ -40,7 +44,9 @@ public:
 	// Fill
 	void AddLevelStart();
 	void AddLevelEnd();
+	//void FillWithEnemies();
 	void PlaceEntitiesOnEdges(vector<Entity*> entities);
+	void PlaceEntitiesInCenter(vector<Entity*> entities);
 	void AddAlcove(Entity* entity);
 
 private:

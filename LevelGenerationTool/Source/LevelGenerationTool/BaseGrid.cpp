@@ -33,6 +33,16 @@ BaseGrid::BaseGrid(const BaseGrid & other)
 	_biasFactor = other._biasFactor;
 }
 
+BaseGrid & BaseGrid::operator=(const BaseGrid & other)
+{
+	_width = other._width;
+	_height = other._height;
+	_baseColor = other._baseColor;
+	_tiles = other._tiles;
+	_biasFactor = other._biasFactor;
+	return *this;
+}
+
 BaseGrid::~BaseGrid()
 {
 	_tiles.clear();
@@ -147,9 +157,16 @@ void BaseGrid::SetFilledPositions(vector<FVector2D> positions, const bool isFill
 
 void BaseGrid::SetColor(const FVector2D pos, const FColor color)
 {
-	if (!IsWithinBounds(pos, FString("BaseGrid::SetFilled")))
+	if (!IsWithinBounds(pos, FString("BaseGrid::SetColor")))
 		return;
 	_tiles[pos.X][pos.Y]->_color = color;
+}
+
+void BaseGrid::SetColor(Tile * tile, const FColor color)
+{
+	if (!IsWithinBounds(tile, FString("BaseGrid::SetColor")))
+		return;
+	tile->_color = color;
 }
 
 void BaseGrid::SetColorArea(const int bottom, const int left, const int top, const int right, const FColor color)
@@ -373,7 +390,7 @@ vector<FVector2D> BaseGrid::GetEmpties(const vector<FVector2D> positions)
 	vector<FVector2D> empties;
 	for (auto p : positions)
 	{
-		if (!_tiles[p.X][p.Y]->_isFilled)
+		if (IsWithinBounds(p.X,	p.Y) && !_tiles[p.X][p.Y]->_isFilled)
 			empties.push_back(p);
 	}
 	return empties;
@@ -384,7 +401,7 @@ vector<FVector2D> BaseGrid::GetFilleds(const vector<FVector2D> positions)
 	vector<FVector2D> filleds;
 	for (auto p : positions)
 	{
-		if (_tiles[p.X][p.Y]->_isFilled)
+		if (IsWithinBounds(p.X, p.Y) && _tiles[p.X][p.Y]->_isFilled)
 			filleds.push_back(p);
 	}
 	return filleds;
@@ -464,28 +481,64 @@ Tile * BaseGrid::GetVertTile(Tile * t, const int offset)
 	return _tiles[t->_x][t->_y + offset];
 }
 
-Pair* BaseGrid::GetClosestStraightPair(vector<Tile*> setA, vector<Tile*> setB)
+//vector<TPair<Tile*, Tile*>> BaseGrid::GetClosestStraightPairs(vector<Tile*> setA, vector<Tile*> setB)
+//{
+//	int closestDistance = GetShortestDistanceStraight(setA, setB);
+//	vector<TPair<Tile*, Tile*>> closestPairs;
+//	for (auto a : setA)
+//	{
+//		if (!a->_isFilled) continue; // only return filled pairs
+//		if (GetEmptyTiles(GetAdjacentTiles(a)).size() > 1) continue;
+//		//if (GetEmpties(GetAdjacentPositions(a->_x, a->_y)).size() > 1) continue;
+//		for (auto b : setB)
+//		{
+//			if (!b->_isFilled) continue;
+//			if (GetEmptyTiles(GetAdjacentTiles(b)).size() > 1) continue;
+//			//if (GetEmpties(GetAdjacentPositions(b->_x, b->_y)).size() > 1) continue;
+//
+//			if (a->_x == b->_x || a->_y == b->_y)
+//			{
+//				int distance = (a->_coordinates - b->_coordinates).Size();
+//				if (distance == closestDistance)
+//					closestPairs.push_back(TPair<Tile*, Tile*>(a, b));
+//			}
+//		}
+//	}
+//	if (closestPairs.size() == 0)
+//		UE_LOG(LogTemp, Warning, TEXT("BaseGrid::GetClosestStraightPair || No straight pair found."));
+//
+//	return closestPairs;
+//}
+
+bool BaseGrid::GetAdjacentPairs(vector<TPair<Tile*, Tile*>> pairs, TPair<TPair<Tile*, Tile*>, TPair<Tile*, Tile*>>& adjacents)
 {
-	int closestDistance = GetShortestDistanceStraight(setA, setB);
-	vector<Pair*> closestPairs;
-	for (auto a : setA)
+	vector<TPair<TPair<Tile*, Tile*>, TPair<Tile*, Tile*>>> adjPairPairs;
+	for (auto base : pairs)
 	{
-		for (auto b : setB)
+		for (auto other : pairs)
 		{
-			if (a->_x == b->_x || a->_y == b->_y)
-			{
-				int distance = (a->_coordinates - b->_coordinates).Size();
-				if (distance == closestDistance)
-					closestPairs.push_back(new Pair(a, b));
-			}
+			// don't check for adjacency if it's the same pair
+			if (base == other)
+				continue;
+
+			// check wheter pairs are adjacent and add it if so
+			if (base.Key->_x == other.Key->_x &&
+				(base.Key->_y == other.Key->_y + 1 || base.Key->_y == other.Key->_y - 1))
+				adjPairPairs.push_back(TPair<TPair<Tile*, Tile*>, TPair<Tile*, Tile*>>(base, other));
+			if (base.Key->_y == other.Key->_y &&
+				(base.Key->_x == other.Key->_x + 1 || base.Key->_x == other.Key->_x - 1))
+				adjPairPairs.push_back(TPair<TPair<Tile*, Tile*>, TPair<Tile*, Tile*>>(base, other));
+
 		}
 	}
-	if (closestPairs.size() == 0) {
-		UE_LOG(LogTemp, Warning, TEXT("BaseGrid::GetClosestStraightPair || No straight pair available."), );
-		return nullptr;
+
+	if (adjPairPairs.size() == 0) {
+		UE_LOG(LogTemp, Warning, TEXT("BaseGrid::GetAdjacentPairs || No adjacent pairs found."));
+		return false;
 	}
-	int randomNr = rand() % closestPairs.size();
-	return closestPairs[randomNr];
+
+	adjacents = adjPairPairs[rand() % adjPairPairs.size()];
+	return true;
 }
 
 int BaseGrid::GetShortestDistanceStraight(vector<Tile*> setA, vector<Tile*> setB)
@@ -569,14 +622,19 @@ bool BaseGrid::IsWithinBounds(const FVector2D pos, const FString logInfo)
 		pos.Y >= 0 && pos.Y < _height)
 		return true;
 
-	if (logInfo != "NULL")
-		UE_LOG(LogTemp, Warning, TEXT("%s || Position[%f,%f] out of grid bounds."), *logInfo, pos.X, pos.Y);
+	//if (logInfo != "NULL")
+	//	UE_LOG(LogTemp, Warning, TEXT("%s || Position[%f,%f] out of grid bounds."), *logInfo, pos.X, pos.Y);
 	return false;
 }
 
 bool BaseGrid::IsWithinBounds(const int x, const int y, const FString logInfo)
 {
 	return IsWithinBounds(FVector2D(x, y), logInfo);
+}
+
+bool BaseGrid::IsWithinBounds(const Tile* tile, const FString logInfo)
+{
+	return IsWithinBounds(FVector2D(tile->_x, tile->_y), logInfo);
 }
 
 void BaseGrid::LogTiles()

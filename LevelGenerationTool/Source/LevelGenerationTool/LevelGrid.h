@@ -17,6 +17,8 @@ public:
 	LevelGrid(const int width, const int height) : BaseGrid(width, height) {}
 	LevelGrid(vector<vector<Tile*>>& tiles) : BaseGrid(tiles) {}
 	LevelGrid(const LevelGrid& other);
+	LevelGrid& operator =(const LevelGrid& other);
+
 	~LevelGrid() {}
  
 	// Subgrid functions
@@ -30,30 +32,40 @@ public:
 
 	// Binary partitioning functions
 	bool Split(const int sizeMin = 5);
-	bool SplitDeep(const int sizeMin = 5);
+	bool SplitDeep(const int sizeMin = 5, int level = 0);
 	bool SplitHorizontal(const int sizeMin, LevelGrid& subLeft, LevelGrid& subRight);
 	bool SplitVertical(const int sizeMin, LevelGrid& subLeft, LevelGrid& subRight);
 
 	// Room functions
 	void AddRoom(const int inset = 0);
 	void AddRoomToChildrenDeep(const int inset = 0);
-	void ConnectRooms();
-	void ConnectRoomsStraight(Room* roomA, Room* roomB);
+	bool ConnectRoomsStraight(Room* roomA, Room* roomB);
+	bool ConnectRoomsStraightWide(Room* roomA, Room* roomB);
+	bool ConnectRoomsBFS(Room* roomA, Room* roomB);
 	void ConnectRoomsDeep();
 
 	vector<Room*> GetChildRoomsDeep();
 	Room* GetClosestRoom(vector<Room*> rooms, Room* targetRoom);
-	vector<Room*> GetClosestRoomPair(vector<Room*> roomsA, vector<Room*> roomsB);
+	Room* GetFurthestRoom(vector<Room*> rooms, Room* targetRoom);
+	TPair<Room*, Room*> GetClosestRoomPair(vector<Room*> roomsA, vector<Room*> roomsB);
+	vector<TPair<Tile*, Tile*>> GetClosestStraightPairs(vector<Tile*> setA, vector<Tile*> setB);
 
-	// Pathing functions
-	vector<Tile*> StraightPath(Tile* start, Tile* target);
-	vector<FVector2D> FindPath(const FVector2D start, const FVector2D target);
-	vector<FVector2D> FindShortestPathBFS(const FVector2D start, const FVector2D goal, const bool onFilledTiles);
+	// Pathfinding functions
+	bool FindStraightPath(Tile* start, Tile* target, vector<Tile*>& path);
+	vector<Tile*> FindShortestPathBFS(const FVector2D start, const FVector2D goal, const bool onFilledTiles);
 
-	int CalculateFcost(const FVector2D start,const FVector2D adj, const FVector2D target);
+	// set parameters
+	void SetOddsDoubleCorridor(const int odds) { _oddsDoubleCorridor = odds; }
+	void SetOddsWideCorridor(const int odds) { _oddsWideCorridor = odds; }
+	void SetGranularityDeviation(const int deviation) { _granularityDeviation = deviation; }
 
 private:
 	LevelGrid* _parentGrid = nullptr;
 	vector<LevelGrid*> _childGrids;
 	vector<Room*> _rooms;
+
+	const int ODDS_BASE = 100;
+	int _oddsDoubleCorridor = 20;
+	int _oddsWideCorridor = 30;
+	int _granularityDeviation = 0;
 };

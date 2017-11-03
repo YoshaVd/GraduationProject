@@ -7,12 +7,29 @@
 #include <map>
 #include "Runtime/Core/Public/Containers/Map.h"
 #include "Runtime/Core/Public/Containers/Queue.h"
+#include "Runtime/Core/Public/Math/UnrealMathUtility.h"
 
 LevelGrid::LevelGrid(const LevelGrid & other)
 	: BaseGrid(other)
 {
 	_parentGrid = other._parentGrid;
 	_childGrids = other._childGrids;
+	_oddsDoubleCorridor = other._oddsDoubleCorridor;
+	_oddsWideCorridor = other._oddsWideCorridor;
+}
+
+LevelGrid & LevelGrid::operator=(const LevelGrid & other)
+{
+	_width = other._width;
+	_height = other._height;
+	_baseColor = other._baseColor;
+	_tiles = other._tiles;
+	_biasFactor = other._biasFactor;
+	_parentGrid = other._parentGrid;
+	_childGrids = other._childGrids;
+	_oddsDoubleCorridor = other._oddsDoubleCorridor;
+	_oddsWideCorridor = other._oddsWideCorridor;
+	return *this;
 }
 
 void LevelGrid::AddChild(LevelGrid * grid)
@@ -59,15 +76,19 @@ bool LevelGrid::Split(const int sizeMin)
 	return true;
 }
 
-bool LevelGrid::SplitDeep(const int sizeMin)
+bool LevelGrid::SplitDeep(const int sizeMin, int level)
 {
 	// Deep split child grids if the current split was successful
-	if (Split(sizeMin))
+	//int deviation = rand() % (_granularityDeviation + 1);
+	int deviation = FMath::RandRange(1, GetParentDeep()->_granularityDeviation);
+
+	if (Split(sizeMin + deviation))
 	{
 		for (auto c : _childGrids)
-			c->SplitDeep(sizeMin);
+			c->SplitDeep(sizeMin, level++);
 		return true;
 	}
+	
 	return false;
 }
 
@@ -164,65 +185,124 @@ void LevelGrid::AddRoomToChildrenDeep(const int inset)
 		c->AddRoomToChildrenDeep(inset);
 }
 
-void LevelGrid::ConnectRooms()
-{
-	//vector<Room*> rooms;
-	//for (auto c : _childGrids)
-	//{
-	//	for (auto r : c->_rooms)
-	//		rooms.push_back(r);
-	//}
-	//for (size_t i = 0; i < rooms.size(); i += 2)
-	//{
-	//	FVector2D start = FVector2D(rooms[i]->GetRandomWall()->_x, rooms[i]->GetRandomWall()->_y);
-	//	FVector2D target = FVector2D(rooms[i + 1]->GetRandomWall()->_x, rooms[i + 1]->GetRandomWall()->_y);
-	//	vector<FVector2D> path = FindPath(start, target);
-	//	for (auto p : path)
-	//	{
-	//		SetFilled(p, false);
-	//	}
-	//}
-}
-
-void LevelGrid::ConnectRoomsStraight(Room * roomA, Room * roomB)
+bool LevelGrid::ConnectRoomsStraight(Room * roomA, Room * roomB)
 {
 	if (roomA == nullptr || roomB == nullptr) {
 		UE_LOG(LOG_LevelGenerator, Log, TEXT("LevelGrid::ConnectRoomsStraight || Invalid room."));
-		return;
+		return false;
 	}
 
-	Pair* closest = GetClosestStraightPair(roomA->GetWalls(), roomB->GetWalls());
-	if (closest == nullptr)
-		return;
+	vector<TPair<Tile*, Tile*>> closest = GetClosestStraightPairs(roomA->GetWalls(), roomB->GetWalls());
 
-	auto path = StraightPath(closest->_a, closest->_b);
-	SetFilledTiles(path);
-	SetTileStates(path, CORRIDOR);
-	SetTileState(path[0], DOOR_NONE);
-	SetTileState(path[path.size()-1], DOOR_NONE);
-	roomA->AddConnection(roomB);
-	roomB->AddConnection(roomA);
+	// shuffle pairs and attempt to path them in that order
+	random_shuffle(closest.begin(), closest.end());
+	vector<Tile*> path;
+
+	for (auto pair : closest)
+	{
+		if (FindStraightPath(pair.Key, pair.Value, path))
+		{
+			SetFilledTiles(path);
+			SetTileStates(path, CORRIDOR);
+			SetTileState(path[0], DOOR_NONE);
+			SetTileState(path[path.size()-1], DOOR_NONE);
+			roomA->AddConnection(roomB);
+			roomB->AddConnection(roomA);
+			return true;
+		}
+	}
+
+	return false;
+}
+
+bool LevelGrid::ConnectRoomsStraightWide(Room * roomA, Room * roomB)
+{
+	vector<TPair<Tile*, Tile*>> pairs = GetClosestStraightPairs(roomA->GetWalls(), roomB->GetWalls());
+	TPair<TPair<Tile*, Tile*>, TPair<Tile*, Tile*>> adjPairs;
+	if (GetAdjacentPairs(pairs, adjPairs))
+	{
+		vector<Tile*> pathA;
+		vector<Tile*> pathB;
+		if (FindStraightPath(adjPairs.Key.Key, adjPairs.Key.Value, pathA)
+			&& FindStraightPath(adjPairs.Value.Key, adjPairs.Value.Value, pathB))
+		{
+			SetFilledTiles(pathA);
+			SetFilledTiles(pathB);
+			SetTileStates(pathA, CORRIDOR);
+			SetTileStates(pathB, CORRIDOR);
+			SetTileState(pathA[0], DOOR_NONE);
+			SetTileState(pathB[0], DOOR_NONE);
+			SetTileState(pathA[pathA.size() - 1], DOOR_NONE);
+			SetTileState(pathB[pathB.size() - 1], DOOR_NONE);
+			roomA->AddConnection(roomB);
+			roomB->AddConnection(roomA);
+			return true;
+		}
+	}
+	return false;
+}
+
+bool LevelGrid::ConnectRoomsBFS(Room * roomA, Room * roomB)
+{
+	// get wall positions
+	if (!roomA || !roomB)
+		return false;
+
+	Tile* start = roomA->GetRandomWall();
+	Tile* end = roomB->GetRandomWall();
+
+	// find path
+	vector<Tile*> path = FindShortestPathBFS(start->GetPosition(), end->GetPosition(), true);
+	if (path.size() > 0)
+	{
+		SetFilledTiles(path);
+		SetTileStates(path, CORRIDOR);
+		SetTileState(path[0], DOOR_NONE);
+		SetTileState(path[path.size() - 1], DOOR_NONE);
+		roomA->AddConnection(roomB);
+		roomB->AddConnection(roomA);
+		return true;
+	}
+	return false;
 }
 
 void LevelGrid::ConnectRoomsDeep()
 {
-	if (_childGrids.size() != 0)
+	if (_childGrids.size() == 0)
+		return;
+	
+	for (auto c : _childGrids)
 	{
-		for (auto c : _childGrids)
+		c->ConnectRoomsDeep();
+	}
+
+	// get child rooms on both sides
+	vector<Room*> roomsLeft = _childGrids[0]->GetChildRoomsDeep();
+	vector<Room*> roomsRight = _childGrids[1]->GetChildRoomsDeep();
+	// get the closest pair of rooms between both sides
+	TPair<Room*, Room*> closestRooms;
+	if(roomsLeft.size() > 0 && roomsRight.size() > 0)
+		closestRooms = GetClosestRoomPair(roomsLeft, roomsRight);
+
+	// determine what kind of connection based on odds
+	if (rand() % ODDS_BASE < GetParentDeep()->_oddsWideCorridor)
+	{
+		if (!ConnectRoomsStraightWide(closestRooms.Key, closestRooms.Value))
+			ConnectRoomsStraight(closestRooms.Key, closestRooms.Value); // make regular connection if wide one fails
+	}
+	else
+		ConnectRoomsStraight(closestRooms.Key, closestRooms.Value);
+
+	// determine whether to generate double corridors or not
+	if (rand() % ODDS_BASE < GetParentDeep()->_oddsDoubleCorridor)
+	{
+		if (rand() % ODDS_BASE < GetParentDeep()->_oddsWideCorridor)
 		{
-			c->ConnectRoomsDeep();
+			if (!ConnectRoomsStraightWide(closestRooms.Key, closestRooms.Value))
+				ConnectRoomsStraight(closestRooms.Key, closestRooms.Value); // make regular connection if wide one fails
 		}
-
-		// get child rooms on both sides
-		vector<Room*> roomsLeft = _childGrids[0]->GetChildRoomsDeep();
-		vector<Room*> roomsRight = _childGrids[1]->GetChildRoomsDeep();
-		// get the closest pair of rooms between both sides
-		vector<Room*> closestPair;
-		if(roomsLeft.size() > 0 && roomsRight.size() > 0)
-			closestPair = GetClosestRoomPair(roomsLeft, roomsRight);
-
-		if(closestPair.size() == 2)
-			ConnectRoomsStraight(closestPair[0], closestPair[1]);
+		else
+			ConnectRoomsStraight(closestRooms.Key, closestRooms.Value);
 	}
 }
 
@@ -257,30 +337,80 @@ Room* LevelGrid::GetClosestRoom(vector<Room*> rooms, Room * targetRoom)
 	return closestRoom;
 }
 
-vector<Room*> LevelGrid::GetClosestRoomPair(vector<Room*> roomsA, vector<Room*> roomsB)
+Room * LevelGrid::GetFurthestRoom(vector<Room*> rooms, Room * targetRoom)
 {
-	vector<Room*> closestPair;
+	Room* furthestRoom = nullptr;
+	int biggestDistance = 0;
+	vector<Tile*> path;
+	for (auto r : rooms)
+	{
+		if (r == targetRoom)
+			continue;
+
+		path = FindShortestPathBFS(r->GetCenterPos(), targetRoom->GetCenterPos(), false);
+		if (path.size() > biggestDistance)
+		{
+			furthestRoom = r;
+			biggestDistance = path.size();
+		}
+	}
+	return furthestRoom;
+}
+
+TPair<Room*, Room*> LevelGrid::GetClosestRoomPair(vector<Room*> roomsA, vector<Room*> roomsB)
+{
+	TPair<Room*, Room*> closestPair;
 	int shortestDistance = std::numeric_limits<int>::max();
 
 	for (auto a : roomsA)
 	{
-		Room* closestToA = GetClosestRoom(roomsB, a);
-		int distance = GetShortestDistanceStraight(a->GetWalls(), closestToA->GetWalls());
+		Room* closestRoom = GetClosestRoom(roomsB, a);
+		int distance = GetShortestDistanceStraight(a->GetWalls(), closestRoom->GetWalls());
 		if (distance < shortestDistance)
 		{
 			shortestDistance = distance;
-			closestPair.clear();
-			closestPair.push_back(a);
-			closestPair.push_back(closestToA);
+			closestPair.Key = a;
+			closestPair.Value = closestRoom;
 		}
 	}
 
 	return closestPair;
 }
 
-vector<Tile*> LevelGrid::StraightPath(Tile* start, Tile* target)
+vector<TPair<Tile*, Tile*>> LevelGrid::GetClosestStraightPairs(vector<Tile*> setA, vector<Tile*> setB)
 {
-	vector<Tile*> path;
+	int closestDistance = GetShortestDistanceStraight(setA, setB);
+	vector<TPair<Tile*, Tile*>> closestPairs;
+	LevelGrid* parentDeep = GetParentDeep();
+	for (auto a : setA)
+	{
+		if (!a->_isFilled) continue; // only return filled pairs
+		if (parentDeep->GetEmpties(parentDeep->GetAdjacentPositions(a->_x, a->_y)).size() > 1)
+			continue;
+
+		for (auto b : setB)
+		{
+			if (!b->_isFilled) continue;
+			if (parentDeep->GetEmpties(parentDeep->GetAdjacentPositions(b->_x, b->_y)).size() > 1)
+				continue;
+
+			if (a->_x == b->_x || a->_y == b->_y)
+			{
+				int distance = (a->_coordinates - b->_coordinates).Size();
+				if (distance == closestDistance)
+					closestPairs.push_back(TPair<Tile*, Tile*>(a, b));
+			}
+		}
+	}
+	if (closestPairs.size() == 0)
+		UE_LOG(LogTemp, Warning, TEXT("BaseGrid::GetClosestStraightPair || No straight pair found."));
+
+	return closestPairs;
+}
+
+bool LevelGrid::FindStraightPath(Tile* start, Tile* target, vector<Tile*>& path)
+{
+	path.clear();
 	int direction = 1;
 	path.push_back(start);
 	LevelGrid* superParent = GetParentDeep();
@@ -289,9 +419,15 @@ vector<Tile*> LevelGrid::StraightPath(Tile* start, Tile* target)
 		if (start->_y > target->_y) // determine whether path goes up or down
 			direction = -1;
 
+		Tile* newTile = nullptr;
 		int distance = abs(start->_y - target->_y);
 		for (size_t i = 0; i < distance; i++)
-			path.push_back(superParent->GetVertTile(start, i * direction));
+		{
+			newTile = superParent->GetVertTile(start, i * direction);
+			if (!newTile->_isFilled) 
+				return false; 
+			path.push_back(newTile);
+		}
 	}
 
 	else if (start->_y == target->_y) // if at same height -> horizontal path
@@ -299,108 +435,26 @@ vector<Tile*> LevelGrid::StraightPath(Tile* start, Tile* target)
 		if (start->_x > target->_x) // determine whether path goes left or right
 			direction = -1;
 
+		Tile* newTile = nullptr;
 		int distance = abs(start->_x - target->_x);
 		for (size_t i = 0; i < distance; i++)
-			path.push_back(superParent->GetHorTile(start, i * direction));
+		{
+			newTile = superParent->GetHorTile(start, i * direction);
+			if (!newTile->_isFilled)
+				return false;
+			path.push_back(newTile);
+		}
 	}
 	else
 	{
 		UE_LOG(LOG_LevelGenerator, Log, TEXT("LevelGrid::StraightPath || No straight path can be formed."));
-		return vector<Tile*>();
+		return false;
 	}
 	path.push_back(target);
-	return path;
+	return true;
 }
 
-vector<FVector2D> LevelGrid::FindPath(const FVector2D start, const FVector2D target)
-{
-	//vector<Connection*> openList;
-	//vector<Connection*> closedList;
-	//Connection* currentConnection;
-
-	//// Initial nodes
-	//for (auto c : GetConnections(start)) {
-	//	c->_cost = CalculateFcost(start, c->_target, target);
-	//	openList.push_back(c);
-	//}
-
-	//while (openList.size() != 0)
-	//{
-	//	// Get tile with lowest F cost
-	//	int lowestF = std::numeric_limits<int>::max();
-	//	for (auto i : isolatedAdjTiles)
-	//	{
-	//		int cost = CalculateFcost(start, i, target);
-	//		if (cost <= lowestF) 
-	//		{
-	//			if (cost == lowestF && rand() % 2 == 1)
-	//				continue;
-	//			lowestF = cost;
-	//			current = i;
-	//		}
-	//	}
-	//}
-
-	//stack<FVector2D> visited;
-	//FVector2D current = start;
-	//if (!IsWithinBounds(current, "ALevelGenerator::FindPath"))
-	//	return vector<FVector2D>();
-
-	//visited.push(current);
-
-	//// continue looking for options as long as the stack is not empty
-	//while (!visited.empty())
-	//{
-	//	// check for isolated adjacent tiles
-	//	vector<FVector2D> adjacentTiles = GetEmptyAdjacentPositions(current);
-	//	vector<FVector2D> isolatedAdjTiles = GetIsolatedPositionsExclusion(adjacentTiles, current);
-	//	// if there are none, pop the stack and try the next one
-	//	while (isolatedAdjTiles.size() == 0 && !visited.empty())
-	//	{
-	//		visited.pop();
-	//		if (visited.empty())
-	//			break;
-
-	//		current = visited.top();
-	//		adjacentTiles = GetEmptyAdjacentPositions(current);
-	//		isolatedAdjTiles = GetIsolatedPositionsExclusion(adjacentTiles, current);
-	//	}
-	//	if (visited.empty())
-	//		break;
-
-	//	// Get tile with lowest F cost
-	//	int lowestF = std::numeric_limits<int>::max();
-	//	for (auto i : isolatedAdjTiles)
-	//	{
-	//		int cost = CalculateFcost(start, i, target);
-	//		if (cost <= lowestF) 
-	//		{
-	//			if (cost == lowestF && rand() % 2 == 1)
-	//				continue;
-	//			lowestF = cost;
-	//			current = i;
-	//		}
-	//	}
-
-	//	visited.push(current);
-	//	if (current == target)
-	//		break;
-	//}
-
-	//// Reconstruct path
-	//vector<FVector2D> path;
-	//while (!visited.empty())
-	//{
-	//	path.push_back(current);
-	//	current = visited.top();
-	//	visited.pop();
-	//}
-	//return path;
-
-	return vector<FVector2D>();
-}
-
-vector<FVector2D> LevelGrid::FindShortestPathBFS(const FVector2D start, const FVector2D goal, const bool onFilledTiles)
+vector<Tile*> LevelGrid::FindShortestPathBFS(const FVector2D start, const FVector2D goal, const bool onFilledTiles)
 {
 	TQueue<FVector2D> nodeQueue;
 	vector<FVector2D> explored;
@@ -411,14 +465,13 @@ vector<FVector2D> LevelGrid::FindShortestPathBFS(const FVector2D start, const FV
 	{
 		FVector2D current;
 		nodeQueue.Dequeue(current);
-		//nodeQueue.pop_back();
 		if (current == goal)
 		{
-			vector<FVector2D> path;
+			vector<Tile*> path;
 			while (connections[current] != start)
 			{
 				current = connections[current];
-				path.push_back(current);
+				path.push_back(GetParentDeep()->_tiles[current.X][current.Y]);
 			}
 			return path;
 		}
@@ -445,12 +498,5 @@ vector<FVector2D> LevelGrid::FindShortestPathBFS(const FVector2D start, const FV
 			
 	}
 
-	return vector<FVector2D>();
-}
-
-int LevelGrid::CalculateFcost(const FVector2D start, const FVector2D adj, const FVector2D target)
-{
-	int gCost = abs(start.X - adj.X) + abs(start.Y - adj.Y);
-	int hCost = abs(target.X - adj.X) + abs(target.Y - adj.Y);
-	return gCost + hCost * 10;
+	return vector<Tile*>();
 }

@@ -84,11 +84,15 @@ void ALevelBlockout::SpawnBlock(const Tile * tile, const int x, const int y)
 		case END_POS:
 			mat->SetVectorParameterValue(FName(TEXT("Color")), FColor::Red);
 			break;
-		case EDGE:
+		case PATH:
 			mat->SetVectorParameterValue(FName(TEXT("Color")), FColor::Yellow);
 			break;
 		case PICKUP:
 			mat->SetVectorParameterValue(FName(TEXT("Color")), FColor::Orange);
+			break;
+		case ENEMY:
+			meshComp->SetWorldLocation(FVector(x, y, - 0.5 * BLOCK_SCALE * BLOCK_SIZE));
+			mat->SetVectorParameterValue(FName(TEXT("Color")), FColor::Red);
 			break;
 		default:
 			break;

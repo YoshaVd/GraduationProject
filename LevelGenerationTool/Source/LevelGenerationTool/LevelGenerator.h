@@ -36,8 +36,6 @@ public:
 		void RandomWalkBiased(const int steps, const FVector2D start, const FVector2D target);
 	UFUNCTION(BlueprintCallable, Category = "Level Actions")
 		void PartitionSpace(const int granularity = 5, const int roomInset = 0);
-	UFUNCTION(BlueprintCallable, Category = "Level Actions")
-		void DelaunayTriangulation();
 
 	/* blockout code */
 	UFUNCTION(BlueprintCallable, Category = "Level Actions")
@@ -51,10 +49,22 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Level Actions")
 		void EmptySubGridTest();
 
+	/* set level parameters */
+	UFUNCTION(BlueprintCallable, Category = "Level parameters")
+		void SetPercentage_WideCorridor(const int odds) { _wideCorridorPercentage = odds; }
+	UFUNCTION(BlueprintCallable, Category = "Level parameters")
+		void SetPercentage_DoubleCorridor(const int odds) { _doubleCorridorPercentage = odds; }
+	UFUNCTION(BlueprintCallable, Category = "Level parameters")
+		void SetDeviation_Granularity(const int deviation) { _granularityDeviation = deviation; }
+
 private:
 	LevelGrid* _pGrid = nullptr;
 	ALevelBlockout* _pLevelBlockout = nullptr;
 	UStaticMesh* _pBasicBlock = nullptr;
 
 	vector<UStaticMeshComponent*> _pMeshes;
+
+	int _doubleCorridorPercentage;
+	int _wideCorridorPercentage;
+	int _granularityDeviation;
 };

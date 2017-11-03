@@ -30,9 +30,12 @@ void ALevelGenerator::ResetLevel()
 			mesh->DestroyComponent();
 	}
 	_pMeshes.clear();
-
 	delete _pGrid;
+
 	_pGrid = new LevelGrid(width, height);
+	_pGrid->SetOddsWideCorridor(_wideCorridorPercentage);
+	_pGrid->SetOddsDoubleCorridor(_doubleCorridorPercentage);
+	_pGrid->SetGranularityDeviation(_granularityDeviation);
 }
 
 void ALevelGenerator::PerfectMaze()
@@ -170,22 +173,18 @@ void ALevelGenerator::PartitionSpace(const int granularity, const int roomInset)
 		UE_LOG(LogTemp, Error, TEXT("ALevelGenerator::PartitionSpace || Granularity/inset ratio too low."));
 		return;
 	}
-	LevelGrid * grid = _pGrid;
-	grid->SplitDeep(granularity);
-	grid->AddRoomToChildrenDeep(roomInset);
-	grid->ConnectRoomsDeep();
-	vector<Room*> rooms = grid->GetChildRoomsDeep();
+
+	_pGrid->SplitDeep(granularity);
+	_pGrid->AddRoomToChildrenDeep(roomInset);
+	_pGrid->ConnectRoomsDeep();
+	vector<Room*> rooms = _pGrid->GetChildRoomsDeep();
+	if (rooms.size() < 2) return;
 	
 	/* --- FILL LEVEL --- */
-	// start and end
-	if (rooms.size() > 2)
-	{
-		rooms[2]->AddLevelStart();
-		rooms[rooms.size() - 1]->AddLevelEnd();
-		// int distance = 0;
-		// rooms[2]->GetShortestDistance(rooms[rooms.size() - 1], distance);
-		// UE_LOG(LogTemp, Warning, TEXT("Shortest distance between start and end: [%d]"), distance);
-	}
+	// start and end	
+	rooms.back()->AddLevelEnd();
+	Room* startRoom = _pGrid->GetFurthestRoom(rooms, rooms.back());
+	startRoom->AddLevelStart();
 
 	// entities
 	vector<Entity*> entities;
@@ -194,27 +193,20 @@ void ALevelGenerator::PartitionSpace(const int granularity, const int roomInset)
 
 	for (auto r : rooms)
 	{
-		//for (auto e : r->GetEdges())
-		//	e->_state = EDGE;
-		if (rand() % 1 == 0)
+		if (rand() % 3 == 0)
 			r->AddAlcove(new Entity());
 
 		r->PlaceEntitiesOnEdges(entities);
+		r->PlaceEntitiesInCenter(entities);
 	}
 
-	auto path = _pGrid->FindShortestPathBFS(rooms[2]->GetCenterPos(), rooms[rooms.size() - 1]->GetCenterPos(), false);
-	for (auto p : path)
+	auto path = _pGrid->FindShortestPathBFS(startRoom->GetCenterPos(), rooms.back()->GetCenterPos(), false);
+	for (auto t : path)
 	{
-		_pGrid->SetColor(p, FColor::Yellow);
-		_pGrid->SetTileState(_pGrid->GetTiles()[p.X][p.Y], EDGE);
+		_pGrid->SetColor(t, FColor::Yellow);
+		if(t->_state == ROOM)
+			_pGrid->SetTileState(t, PATH);
 	}
-}
-
-void ALevelGenerator::DelaunayTriangulation()
-{
-	LevelGrid * grid = _pGrid;
-	grid->SplitDeep(6);
-	grid->AddRoomToChildrenDeep(2);
 }
 
 void ALevelGenerator::GenerateBlockout()

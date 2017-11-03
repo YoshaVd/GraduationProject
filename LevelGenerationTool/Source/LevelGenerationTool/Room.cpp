@@ -1,5 +1,6 @@
 #include "Room.h"
 #include <stack>
+#include <algorithm>
 
 Room::Room(vector<vector<Tile*>> tiles) 
 	: BaseGrid(tiles)
@@ -78,6 +79,29 @@ vector<Tile*> Room::GetEdges()
 	return edges;
 }
 
+vector<vector<Tile*>> Room::GetMiddle()
+{
+	vector<vector<Tile*>> middle;
+	for (size_t col = 0; col < _width; col++)
+	{
+		if (col > 1 && col < _width - 2)
+			middle.push_back(vector<Tile*>());
+		for (size_t row = 0; row < _height; row++)
+		{
+			if (IsWithinBounds(FVector2D(col, row), FString("Room::GetMiddle")))
+			{
+				if (col > 1 && col < _width - 2 && row > 1 && row < _height - 2)
+				{
+					if (_tiles[col][row]->_state == ROOM)
+						middle[col - 2].push_back(_tiles[col][row]);
+				}
+			}
+		}
+	}
+
+	return middle;
+}
+
 void Room::PlaceEntitiesOnEdges(vector<Entity*> entities)
 {
 	vector<Tile*> emptyEdges = GetTilesWithState(GetEdges(), ROOM);
@@ -100,6 +124,57 @@ void Room::PlaceEntitiesOnEdges(vector<Entity*> entities)
 	}
 }
 
+void Room::PlaceEntitiesInCenter(vector<Entity*> entities)
+{
+	vector<vector<Tile*>> middle = GetMiddle();
+
+	int width = middle.size();
+	int height = middle[0].size();
+	int amount = 6;
+	int entityCols = 0;
+	int entityRows = 0;
+
+	if (height == 0 || width == 0) return;
+	if (width * height < entities.size()) return;
+
+	if (width > height)
+	{
+		int colToRowsRatio = (width + height - 1) / height; // round up
+		entityCols = (amount + colToRowsRatio - 1) / colToRowsRatio; // round up
+		entityRows = amount / entityCols; // round down
+		if (entityRows == 0)
+			entityRows = 1;
+	}
+	else
+	{
+		int rowToColsRatio = (height + width - 1) / width; // round up
+		entityRows = (amount + rowToColsRatio - 1) / rowToColsRatio; // round up
+		entityCols = amount / entityRows; // round down
+		if (entityCols == 0)
+			entityCols = 1;
+	}
+
+	int stepX = (width + entityCols - 1) / entityCols;
+	int stepY = (height + entityRows - 1) / entityRows;
+
+	vector<Tile*> locations;
+	for (size_t col = 0; col < entityCols; col++)
+	{
+		for (size_t row = 0; row < entityRows; row++)
+		{
+			int x = (col * stepX) % (width == 0 ? width : width - 1);
+			int y = (row * stepY) % (height == 0 ? height : height - 1);
+			locations.push_back(middle[x][y]);
+		}
+	}
+
+	random_shuffle(locations.begin(),locations.end());
+	for (size_t i = 0; i < amount; i++)
+	{
+		locations[i]->_state = ENEMY;
+	}
+}
+
 void Room::AddAlcove(Entity * entity)
 {
 	vector<FVector2D> walls = GetWallPositions();
@@ -118,7 +193,7 @@ void Room::AddAlcove(Entity * entity)
 
 Tile * Room::GetCenterTile()
 {
-	if (_tiles[_width / 2][_height / 2])
+	if (IsWithinBounds(_width / 2, _height / 2))
 		return _tiles[_width / 2][_height / 2];
 	else
 	{
@@ -137,7 +212,7 @@ Tile * Room::GetCenterTile()
 
 FVector2D Room::GetCenterPos()
 {
-	if (_tiles[_width / 2][_height / 2])
+	if (IsWithinBounds(_width / 2, _height / 2))
 		return _tiles[_width / 2][_height / 2]->GetPosition();
 	else
 	{
@@ -157,6 +232,19 @@ bool Room::IsCorner(const int x, const int y)
 {
 	return (x == 0 && y == 0) || (x == 0 && y == _height - 1) ||
 		(x == _width - 1 && y == _height - 1) || (x == _width - 1 && y == 0);
+}
+
+bool Room::Contains(TileState state)
+{
+	for (size_t col = 0; col < _width; col++)
+	{
+		for (size_t row = 0; row < _height; row++)
+		{
+			if (_tiles[col][row]->_state == state)
+				return true;
+		}
+	}
+	return false;
 }
 
 int Room::GetShortestDistance(Room * other, int& distance)

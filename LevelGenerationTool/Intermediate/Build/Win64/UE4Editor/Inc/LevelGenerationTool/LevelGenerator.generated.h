@@ -18,6 +18,33 @@ struct FVector2D;
 
 #define LevelGenerationTool_Source_LevelGenerationTool_LevelGenerator_h_14_RPC_WRAPPERS \
  \
+	DECLARE_FUNCTION(execSetDeviation_Granularity) \
+	{ \
+		P_GET_PROPERTY(UIntProperty,Z_Param_deviation); \
+		P_FINISH; \
+		P_NATIVE_BEGIN; \
+		this->SetDeviation_Granularity(Z_Param_deviation); \
+		P_NATIVE_END; \
+	} \
+ \
+	DECLARE_FUNCTION(execSetPercentage_DoubleCorridor) \
+	{ \
+		P_GET_PROPERTY(UIntProperty,Z_Param_odds); \
+		P_FINISH; \
+		P_NATIVE_BEGIN; \
+		this->SetPercentage_DoubleCorridor(Z_Param_odds); \
+		P_NATIVE_END; \
+	} \
+ \
+	DECLARE_FUNCTION(execSetPercentage_WideCorridor) \
+	{ \
+		P_GET_PROPERTY(UIntProperty,Z_Param_odds); \
+		P_FINISH; \
+		P_NATIVE_BEGIN; \
+		this->SetPercentage_WideCorridor(Z_Param_odds); \
+		P_NATIVE_END; \
+	} \
+ \
 	DECLARE_FUNCTION(execEmptySubGridTest) \
 	{ \
 		P_FINISH; \
@@ -48,14 +75,6 @@ struct FVector2D;
 		P_FINISH; \
 		P_NATIVE_BEGIN; \
 		this->SetBasicBlock(Z_Param_mesh); \
-		P_NATIVE_END; \
-	} \
- \
-	DECLARE_FUNCTION(execDelaunayTriangulation) \
-	{ \
-		P_FINISH; \
-		P_NATIVE_BEGIN; \
-		this->DelaunayTriangulation(); \
 		P_NATIVE_END; \
 	} \
  \
@@ -119,6 +138,33 @@ struct FVector2D;
 
 #define LevelGenerationTool_Source_LevelGenerationTool_LevelGenerator_h_14_RPC_WRAPPERS_NO_PURE_DECLS \
  \
+	DECLARE_FUNCTION(execSetDeviation_Granularity) \
+	{ \
+		P_GET_PROPERTY(UIntProperty,Z_Param_deviation); \
+		P_FINISH; \
+		P_NATIVE_BEGIN; \
+		this->SetDeviation_Granularity(Z_Param_deviation); \
+		P_NATIVE_END; \
+	} \
+ \
+	DECLARE_FUNCTION(execSetPercentage_DoubleCorridor) \
+	{ \
+		P_GET_PROPERTY(UIntProperty,Z_Param_odds); \
+		P_FINISH; \
+		P_NATIVE_BEGIN; \
+		this->SetPercentage_DoubleCorridor(Z_Param_odds); \
+		P_NATIVE_END; \
+	} \
+ \
+	DECLARE_FUNCTION(execSetPercentage_WideCorridor) \
+	{ \
+		P_GET_PROPERTY(UIntProperty,Z_Param_odds); \
+		P_FINISH; \
+		P_NATIVE_BEGIN; \
+		this->SetPercentage_WideCorridor(Z_Param_odds); \
+		P_NATIVE_END; \
+	} \
+ \
 	DECLARE_FUNCTION(execEmptySubGridTest) \
 	{ \
 		P_FINISH; \
@@ -149,14 +195,6 @@ struct FVector2D;
 		P_FINISH; \
 		P_NATIVE_BEGIN; \
 		this->SetBasicBlock(Z_Param_mesh); \
-		P_NATIVE_END; \
-	} \
- \
-	DECLARE_FUNCTION(execDelaunayTriangulation) \
-	{ \
-		P_FINISH; \
-		P_NATIVE_BEGIN; \
-		this->DelaunayTriangulation(); \
 		P_NATIVE_END; \
 	} \
  \

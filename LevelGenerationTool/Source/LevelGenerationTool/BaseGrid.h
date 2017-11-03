@@ -16,6 +16,7 @@ public:
 	BaseGrid(const int width, const int height);
 	BaseGrid(vector<vector<Tile*>>& tiles);
 	BaseGrid(const BaseGrid& other);
+	BaseGrid& operator =(const BaseGrid& other);
 	~BaseGrid();
 
 	// Tile get/set functions
@@ -36,6 +37,7 @@ public:
 	void SetFilledPositions(vector<FVector2D> positions, const bool isFilled = false);
 
 	void SetColor(const FVector2D pos, const FColor color);
+	void SetColor(Tile* tile, const FColor color);
 	void SetColorArea(const int bottom, const int left, const int top, const int right, const FColor color);
 	void SetColorAll(const FColor color);
 
@@ -77,7 +79,8 @@ public:
 	Tile* GetVertTile(Tile* t, const int offset);
 
 	// Get pairs
-	Pair* GetClosestStraightPair(vector<Tile*> setA, vector<Tile*> setB);
+	//vector<TPair<Tile*, Tile*>> GetClosestStraightPairs(vector<Tile*> setA, vector<Tile*> setB);
+	bool GetAdjacentPairs(vector<TPair<Tile*, Tile*>> pairs, TPair<TPair<Tile*, Tile*>, TPair<Tile*, Tile*>>& adjacents);
 	int GetShortestDistanceStraight(vector<Tile*> setA, vector<Tile*> setB);
 
 	// Tile checks
@@ -87,6 +90,7 @@ public:
 
 	bool IsWithinBounds(const FVector2D pos, const FString logInfo = "");
 	bool IsWithinBounds(const int x, const int y, const FString logInfo = "");
+	bool IsWithinBounds(const Tile* tile, const FString logInfo = "");
 
 	// Debugging
 	FColor GetBaseColor() { return _baseColor; }

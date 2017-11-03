@@ -52,4 +52,8 @@ private:
 	const int BLOCK_SIZE = 100;
 
 	FVector _spawnLocation;
+
+	/* --- COLORS --- */
+	FColor _colPathRooms = FColor(225, 225, 225);
+	FColor _colOffPathRooms = FColor(200, 200, 200);
 };
