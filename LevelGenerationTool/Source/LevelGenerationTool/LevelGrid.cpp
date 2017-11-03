@@ -326,8 +326,8 @@ Room* LevelGrid::GetClosestRoom(vector<Room*> rooms, Room * targetRoom)
 	int shortestDistance = std::numeric_limits<int>::max();
 	for (auto r : rooms)
 	{
-		FVector2D centerA = targetRoom->GetCenterTile()->_coordinates;
-		FVector2D centerB = r->GetCenterTile()->_coordinates;
+		FVector2D centerA = targetRoom->GetCenterPos();
+		FVector2D centerB = r->GetCenterPos();
 		if ((centerA - centerB).Size() < shortestDistance)
 		{
 			closestRoom = r;
@@ -396,7 +396,7 @@ vector<TPair<Tile*, Tile*>> LevelGrid::GetClosestStraightPairs(vector<Tile*> set
 
 			if (a->_x == b->_x || a->_y == b->_y)
 			{
-				int distance = (a->_coordinates - b->_coordinates).Size();
+				int distance = (a->GetPosition() - b->GetPosition()).Size();
 				if (distance == closestDistance)
 					closestPairs.push_back(TPair<Tile*, Tile*>(a, b));
 			}
@@ -406,6 +406,80 @@ vector<TPair<Tile*, Tile*>> LevelGrid::GetClosestStraightPairs(vector<Tile*> set
 		UE_LOG(LogTemp, Warning, TEXT("BaseGrid::GetClosestStraightPair || No straight pair found."));
 
 	return closestPairs;
+}
+
+void LevelGrid::FlagRoomsOnPath(vector<Tile*> path, RoomType type)
+{
+	Tile* previous = path.front();
+	// flag first room
+	previous->_parent->FlagRoom(type);
+	
+	// flag the other rooms on path
+	for (auto t : path)
+	{
+		if ((t->_state == PATH || t->_state == ROOM) &&
+			(previous->_state == DOOR_NONE || previous->_state == DOOR_LOCKED || previous->_state == DOOR_OPEN))
+		{
+			if (t->_parent)
+				t->_parent->FlagRoom(type);
+		}
+		previous = t;
+	}
+}
+
+vector<Room*> LevelGrid::GetRoomPathToType(Room * start, RoomType type)
+{
+	TQueue<Room*> nodeQueue;
+	vector<Room*> explored;
+	TMap<Room*, Room*> connections;
+	nodeQueue.Enqueue(start);
+
+	while (!nodeQueue.IsEmpty())
+	{
+		Room* current;
+		nodeQueue.Dequeue(current);
+		if (current->GetType() == type)
+		{
+			vector<Room*> path;
+			while (connections[current] != start)
+			{
+				current = connections[current];
+				path.push_back(current);
+			}
+			return path;
+		}
+
+		vector<Room*> adjacents = current->GetConnectedRooms();
+
+		for (auto node : adjacents)
+		{
+			// make sure no explored nodes are checked again
+			if (std::find(explored.begin(), explored.end(), node) != explored.end())
+				continue;
+
+			// mark node as explored
+			explored.push_back(node);
+			// store reference to previous node
+			connections.Add(node, current);
+			// add to queue of nodes to examine
+			nodeQueue.Enqueue(node);
+		}
+	}
+
+	return vector<Room*>();
+}
+
+void LevelGrid::SetRoomDepths()
+{
+	for (auto r : GetChildRoomsDeep())
+	{
+		if (r->GetType() != ON_PATH)
+		{
+			int depth = GetRoomPathToType(r, ON_PATH).size();
+			r->SetDepthLevel(depth);
+
+		}
+	}
 }
 
 bool LevelGrid::FindStraightPath(Tile* start, Tile* target, vector<Tile*>& path)

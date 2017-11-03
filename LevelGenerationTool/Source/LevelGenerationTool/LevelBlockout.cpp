@@ -72,7 +72,14 @@ void ALevelBlockout::SpawnBlock(const Tile * tile, const int x, const int y)
 		switch (tile->_state)
 		{
 		case ROOM:
-			mat->SetVectorParameterValue(FName(TEXT("Color")), FColor::Silver);
+		{
+			int depth = tile->_parent->GetDepthLevel();
+			FColor col = FColor(_colOffPathRooms.R - depth * 30, _colOffPathRooms.G - depth * 30, _colOffPathRooms.B - depth * 30);
+			mat->SetVectorParameterValue(FName(TEXT("Color")), col);
+			break;
+		}
+		case ROOM_ON_PATH:
+			mat->SetVectorParameterValue(FName(TEXT("Color")), _colPathRooms);
 			break;
 		case CORRIDOR:
 			mat->SetVectorParameterValue(FName(TEXT("Color")), FColor::White);

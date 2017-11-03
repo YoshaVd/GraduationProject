@@ -7,6 +7,8 @@ Room::Room(vector<vector<Tile*>> tiles)
 {
 	SetFilledArea(1, 1, _height - 2, _width - 2);
 	SetTileStatesArea(1, 1, _height - 2, _width - 2, ROOM);
+	SetTilesParent();
+
 	_baseColor = FColor::Blue;
 	SetColorAll(_baseColor);
 }
@@ -245,6 +247,53 @@ bool Room::Contains(TileState state)
 		}
 	}
 	return false;
+}
+
+void Room::SetTilesParent()
+{
+	for (size_t col = 0; col < _width; col++)
+	{
+		for (size_t row = 0; row < _height; row++)
+		{
+			_tiles[col][row]->_parent = this;
+		}
+	}
+}
+
+void Room::FlagRoom(RoomType type)
+{
+	_type = type;
+	if (type == ON_PATH)
+	{
+		for (auto t : _tiles)
+			SetTileStates(GetTilesWithState(t, ROOM), ROOM_ON_PATH);
+	}
+	else if (type == OFF_PATH)
+	{
+		//_depthLevel = GetDistanceToRoomWithType(ON_PATH, this);
+	}
+}
+
+int Room::GetDistanceToRoomWithType(RoomType type, Room* previousCaller)
+{
+	vector<int> distances;
+	for (auto r : _connectedRooms)
+	{
+		if (r == previousCaller) continue;
+
+		if (r->_type == type)
+			return 0;
+		else
+			distances.push_back(r->GetDistanceToRoomWithType(type, this) + 1);
+	}
+
+	int shortestDistance = std::numeric_limits<int>::max();
+	for (auto d : distances)
+	{
+		if (d < shortestDistance)
+			shortestDistance = d;
+	}
+	return shortestDistance;
 }
 
 int Room::GetShortestDistance(Room * other, int& distance)

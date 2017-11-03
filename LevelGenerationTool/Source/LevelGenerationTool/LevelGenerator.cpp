@@ -193,11 +193,11 @@ void ALevelGenerator::PartitionSpace(const int granularity, const int roomInset)
 
 	for (auto r : rooms)
 	{
-		if (rand() % 3 == 0)
-			r->AddAlcove(new Entity());
+		//if (rand() % 3 == 0)
+		//	r->AddAlcove(new Entity());
 
-		r->PlaceEntitiesOnEdges(entities);
-		r->PlaceEntitiesInCenter(entities);
+		//r->PlaceEntitiesOnEdges(entities);
+		//r->PlaceEntitiesInCenter(entities);
 	}
 
 	auto path = _pGrid->FindShortestPathBFS(startRoom->GetCenterPos(), rooms.back()->GetCenterPos(), false);
@@ -207,6 +207,8 @@ void ALevelGenerator::PartitionSpace(const int granularity, const int roomInset)
 		if(t->_state == ROOM)
 			_pGrid->SetTileState(t, PATH);
 	}
+	_pGrid->FlagRoomsOnPath(path, ON_PATH);
+	_pGrid->SetRoomDepths();
 }
 
 void ALevelGenerator::GenerateBlockout()

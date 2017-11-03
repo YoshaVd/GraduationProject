@@ -54,6 +54,6 @@ private:
 	FVector _spawnLocation;
 
 	/* --- COLORS --- */
-	FColor _colPathRooms = FColor(225, 225, 225);
-	FColor _colOffPathRooms = FColor(200, 200, 200);
+	FColor _colPathRooms = FColor(235, 235, 235);
+	FColor _colOffPathRooms = FColor(175, 175, 175);
 };

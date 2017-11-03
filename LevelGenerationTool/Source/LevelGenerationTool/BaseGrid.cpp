@@ -548,7 +548,7 @@ int BaseGrid::GetShortestDistanceStraight(vector<Tile*> setA, vector<Tile*> setB
 	{
 		for (auto b : setB)
 		{
-			int distance = (a->_coordinates - b->_coordinates).Size();
+			int distance = (a->GetPosition() - b->GetPosition()).Size();
 			if (distance < closestDistance)
 			{
 				if (a->_x == b->_x || a->_y == b->_y)

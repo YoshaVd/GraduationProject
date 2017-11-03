@@ -50,6 +50,10 @@ public:
 	TPair<Room*, Room*> GetClosestRoomPair(vector<Room*> roomsA, vector<Room*> roomsB);
 	vector<TPair<Tile*, Tile*>> GetClosestStraightPairs(vector<Tile*> setA, vector<Tile*> setB);
 
+	void FlagRoomsOnPath(vector<Tile*> path, RoomType type);
+	vector<Room*> GetRoomPathToType(Room* start, RoomType type);
+	void SetRoomDepths();
+
 	// Pathfinding functions
 	bool FindStraightPath(Tile* start, Tile* target, vector<Tile*>& path);
 	vector<Tile*> FindShortestPathBFS(const FVector2D start, const FVector2D goal, const bool onFilledTiles);
