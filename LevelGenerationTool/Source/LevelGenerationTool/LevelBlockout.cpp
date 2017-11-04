@@ -37,10 +37,17 @@ void ALevelBlockout::GenerateSpawnData()
 				_spawnData.Add(FSpawnData(pos, EProp::E_KEY));
 				break;
 			case DOOR_LOCKED:
+				pos.Z =
 				_spawnData.Add(FSpawnData(pos, EProp::E_DOOR_LOCKED));
 				break;
 			case DOOR_OPEN:
 				_spawnData.Add(FSpawnData(pos, EProp::E_DOOR_OPEN));
+				break;
+			case ENEMY:
+				_spawnData.Add(FSpawnData(pos, EProp::E_ENEMY));
+				break;
+			case PICKUP:
+				_spawnData.Add(FSpawnData(pos, EProp::E_PICKUP));
 				break;
 			default:
 				break;
@@ -92,7 +99,7 @@ void ALevelBlockout::SpawnBlock(const Tile * tile, const int x, const int y)
 	{
 		// set location && scale for walls
 		meshComp->SetWorldLocation(FVector(x, y, 0));
-		meshComp->SetWorldScale3D(FVector(BLOCK_SCALE, BLOCK_SCALE, 1.5 * BLOCK_SCALE));		
+		meshComp->SetWorldScale3D(FVector(BLOCK_SCALE, BLOCK_SCALE, BLOCK_SCALE));		
 		mat->SetVectorParameterValue(FName(TEXT("Color")), tile->_color);
 	}
 	else
@@ -103,9 +110,11 @@ void ALevelBlockout::SpawnBlock(const Tile * tile, const int x, const int y)
 		switch (tile->_state)
 		{
 		case ROOM:
+		case PICKUP:
+		case ENEMY:
 		{
 			int depth = tile->_parent->GetDepthLevel();
-			FColor col = FColor(_colOffPathRooms.R - depth * 30, _colOffPathRooms.G - depth * 30, _colOffPathRooms.B - depth * 30);
+			FColor col = FColor(_colPathRooms.R - depth * 30, _colPathRooms.G - depth * 30, _colPathRooms.B - depth * 30);
 			mat->SetVectorParameterValue(FName(TEXT("Color")), col);
 			break;
 		}
@@ -125,12 +134,12 @@ void ALevelBlockout::SpawnBlock(const Tile * tile, const int x, const int y)
 		case PATH:
 			mat->SetVectorParameterValue(FName(TEXT("Color")), FColor::Yellow);
 			break;
-		case PICKUP:
-			mat->SetVectorParameterValue(FName(TEXT("Color")), FColor::Orange);
-			break;
-		case ENEMY:
-			meshComp->SetWorldLocation(FVector(x, y, - 0.5 * BLOCK_SCALE * BLOCK_SIZE));
-			mat->SetVectorParameterValue(FName(TEXT("Color")), FColor::Red);
+		//case PICKUP:
+		//	mat->SetVectorParameterValue(FName(TEXT("Color")), FColor::Orange);
+		//	break;
+		//case ENEMY:
+		//	meshComp->SetWorldLocation(FVector(x, y, - 0.5 * BLOCK_SCALE * BLOCK_SIZE));
+		//	mat->SetVectorParameterValue(FName(TEXT("Color")), FColor::Red);
 			break;
 		default:
 			break;
@@ -190,6 +199,7 @@ void ALevelBlockout::Generate()
 			SpawnBlock(_tiles[col][row],
 				origin.X + col * BLOCK_SCALE * BLOCK_SIZE,
 				origin.Y + row * BLOCK_SCALE * BLOCK_SIZE);
+
 			if (_tiles[col][row]->_state == DOOR_NONE)
 				SpawnDoorTop(_tiles[col][row], 
 					origin.X + col * BLOCK_SCALE * BLOCK_SIZE,

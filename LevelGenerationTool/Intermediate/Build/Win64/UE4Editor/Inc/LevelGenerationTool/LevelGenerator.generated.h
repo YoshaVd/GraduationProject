@@ -18,6 +18,15 @@ struct FVector2D;
 
 #define LevelGenerationTool_Source_LevelGenerationTool_LevelGenerator_h_14_RPC_WRAPPERS \
  \
+	DECLARE_FUNCTION(execSetRandomized_Inset) \
+	{ \
+		P_GET_UBOOL(Z_Param_enabled); \
+		P_FINISH; \
+		P_NATIVE_BEGIN; \
+		this->SetRandomized_Inset(Z_Param_enabled); \
+		P_NATIVE_END; \
+	} \
+ \
 	DECLARE_FUNCTION(execSetDeviation_Granularity) \
 	{ \
 		P_GET_PROPERTY(UIntProperty,Z_Param_deviation); \
@@ -137,6 +146,15 @@ struct FVector2D;
 
 
 #define LevelGenerationTool_Source_LevelGenerationTool_LevelGenerator_h_14_RPC_WRAPPERS_NO_PURE_DECLS \
+ \
+	DECLARE_FUNCTION(execSetRandomized_Inset) \
+	{ \
+		P_GET_UBOOL(Z_Param_enabled); \
+		P_FINISH; \
+		P_NATIVE_BEGIN; \
+		this->SetRandomized_Inset(Z_Param_enabled); \
+		P_NATIVE_END; \
+	} \
  \
 	DECLARE_FUNCTION(execSetDeviation_Granularity) \
 	{ \

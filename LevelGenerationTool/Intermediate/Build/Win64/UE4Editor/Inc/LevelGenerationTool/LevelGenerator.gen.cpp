@@ -31,6 +31,7 @@ void EmptyLinkFunctionForGeneratedCodeLevelGenerator() {}
 	LEVELGENERATIONTOOL_API UFunction* Z_Construct_UFunction_ALevelGenerator_SetDeviation_Granularity();
 	LEVELGENERATIONTOOL_API UFunction* Z_Construct_UFunction_ALevelGenerator_SetPercentage_DoubleCorridor();
 	LEVELGENERATIONTOOL_API UFunction* Z_Construct_UFunction_ALevelGenerator_SetPercentage_WideCorridor();
+	LEVELGENERATIONTOOL_API UFunction* Z_Construct_UFunction_ALevelGenerator_SetRandomized_Inset();
 	LEVELGENERATIONTOOL_API UClass* Z_Construct_UClass_ALevelGenerator_NoRegister();
 	ENGINE_API UClass* Z_Construct_UClass_AActor();
 	UPackage* Z_Construct_UPackage__Script_LevelGenerationTool();
@@ -53,6 +54,7 @@ void EmptyLinkFunctionForGeneratedCodeLevelGenerator() {}
 			{ "SetDeviation_Granularity", (Native)&ALevelGenerator::execSetDeviation_Granularity },
 			{ "SetPercentage_DoubleCorridor", (Native)&ALevelGenerator::execSetPercentage_DoubleCorridor },
 			{ "SetPercentage_WideCorridor", (Native)&ALevelGenerator::execSetPercentage_WideCorridor },
+			{ "SetRandomized_Inset", (Native)&ALevelGenerator::execSetRandomized_Inset },
 		};
 		FNativeFunctionRegistrar::RegisterFunctions(Class, AnsiFuncs, ARRAY_COUNT(AnsiFuncs));
 	}
@@ -351,6 +353,30 @@ void EmptyLinkFunctionForGeneratedCodeLevelGenerator() {}
 		}
 		return ReturnFunction;
 	}
+	UFunction* Z_Construct_UFunction_ALevelGenerator_SetRandomized_Inset()
+	{
+		struct LevelGenerator_eventSetRandomized_Inset_Parms
+		{
+			bool enabled;
+		};
+		UObject* Outer = Z_Construct_UClass_ALevelGenerator();
+		static UFunction* ReturnFunction = nullptr;
+		if (!ReturnFunction)
+		{
+			ReturnFunction = new(EC_InternalUseOnlyConstructor, Outer, TEXT("SetRandomized_Inset"), RF_Public|RF_Transient|RF_MarkAsNative) UFunction(FObjectInitializer(), nullptr, (EFunctionFlags)0x04020401, 65535, sizeof(LevelGenerator_eventSetRandomized_Inset_Parms));
+			CPP_BOOL_PROPERTY_BITMASK_STRUCT(enabled, LevelGenerator_eventSetRandomized_Inset_Parms);
+			UProperty* NewProp_enabled = new(EC_InternalUseOnlyConstructor, ReturnFunction, TEXT("enabled"), RF_Public|RF_Transient|RF_MarkAsNative) UBoolProperty(FObjectInitializer(), EC_CppProperty, CPP_BOOL_PROPERTY_OFFSET(enabled, LevelGenerator_eventSetRandomized_Inset_Parms), 0x0010000000000082, CPP_BOOL_PROPERTY_BITMASK(enabled, LevelGenerator_eventSetRandomized_Inset_Parms), sizeof(bool), true);
+			ReturnFunction->Bind();
+			ReturnFunction->StaticLink();
+#if WITH_METADATA
+			UMetaData* MetaData = ReturnFunction->GetOutermost()->GetMetaData();
+			MetaData->SetValue(ReturnFunction, TEXT("Category"), TEXT("Level parameters"));
+			MetaData->SetValue(ReturnFunction, TEXT("ModuleRelativePath"), TEXT("LevelGenerator.h"));
+			MetaData->SetValue(NewProp_enabled, TEXT("NativeConst"), TEXT(""));
+#endif
+		}
+		return ReturnFunction;
+	}
 	UClass* Z_Construct_UClass_ALevelGenerator_NoRegister()
 	{
 		return ALevelGenerator::StaticClass();
@@ -381,6 +407,7 @@ void EmptyLinkFunctionForGeneratedCodeLevelGenerator() {}
 				OuterClass->LinkChild(Z_Construct_UFunction_ALevelGenerator_SetDeviation_Granularity());
 				OuterClass->LinkChild(Z_Construct_UFunction_ALevelGenerator_SetPercentage_DoubleCorridor());
 				OuterClass->LinkChild(Z_Construct_UFunction_ALevelGenerator_SetPercentage_WideCorridor());
+				OuterClass->LinkChild(Z_Construct_UFunction_ALevelGenerator_SetRandomized_Inset());
 
 				UProperty* NewProp__pLevelBlockout = new(EC_InternalUseOnlyConstructor, OuterClass, TEXT("_pLevelBlockout"), RF_Public|RF_Transient|RF_MarkAsNative) UObjectProperty(CPP_PROPERTY_BASE(_pLevelBlockout, ALevelGenerator), 0x0010000000000005, Z_Construct_UClass_ALevelBlockout_NoRegister());
 				OuterClass->AddFunctionToFunctionMapWithOverriddenName(Z_Construct_UFunction_ALevelGenerator_EmptySubGridTest(), "EmptySubGridTest"); // 616385459
@@ -396,6 +423,7 @@ void EmptyLinkFunctionForGeneratedCodeLevelGenerator() {}
 				OuterClass->AddFunctionToFunctionMapWithOverriddenName(Z_Construct_UFunction_ALevelGenerator_SetDeviation_Granularity(), "SetDeviation_Granularity"); // 2209787177
 				OuterClass->AddFunctionToFunctionMapWithOverriddenName(Z_Construct_UFunction_ALevelGenerator_SetPercentage_DoubleCorridor(), "SetPercentage_DoubleCorridor"); // 3412002295
 				OuterClass->AddFunctionToFunctionMapWithOverriddenName(Z_Construct_UFunction_ALevelGenerator_SetPercentage_WideCorridor(), "SetPercentage_WideCorridor"); // 1616273556
+				OuterClass->AddFunctionToFunctionMapWithOverriddenName(Z_Construct_UFunction_ALevelGenerator_SetRandomized_Inset(), "SetRandomized_Inset"); // 2516065057
 				static TCppClassTypeInfo<TCppClassTypeTraits<ALevelGenerator> > StaticCppClassTypeInfo;
 				OuterClass->SetCppTypeInfo(&StaticCppClassTypeInfo);
 				OuterClass->StaticLink();
@@ -411,7 +439,7 @@ void EmptyLinkFunctionForGeneratedCodeLevelGenerator() {}
 		check(OuterClass->GetClass());
 		return OuterClass;
 	}
-	IMPLEMENT_CLASS(ALevelGenerator, 3187746054);
+	IMPLEMENT_CLASS(ALevelGenerator, 1893192153);
 	static FCompiledInDefer Z_CompiledInDefer_UClass_ALevelGenerator(Z_Construct_UClass_ALevelGenerator, &ALevelGenerator::StaticClass, TEXT("/Script/LevelGenerationTool"), TEXT("ALevelGenerator"), false, nullptr, nullptr, nullptr);
 	DEFINE_VTABLE_PTR_HELPER_CTOR(ALevelGenerator);
 PRAGMA_ENABLE_DEPRECATION_WARNINGS

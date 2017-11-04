@@ -47,7 +47,9 @@ static FCompiledInDeferEnum Z_CompiledInDeferEnum_UEnum_EProp(EProp_StaticEnum, 
 			EnumNames.Emplace(TEXT("EProp::E_KEY"), 0);
 			EnumNames.Emplace(TEXT("EProp::E_DOOR_OPEN"), 1);
 			EnumNames.Emplace(TEXT("EProp::E_DOOR_LOCKED"), 2);
-			EnumNames.Emplace(TEXT("EProp::E_MAX"), 3);
+			EnumNames.Emplace(TEXT("EProp::E_ENEMY"), 3);
+			EnumNames.Emplace(TEXT("EProp::E_PICKUP"), 4);
+			EnumNames.Emplace(TEXT("EProp::E_MAX"), 5);
 			ReturnEnum->SetEnums(EnumNames, UEnum::ECppForm::EnumClass);
 			ReturnEnum->CppType = TEXT("EProp");
 #if WITH_METADATA
@@ -55,13 +57,15 @@ static FCompiledInDeferEnum Z_CompiledInDeferEnum_UEnum_EProp(EProp_StaticEnum, 
 			MetaData->SetValue(ReturnEnum, TEXT("BlueprintType"), TEXT("true"));
 			MetaData->SetValue(ReturnEnum, TEXT("E_DOOR_LOCKED.DisplayName"), TEXT("Door Locked"));
 			MetaData->SetValue(ReturnEnum, TEXT("E_DOOR_OPEN.DisplayName"), TEXT("Door Open"));
+			MetaData->SetValue(ReturnEnum, TEXT("E_ENEMY.DisplayName"), TEXT("Enemy"));
 			MetaData->SetValue(ReturnEnum, TEXT("E_KEY.DisplayName"), TEXT("Key"));
+			MetaData->SetValue(ReturnEnum, TEXT("E_PICKUP.DisplayName"), TEXT("Pickup"));
 			MetaData->SetValue(ReturnEnum, TEXT("ModuleRelativePath"), TEXT("LevelBlockout.h"));
 #endif
 		}
 		return ReturnEnum;
 	}
-	uint32 Get_Z_Construct_UEnum_LevelGenerationTool_EProp_CRC() { return 375176716U; }
+	uint32 Get_Z_Construct_UEnum_LevelGenerationTool_EProp_CRC() { return 441053904U; }
 class UScriptStruct* FSpawnData::StaticStruct()
 {
 	static class UScriptStruct* Singleton = NULL;

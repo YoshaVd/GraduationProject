@@ -37,7 +37,7 @@ public:
 	bool SplitVertical(const int sizeMin, LevelGrid& subLeft, LevelGrid& subRight);
 
 	// Room functions
-	void AddRoom(const int inset = 0);
+	void AddRoom(int inset = 0);
 	void AddRoomToChildrenDeep(const int inset = 0);
 	bool ConnectRoomsStraight(Room* roomA, Room* roomB);
 	bool ConnectRoomsStraightWide(Room* roomA, Room* roomB);
@@ -58,10 +58,11 @@ public:
 	bool FindStraightPath(Tile* start, Tile* target, vector<Tile*>& path);
 	vector<Tile*> FindShortestPathBFS(const FVector2D start, const FVector2D goal, const bool onFilledTiles);
 
-	// set parameters
+	/* --- UI Parameters --- */
 	void SetOddsDoubleCorridor(const int odds) { _oddsDoubleCorridor = odds; }
 	void SetOddsWideCorridor(const int odds) { _oddsWideCorridor = odds; }
 	void SetGranularityDeviation(const int deviation) { _granularityDeviation = deviation; }
+	void SetInsetRandomized(const bool enabled) { _isInsetRandomized = enabled; }
 
 private:
 	LevelGrid* _parentGrid = nullptr;
@@ -72,4 +73,5 @@ private:
 	int _oddsDoubleCorridor = 20;
 	int _oddsWideCorridor = 30;
 	int _granularityDeviation = 0;
+	bool _isInsetRandomized = false;
 };

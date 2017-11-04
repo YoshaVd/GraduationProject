@@ -56,12 +56,15 @@ public:
 		void SetPercentage_DoubleCorridor(const int odds) { _doubleCorridorPercentage = odds; }
 	UFUNCTION(BlueprintCallable, Category = "Level parameters")
 		void SetDeviation_Granularity(const int deviation) { _granularityDeviation = deviation; }
+	UFUNCTION(BlueprintCallable, Category = "Level parameters")
+		void SetRandomized_Inset(const bool enabled) { _isInsetRandomized = enabled; }
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	ALevelBlockout* _pLevelBlockout = nullptr;
 
 private:
 	LevelGrid* _pGrid = nullptr;
+	LevelGrid* _pGridEmptyLayout = nullptr;
 	UStaticMesh* _pBasicBlock = nullptr;
 
 	vector<UStaticMeshComponent*> _pMeshes;
@@ -69,4 +72,5 @@ private:
 	int _doubleCorridorPercentage;
 	int _wideCorridorPercentage;
 	int _granularityDeviation;
+	bool _isInsetRandomized;
 };

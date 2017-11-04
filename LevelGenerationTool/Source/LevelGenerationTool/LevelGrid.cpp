@@ -163,12 +163,15 @@ vector<LevelGrid*> LevelGrid::GetChildrenDeep()
 	return children;
 }
 
-void LevelGrid::AddRoom(const int inset)
+void LevelGrid::AddRoom(int inset)
 {
 	if (2 * inset + 4 > _width || 2 * inset + 4 > _height) {
 		UE_LOG(LogTemp, Error, TEXT("LevelGrid::AddRoom || Inset is too high for this room size"));
 		return;
 	}
+	if (GetParentDeep()->_isInsetRandomized)
+		inset = rand() % ++inset;
+
 	_rooms.push_back(new Room(GetTilesArea(inset, inset, _height - (inset + 1), _width - (inset + 1))));
 }
 
@@ -272,9 +275,7 @@ void LevelGrid::ConnectRoomsDeep()
 		return;
 	
 	for (auto c : _childGrids)
-	{
 		c->ConnectRoomsDeep();
-	}
 
 	// get child rooms on both sides
 	vector<Room*> roomsLeft = _childGrids[0]->GetChildRoomsDeep();
@@ -380,7 +381,7 @@ TPair<Room*, Room*> LevelGrid::GetClosestRoomPair(vector<Room*> roomsA, vector<R
 vector<TPair<Tile*, Tile*>> LevelGrid::GetClosestStraightPairs(vector<Tile*> setA, vector<Tile*> setB)
 {
 	int closestDistance = GetShortestDistanceStraight(setA, setB);
-	vector<TPair<Tile*, Tile*>> closestPairs;
+	vector<TPair<Tile*, Tile*>> closestPairs{};
 	LevelGrid* parentDeep = GetParentDeep();
 	for (auto a : setA)
 	{
@@ -475,9 +476,8 @@ void LevelGrid::SetRoomDepths()
 	{
 		if (r->GetType() != ON_PATH)
 		{
-			int depth = GetRoomPathToType(r, ON_PATH).size();
+			int depth = GetRoomPathToType(r, ON_PATH).size() + 1;
 			r->SetDepthLevel(depth);
-
 		}
 	}
 }

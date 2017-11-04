@@ -36,6 +36,7 @@ void ALevelGenerator::ResetLevel()
 	_pGrid->SetOddsWideCorridor(_wideCorridorPercentage);
 	_pGrid->SetOddsDoubleCorridor(_doubleCorridorPercentage);
 	_pGrid->SetGranularityDeviation(_granularityDeviation);
+	_pGrid->SetInsetRandomized(_isInsetRandomized);
 }
 
 void ALevelGenerator::PerfectMaze()
@@ -213,8 +214,8 @@ void ALevelGenerator::PartitionSpace(const int granularity, const int roomInset)
 		//if (rand() % 3 == 0)
 		//	r->AddAlcove(new Entity());
 
-		//r->PlaceEntitiesOnEdges(entities);
-		//r->PlaceEntitiesInCenter(entities);
+		r->PlaceEntitiesOnEdges(entities);
+		r->PlaceEntitiesInCenter(entities);
 	}
 
 	auto path = _pGrid->FindShortestPathBFS(startRoom->GetCenterPos(), rooms.back()->GetCenterPos(), false);
