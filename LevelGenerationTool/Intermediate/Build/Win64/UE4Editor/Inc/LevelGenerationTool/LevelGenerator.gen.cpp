@@ -326,10 +326,12 @@ void EmptyLinkFunctionForGeneratedCodeLevelGenerator() {}
 
 				UProperty* NewProp__enemyAlcoveRate = new(EC_InternalUseOnlyConstructor, OuterClass, TEXT("_enemyAlcoveRate"), RF_Public|RF_Transient|RF_MarkAsNative) UFloatProperty(CPP_PROPERTY_BASE(_enemyAlcoveRate, ALevelGenerator), 0x0010000000000005);
 				UProperty* NewProp__enemyCenterSpawnRate = new(EC_InternalUseOnlyConstructor, OuterClass, TEXT("_enemyCenterSpawnRate"), RF_Public|RF_Transient|RF_MarkAsNative) UFloatProperty(CPP_PROPERTY_BASE(_enemyCenterSpawnRate, ALevelGenerator), 0x0010000000000005);
+				UProperty* NewProp__enemySideSpawnRate = new(EC_InternalUseOnlyConstructor, OuterClass, TEXT("_enemySideSpawnRate"), RF_Public|RF_Transient|RF_MarkAsNative) UFloatProperty(CPP_PROPERTY_BASE(_enemySideSpawnRate, ALevelGenerator), 0x0010000000000005);
 				UProperty* NewProp__enemyPathSpawnRate = new(EC_InternalUseOnlyConstructor, OuterClass, TEXT("_enemyPathSpawnRate"), RF_Public|RF_Transient|RF_MarkAsNative) UFloatProperty(CPP_PROPERTY_BASE(_enemyPathSpawnRate, ALevelGenerator), 0x0010000000000005);
 				UProperty* NewProp__enemyDensity = new(EC_InternalUseOnlyConstructor, OuterClass, TEXT("_enemyDensity"), RF_Public|RF_Transient|RF_MarkAsNative) UFloatProperty(CPP_PROPERTY_BASE(_enemyDensity, ALevelGenerator), 0x0010000000000005);
 				UProperty* NewProp__pickupAlcoveRate = new(EC_InternalUseOnlyConstructor, OuterClass, TEXT("_pickupAlcoveRate"), RF_Public|RF_Transient|RF_MarkAsNative) UFloatProperty(CPP_PROPERTY_BASE(_pickupAlcoveRate, ALevelGenerator), 0x0010000000000005);
 				UProperty* NewProp__pickupCenterSpawnRate = new(EC_InternalUseOnlyConstructor, OuterClass, TEXT("_pickupCenterSpawnRate"), RF_Public|RF_Transient|RF_MarkAsNative) UFloatProperty(CPP_PROPERTY_BASE(_pickupCenterSpawnRate, ALevelGenerator), 0x0010000000000005);
+				UProperty* NewProp__pickupSideSpawnRate = new(EC_InternalUseOnlyConstructor, OuterClass, TEXT("_pickupSideSpawnRate"), RF_Public|RF_Transient|RF_MarkAsNative) UFloatProperty(CPP_PROPERTY_BASE(_pickupSideSpawnRate, ALevelGenerator), 0x0010000000000005);
 				UProperty* NewProp__pickupPathSpawnRate = new(EC_InternalUseOnlyConstructor, OuterClass, TEXT("_pickupPathSpawnRate"), RF_Public|RF_Transient|RF_MarkAsNative) UFloatProperty(CPP_PROPERTY_BASE(_pickupPathSpawnRate, ALevelGenerator), 0x0010000000000005);
 				UProperty* NewProp__pickupDensity = new(EC_InternalUseOnlyConstructor, OuterClass, TEXT("_pickupDensity"), RF_Public|RF_Transient|RF_MarkAsNative) UFloatProperty(CPP_PROPERTY_BASE(_pickupDensity, ALevelGenerator), 0x0010000000000005);
 				CPP_BOOL_PROPERTY_BITMASK_STRUCT(_isInsetRandomized, ALevelGenerator);
@@ -361,7 +363,10 @@ void EmptyLinkFunctionForGeneratedCodeLevelGenerator() {}
 				MetaData->SetValue(NewProp__enemyAlcoveRate, TEXT("ToolTip"), TEXT("Chance to spawn in the center of rooms vs at the edges"));
 				MetaData->SetValue(NewProp__enemyCenterSpawnRate, TEXT("Category"), TEXT("Filler parameters"));
 				MetaData->SetValue(NewProp__enemyCenterSpawnRate, TEXT("ModuleRelativePath"), TEXT("LevelGenerator.h"));
-				MetaData->SetValue(NewProp__enemyCenterSpawnRate, TEXT("ToolTip"), TEXT("Chance to spawn on path rooms vs off path rooms"));
+				MetaData->SetValue(NewProp__enemyCenterSpawnRate, TEXT("ToolTip"), TEXT("Chance to spawn on side rooms"));
+				MetaData->SetValue(NewProp__enemySideSpawnRate, TEXT("Category"), TEXT("Filler parameters"));
+				MetaData->SetValue(NewProp__enemySideSpawnRate, TEXT("ModuleRelativePath"), TEXT("LevelGenerator.h"));
+				MetaData->SetValue(NewProp__enemySideSpawnRate, TEXT("ToolTip"), TEXT("Chance to spawn on path rooms"));
 				MetaData->SetValue(NewProp__enemyPathSpawnRate, TEXT("Category"), TEXT("Filler parameters"));
 				MetaData->SetValue(NewProp__enemyPathSpawnRate, TEXT("ModuleRelativePath"), TEXT("LevelGenerator.h"));
 				MetaData->SetValue(NewProp__enemyPathSpawnRate, TEXT("ToolTip"), TEXT("Actual spawns / maximum spawns"));
@@ -373,7 +378,10 @@ void EmptyLinkFunctionForGeneratedCodeLevelGenerator() {}
 				MetaData->SetValue(NewProp__pickupAlcoveRate, TEXT("ToolTip"), TEXT("Chance to spawn in the center of rooms vs at the edges"));
 				MetaData->SetValue(NewProp__pickupCenterSpawnRate, TEXT("Category"), TEXT("Filler parameters"));
 				MetaData->SetValue(NewProp__pickupCenterSpawnRate, TEXT("ModuleRelativePath"), TEXT("LevelGenerator.h"));
-				MetaData->SetValue(NewProp__pickupCenterSpawnRate, TEXT("ToolTip"), TEXT("Chance to spawn on path rooms vs off path rooms"));
+				MetaData->SetValue(NewProp__pickupCenterSpawnRate, TEXT("ToolTip"), TEXT("Chance to spawn on side rooms"));
+				MetaData->SetValue(NewProp__pickupSideSpawnRate, TEXT("Category"), TEXT("Filler parameters"));
+				MetaData->SetValue(NewProp__pickupSideSpawnRate, TEXT("ModuleRelativePath"), TEXT("LevelGenerator.h"));
+				MetaData->SetValue(NewProp__pickupSideSpawnRate, TEXT("ToolTip"), TEXT("Chance to spawn on path rooms"));
 				MetaData->SetValue(NewProp__pickupPathSpawnRate, TEXT("Category"), TEXT("Filler parameters"));
 				MetaData->SetValue(NewProp__pickupPathSpawnRate, TEXT("ModuleRelativePath"), TEXT("LevelGenerator.h"));
 				MetaData->SetValue(NewProp__pickupPathSpawnRate, TEXT("ToolTip"), TEXT("Actual spawns / maximum spawns"));
@@ -400,7 +408,7 @@ void EmptyLinkFunctionForGeneratedCodeLevelGenerator() {}
 		check(OuterClass->GetClass());
 		return OuterClass;
 	}
-	IMPLEMENT_CLASS(ALevelGenerator, 953972196);
+	IMPLEMENT_CLASS(ALevelGenerator, 242796263);
 	static FCompiledInDefer Z_CompiledInDefer_UClass_ALevelGenerator(Z_Construct_UClass_ALevelGenerator, &ALevelGenerator::StaticClass, TEXT("/Script/LevelGenerationTool"), TEXT("ALevelGenerator"), false, nullptr, nullptr, nullptr);
 	DEFINE_VTABLE_PTR_HELPER_CTOR(ALevelGenerator);
 PRAGMA_ENABLE_DEPRECATION_WARNINGS

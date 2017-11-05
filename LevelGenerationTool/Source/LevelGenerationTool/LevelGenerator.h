@@ -74,7 +74,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Filler parameters")
 		float _pickupDensity = 0.5;					// Actual spawns / maximum spawns
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Filler parameters")
-		float _pickupPathSpawnRate = 0.5;				// Chance to spawn on path rooms vs off path rooms
+		float _pickupPathSpawnRate = 0.5;			// Chance to spawn on path rooms
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Filler parameters")
+		float _pickupSideSpawnRate = 0.5;			// Chance to spawn on side rooms
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Filler parameters")
 		float _pickupCenterSpawnRate = 0.5;			// Chance to spawn in the center of rooms vs at the edges
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Filler parameters")
@@ -83,11 +85,13 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Filler parameters")
 		float _enemyDensity = 0.5;					// Actual spawns / maximum spawns
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Filler parameters")
-		float _enemyPathSpawnRate = 0.5;				// Chance to spawn on path rooms vs off path rooms
+		float _enemyPathSpawnRate = 0.5;			// Chance to spawn on path rooms
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Filler parameters")
+		float _enemySideSpawnRate = 0.5;			// Chance to spawn on side rooms
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Filler parameters")
 		float _enemyCenterSpawnRate = 0.5;			// Chance to spawn in the center of rooms vs at the edges
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Filler parameters")
-		float _enemyAlcoveRate = 0.5;					// Chance of edge spawns to generate an alcove
+		float _enemyAlcoveRate = 0.5;				// Chance of edge spawns to generate an alcove
 
 private:
 	/* --- Functions --- */

@@ -9,6 +9,7 @@
 
 enum RoomType
 {
+	START,
 	NO_TYPE,
 	ON_PATH,
 	OFF_PATH

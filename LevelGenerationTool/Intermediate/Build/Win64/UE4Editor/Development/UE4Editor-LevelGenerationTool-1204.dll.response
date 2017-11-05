@@ -71,7 +71,7 @@
 "C:\Program Files\Epic Games\UE_4.17\Engine\Intermediate\Build\Win64\UE4Editor\Development\UE4Editor-Core.lib"
 "C:\Program Files\Epic Games\UE_4.17\Engine\Intermediate\Build\Win64\UE4Editor\Development\UE4Editor-CoreUObject.lib"
 "C:\Program Files\Epic Games\UE_4.17\Engine\Intermediate\Build\Win64\UE4Editor\Development\UE4Editor-InputCore.lib"
-/OUT:"C:\Users\Yosha\Documents\DAE\Graduation Project\Repository\LevelGenerationTool\Binaries\Win64\UE4Editor-LevelGenerationTool-2550.dll"
-/IMPLIB:"C:\Users\Yosha\Documents\DAE\Graduation Project\Repository\LevelGenerationTool\Intermediate\Build\Win64\UE4Editor\Development\UE4Editor-LevelGenerationTool-2550.suppressed.lib"
-/PDB:"C:\Users\Yosha\Documents\DAE\Graduation Project\Repository\LevelGenerationTool\Binaries\Win64\UE4Editor-LevelGenerationTool-2550.pdb"
+/OUT:"C:\Users\Yosha\Documents\DAE\Graduation Project\Repository\LevelGenerationTool\Binaries\Win64\UE4Editor-LevelGenerationTool-1204.dll"
+/IMPLIB:"C:\Users\Yosha\Documents\DAE\Graduation Project\Repository\LevelGenerationTool\Intermediate\Build\Win64\UE4Editor\Development\UE4Editor-LevelGenerationTool-1204.suppressed.lib"
+/PDB:"C:\Users\Yosha\Documents\DAE\Graduation Project\Repository\LevelGenerationTool\Binaries\Win64\UE4Editor-LevelGenerationTool-1204.pdb"
 /ignore:4078

@@ -295,11 +295,13 @@ void ALevelGenerator::SetFillerParameters()
 
 	_pFiller->SetPickupDensity(_pickupDensity);
 	_pFiller->SetPickupPathSpawnrate(_pickupPathSpawnRate);
+	_pFiller->SetPickupSideSpawnrate(_pickupSideSpawnRate);
 	_pFiller->SetPickupCenterSpawnrate(_pickupCenterSpawnRate);
 	_pFiller->SetPickupAlcoveSpawnrate(_pickupAlcoveRate);
 
 	_pFiller->SetEnemyDensity(_enemyDensity);
 	_pFiller->SetEnemyPathSpawnrate(_enemyPathSpawnRate);
+	_pFiller->SetEnemySideSpawnrate(_enemySideSpawnRate);
 	_pFiller->SetEnemyCenterSpawnrate(_enemyCenterSpawnRate);
 	_pFiller->SetEnemyAlcoveSpawnrate(_enemyAlcoveRate);
 }

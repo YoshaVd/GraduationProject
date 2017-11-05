@@ -41,65 +41,81 @@ vector<Tile*> LevelFiller::GetAlcoveFriendlyTiles(Room * room)
 
 void LevelFiller::FillRoomsWithLoot()
 {
-	float pathDensity = _pickupDensity * _pickupPathSpawnRate;
-	float sideRoomDensity = _pickupDensity * (1 - _pickupPathSpawnRate);
 	float pickupEdgeSpawnRate = 1 - _pickupCenterSpawnRate;
 
 	for (auto r : _rooms)
 	{
-		if (r->GetType() == ON_PATH)
+		if (r->GetType() == ON_PATH || r->GetType() == START)
 		{
-			r->PlaceEntitiesOnEdges(pathDensity * pickupEdgeSpawnRate, PICKUP, _pickupAlcoveRate, GetAlcoveFriendlyTiles(r));
-			r->PlaceEntitiesInCenter(pathDensity * _pickupCenterSpawnRate, PICKUP);
+			r->PlaceEntitiesOnEdges(_pickupDensity * _pickupPathSpawnRate * pickupEdgeSpawnRate, PICKUP, _pickupAlcoveRate, GetAlcoveFriendlyTiles(r));
+			r->PlaceEntitiesInCenter(_pickupDensity *_pickupPathSpawnRate * _pickupCenterSpawnRate, PICKUP);
 		}
 		else
 		{
-			r->PlaceEntitiesOnEdges(sideRoomDensity * pickupEdgeSpawnRate, PICKUP, _pickupAlcoveRate, GetAlcoveFriendlyTiles(r));
-			r->PlaceEntitiesInCenter(sideRoomDensity * _pickupCenterSpawnRate, PICKUP);
+			r->PlaceEntitiesOnEdges(_pickupDensity *_pickupSideSpawnRate * pickupEdgeSpawnRate, PICKUP, _pickupAlcoveRate, GetAlcoveFriendlyTiles(r));
+			r->PlaceEntitiesInCenter(_pickupDensity *_pickupSideSpawnRate * _pickupCenterSpawnRate, PICKUP);
 		}
 	}
 }
 
 void LevelFiller::FillRoomsWithEnemies()
 {
-	float pathDensity = _enemyDensity * _enemyPathSpawnRate;
-	float sideRoomDensity = _enemyDensity * (1 - _enemyPathSpawnRate);
 	float enemyEdgeSpawnRate = 1 - _enemyCenterSpawnRate;
 
 	for (auto r : _rooms)
 	{
+		if (r->GetType() == START)
+			continue;
+
 		if (r->GetType() == ON_PATH)
 		{
-			r->PlaceEntitiesOnEdges(pathDensity * enemyEdgeSpawnRate, ENEMY, _enemyAlcoveRate, GetAlcoveFriendlyTiles(r));
-			r->PlaceEntitiesInCenter(pathDensity * _enemyCenterSpawnRate, ENEMY);
+			r->PlaceEntitiesOnEdges(_enemyDensity * _enemyPathSpawnRate * enemyEdgeSpawnRate, ENEMY, _enemyAlcoveRate, GetAlcoveFriendlyTiles(r));
+			r->PlaceEntitiesInCenter(_enemyDensity * _enemyPathSpawnRate * _enemyCenterSpawnRate, ENEMY);
 		}
 		else
 		{
-			r->PlaceEntitiesOnEdges(sideRoomDensity * enemyEdgeSpawnRate, ENEMY, _enemyAlcoveRate, GetAlcoveFriendlyTiles(r));
-			r->PlaceEntitiesInCenter(sideRoomDensity * _enemyCenterSpawnRate, ENEMY);
+			r->PlaceEntitiesOnEdges(_enemyDensity * _enemySideSpawnRate * enemyEdgeSpawnRate, ENEMY, _enemyAlcoveRate, GetAlcoveFriendlyTiles(r));
+			r->PlaceEntitiesInCenter(_enemyDensity * _enemySideSpawnRate * _enemyCenterSpawnRate, ENEMY);
 		}
 	}
 }
 
 void LevelFiller::EmptyRooms()
 {
-	vector<vector<Tile*>> tiles = _pGrid->GetTiles();
-
-	for (auto col : tiles)
+	vector<vector<Tile*>> tiles2D;
+	vector<Tile*> tiles;
+	vector<Tile*> entities;
+	vector<TileState> states{ PICKUP, ENEMY };
+	vector<Tile*> walls;
+	for (auto r : _rooms)
 	{
-		for (auto t : col)
+		walls = r->GetWallTiles();
+		// 1d array of room tiles
+		tiles2D = r->GetTiles();
+		for (auto col : tiles2D)
 		{
-			if (t->_state == PICKUP
-				|| t->_state == ENEMY)
+			for (auto t : col)
 			{
-				if (t->_parent->GetType() == ON_PATH)
-					t->_state = ROOM_ON_PATH;
-				else
-					t->_state = ROOM;
-				// fill alcoves
-				if (_pGrid->GetFilledTiles(_pGrid->GetAdjacentTiles(t)).size() == 3)
-					t->_isFilled = true;
+				tiles.push_back(t);
 			}
+		}
+
+		// put tiles with object back to their intended roomstate
+		entities = _pGrid->GetTilesWithStates(tiles, states);
+		for (auto e : entities)
+		{
+			if (e->_parent->GetType() == ON_PATH)
+				e->_state = ROOM_ON_PATH;
+			else
+				e->_state = ROOM;
+
+			// if loot == wall -> fill alcove
+			for (auto w : walls) 
+			{
+				if (e == w)
+					e->_isFilled = true;
+			}
+			
 		}
 	}
 }
