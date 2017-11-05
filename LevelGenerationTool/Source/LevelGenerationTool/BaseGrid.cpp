@@ -226,6 +226,23 @@ vector<Tile*> BaseGrid::GetTilesWithState(const vector<Tile*> tiles, const TileS
 	return tilesWithState;
 }
 
+vector<Tile*> BaseGrid::GetTilesWithStates(const vector<Tile*> tiles, const vector<TileState> states)
+{
+	vector<Tile*> tilesWithState;
+	for (auto t : tiles)
+	{
+		for (auto s : states)
+		{
+			if (t->_state == s) 
+			{
+				tilesWithState.push_back(t);
+				break;
+			}
+		}
+	}
+	return tilesWithState;
+}
+
 bool BaseGrid::IsAdjTileWithState(const FVector2D pos, const TileState state)
 {
 	for (auto adj : GetAdjacentPositions(pos))
@@ -396,6 +413,17 @@ vector<FVector2D> BaseGrid::GetEmpties(const vector<FVector2D> positions)
 	return empties;
 }
 
+vector<Tile*> BaseGrid::GetEmptyTiles(const vector<Tile*> tiles)
+{
+	vector<Tile*> empties;
+	for (auto t : tiles)
+	{
+		if (!t->_isFilled)
+			empties.push_back(t);
+	}
+	return empties;
+}
+
 vector<FVector2D> BaseGrid::GetFilleds(const vector<FVector2D> positions)
 {
 	vector<FVector2D> filleds;
@@ -403,6 +431,17 @@ vector<FVector2D> BaseGrid::GetFilleds(const vector<FVector2D> positions)
 	{
 		if (IsWithinBounds(p.X, p.Y) && _tiles[p.X][p.Y]->_isFilled)
 			filleds.push_back(p);
+	}
+	return filleds;
+}
+
+vector<Tile*> BaseGrid::GetFilledTiles(const vector<Tile*> tiles)
+{
+	vector<Tile*> filleds;
+	for (auto t : tiles)
+	{
+		if (t->_isFilled)
+			filleds.push_back(t);
 	}
 	return filleds;
 }

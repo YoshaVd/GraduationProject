@@ -277,6 +277,9 @@ void LevelGrid::ConnectRoomsDeep()
 	for (auto c : _childGrids)
 		c->ConnectRoomsDeep();
 
+	if (_childGrids.size() == 1)
+		return;
+
 	// get child rooms on both sides
 	vector<Room*> roomsLeft = _childGrids[0]->GetChildRoomsDeep();
 	vector<Room*> roomsRight = _childGrids[1]->GetChildRoomsDeep();

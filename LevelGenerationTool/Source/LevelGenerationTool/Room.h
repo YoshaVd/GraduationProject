@@ -25,8 +25,10 @@ public:
 	Tile* GetRandomWall();
 	vector<Tile*> GetWalls();
 	vector<FVector2D> GetWallPositions();
+	vector<Tile*> GetWallTiles();
 	vector<Tile*> GetEdges();
-	vector<vector<Tile*>> GetMiddle();
+	vector<vector<Tile*>> GetMiddle2D();
+	vector<Tile*> GetMiddle();
 
 	int GetLeft() { return _tiles[0][0]->_x; }
 	int GetBottom() { return _tiles[0][0]->_y; }
@@ -54,13 +56,17 @@ public:
 	// Fill
 	void AddLevelStart();
 	void AddLevelEnd();
-	//void FillWithEnemies();
-	void PlaceEntitiesOnEdges(vector<Entity*> entities);
-	void PlaceEntitiesInCenter(vector<Entity*> entities);
+	int GetMaxEdgeEntities();
+	int GetMaxCenterEntities();
+	void PlaceEntitiesOnEdges(float density, const TileState state, float alcoveDensity = 0, vector<Tile*> alcoveTiles = vector<Tile*>());
+	void PlaceEntitiesInCenter(float density, TileState state);
 	void AddAlcove(Entity* entity);
 
 private:
 	vector<Room*> _connectedRooms;
 	RoomType _type = NO_TYPE;
 	int _depthLevel = 0;
+
+	const float ENTITY_PER_EDGE = 0.70;
+	const float ENTITY_PER_MIDDLE = 1;
 };

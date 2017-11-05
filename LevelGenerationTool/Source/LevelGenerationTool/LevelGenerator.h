@@ -5,6 +5,7 @@
 #include "LevelGrid.h"
 #include "LevelBlockout.h"
 #include "Runtime/Engine/Classes/Components/StaticMeshComponent.h"
+#include "LevelFiller.h"
 
 #include "LevelGenerator.generated.h"
 
@@ -51,26 +52,52 @@ public:
 
 	/* set level parameters */
 	UFUNCTION(BlueprintCallable, Category = "Level parameters")
-		void SetPercentage_WideCorridor(const int odds) { _wideCorridorPercentage = odds; }
-	UFUNCTION(BlueprintCallable, Category = "Level parameters")
-		void SetPercentage_DoubleCorridor(const int odds) { _doubleCorridorPercentage = odds; }
-	UFUNCTION(BlueprintCallable, Category = "Level parameters")
-		void SetDeviation_Granularity(const int deviation) { _granularityDeviation = deviation; }
-	UFUNCTION(BlueprintCallable, Category = "Level parameters")
-		void SetRandomized_Inset(const bool enabled) { _isInsetRandomized = enabled; }
+		void UpdateLevelContent();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	ALevelBlockout* _pLevelBlockout = nullptr;
 
+	/* ------------------------- */
+	/* ----- UI PARAMETERS ----- */
+	/* ------------------------- */
+	/* --- Layout parameters --- */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Layout parameters")
+		int _doubleCorridorPercentage;				// Chance of making a second entrance to the same area
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Layout parameters")
+		int _wideCorridorPercentage;				// Chance of making a corridor twice the width
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Layout parameters")
+		int _granularityDeviation;					// Amount the granularity can randomly deviate upwards
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Layout parameters")
+		bool _isInsetRandomized;					// Makes inset range between 0 and the specified amount
+
+	/* --- Filler parameters --- */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Filler parameters")
+		float _pickupDensity = 0.5;					// Actual spawns / maximum spawns
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Filler parameters")
+		float _pickupPathSpawnRate = 0.5;				// Chance to spawn on path rooms vs off path rooms
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Filler parameters")
+		float _pickupCenterSpawnRate = 0.5;			// Chance to spawn in the center of rooms vs at the edges
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Filler parameters")
+		float _pickupAlcoveRate = 0.5;				// Chance of edge spawns to generate an alcove
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Filler parameters")
+		float _enemyDensity = 0.5;					// Actual spawns / maximum spawns
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Filler parameters")
+		float _enemyPathSpawnRate = 0.5;				// Chance to spawn on path rooms vs off path rooms
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Filler parameters")
+		float _enemyCenterSpawnRate = 0.5;			// Chance to spawn in the center of rooms vs at the edges
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Filler parameters")
+		float _enemyAlcoveRate = 0.5;					// Chance of edge spawns to generate an alcove
+
 private:
+	/* --- Functions --- */
+	void SetLayoutParamaters(LevelGrid* grid);
+	void SetFillerParameters();
+
+	/* --- Members --- */
 	LevelGrid* _pGrid = nullptr;
-	LevelGrid* _pGridEmptyLayout = nullptr;
+	LevelFiller* _pFiller = nullptr;
 	UStaticMesh* _pBasicBlock = nullptr;
 
 	vector<UStaticMeshComponent*> _pMeshes;
-
-	int _doubleCorridorPercentage;
-	int _wideCorridorPercentage;
-	int _granularityDeviation;
-	bool _isInsetRandomized;
 };

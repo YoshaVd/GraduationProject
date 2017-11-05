@@ -1,6 +1,7 @@
 #include "Room.h"
 #include <stack>
 #include <algorithm>
+#include "Runtime/Core/Public/Math/UnrealMathUtility.h"
 
 Room::Room(vector<vector<Tile*>> tiles) 
 	: BaseGrid(tiles)
@@ -18,6 +19,8 @@ Room::Room(const Room & other)
 {
 	SetFilledArea(1, 1, _height - 2, _width - 2);
 	SetTileStatesArea(1, 1, _height - 2, _width - 2, ROOM);
+	SetTilesParent();
+
 	_baseColor = FColor::Blue;
 	SetColorAll(_baseColor);
 }
@@ -35,6 +38,8 @@ vector<Tile*> Room::GetWalls()
 	{
 		for (size_t row = 0; row < _height; row++)
 		{
+			if (!IsWithinBounds(col, row))
+				continue;
 			// don't return corners
 			if(IsCorner(col, row))
 				continue;
@@ -64,6 +69,24 @@ vector<FVector2D> Room::GetWallPositions()
 	return walls;
 }
 
+vector<Tile*> Room::GetWallTiles()
+{
+	vector<Tile*> walls;
+	for (size_t col = 0; col < _width; col++)
+	{
+		for (size_t row = 0; row < _height; row++)
+		{
+			// don't return corners
+			if (IsCorner(col, row))
+				continue;
+			if (col == 0 || col == _width - 1 || row == 0 || row == _height - 1)
+				walls.push_back(_tiles[col][row]);
+		}
+	}
+
+	return walls;
+}
+
 vector<Tile*> Room::GetEdges()
 {
 	vector<Tile*> edges;
@@ -73,7 +96,9 @@ vector<Tile*> Room::GetEdges()
 		{
 			if (col != 0 && col != _width - 1 && row != 0 && row != _height - 1)
 				if (col == 1 || col == _width - 2 || row == 1 || row == _height - 2)
-					if (!IsAdjTileWithState(FVector2D(col, row), DOOR_NONE))
+					if (!IsAdjTileWithState(FVector2D(col, row), DOOR_NONE)
+						&& !IsAdjTileWithState(FVector2D(col, row), DOOR_LOCKED)
+						&& !IsAdjTileWithState(FVector2D(col, row), DOOR_LOCKED))
 						edges.push_back(_tiles[col][row]);
 		}
 	}
@@ -81,7 +106,7 @@ vector<Tile*> Room::GetEdges()
 	return edges;
 }
 
-vector<vector<Tile*>> Room::GetMiddle()
+vector<vector<Tile*>> Room::GetMiddle2D()
 {
 	vector<vector<Tile*>> middle;
 	for (size_t col = 0; col < _width; col++)
@@ -90,13 +115,10 @@ vector<vector<Tile*>> Room::GetMiddle()
 			middle.push_back(vector<Tile*>());
 		for (size_t row = 0; row < _height; row++)
 		{
-			if (IsWithinBounds(FVector2D(col, row), FString("Room::GetMiddle")))
+			if (col > 1 && col < _width - 2 && row > 1 && row < _height - 2)
 			{
-				if (col > 1 && col < _width - 2 && row > 1 && row < _height - 2)
-				{
-					if (_tiles[col][row]->_state == ROOM)
-						middle[col - 2].push_back(_tiles[col][row]);
-				}
+				if (IsWithinBounds(FVector2D(col, row), FString("Room::GetMiddle")))
+					middle[col - 2].push_back(_tiles[col][row]);
 			}
 		}
 	}
@@ -104,76 +126,88 @@ vector<vector<Tile*>> Room::GetMiddle()
 	return middle;
 }
 
-void Room::PlaceEntitiesOnEdges(vector<Entity*> entities)
+vector<Tile*> Room::GetMiddle()
 {
-	vector<Tile*> emptyEdges = GetTilesWithState(GetEdges(), ROOM);
-	if (emptyEdges.size() < entities.size()) {
-		UE_LOG(LogTemp, Error, TEXT("Room::PlaceOnEdges || More entities than empty tiles to put them on"));
-		return;
-	}
-
-	for (auto entity : entities)
+	vector<Tile*> middle;
+	for (size_t col = 0; col < _width; col++)
 	{
-		int randomNr;
-		do
+		for (size_t row = 0; row < _height; row++)
 		{
-			randomNr = rand() % emptyEdges.size();
-
-		} while (!emptyEdges[randomNr]->_state == ROOM);
-
-		emptyEdges[randomNr]->_state = PICKUP;
-		
-	}
-}
-
-void Room::PlaceEntitiesInCenter(vector<Entity*> entities)
-{
-	vector<vector<Tile*>> middle = GetMiddle();
-
-	int width = middle.size();
-	int height = middle[0].size();
-	int amount = 6;
-	int entityCols = 0;
-	int entityRows = 0;
-
-	if (height == 0 || width == 0) return;
-	if (width * height < entities.size()) return;
-
-	if (width > height)
-	{
-		int colToRowsRatio = (width + height - 1) / height; // round up
-		entityCols = (amount + colToRowsRatio - 1) / colToRowsRatio; // round up
-		entityRows = amount / entityCols; // round down
-		if (entityRows == 0)
-			entityRows = 1;
-	}
-	else
-	{
-		int rowToColsRatio = (height + width - 1) / width; // round up
-		entityRows = (amount + rowToColsRatio - 1) / rowToColsRatio; // round up
-		entityCols = amount / entityRows; // round down
-		if (entityCols == 0)
-			entityCols = 1;
-	}
-
-	int stepX = (width + entityCols - 1) / entityCols;
-	int stepY = (height + entityRows - 1) / entityRows;
-
-	vector<Tile*> locations;
-	for (size_t col = 0; col < entityCols; col++)
-	{
-		for (size_t row = 0; row < entityRows; row++)
-		{
-			int x = (col * stepX) % (width == 0 ? width : width - 1);
-			int y = (row * stepY) % (height == 0 ? height : height - 1);
-			locations.push_back(middle[x][y]);
+			if (col > 1 && col < _width - 2 && row > 1 && row < _height - 2)
+			{
+				if (IsWithinBounds(FVector2D(col, row), FString("Room::GetMiddle")))
+					middle.push_back(_tiles[col][row]);
+				
+			}
 		}
 	}
 
-	random_shuffle(locations.begin(),locations.end());
+	return middle;
+}
+
+void Room::PlaceEntitiesOnEdges(float density, const TileState state, float alcoveDensity, vector<Tile*> alcoveTiles)
+{
+	if (!(state == PICKUP || state == ENEMY || state == KEY)) {
+		UE_LOG(LogTemp, Error, TEXT("Room::PlaceEntitiesInCenter || Incorrect entity type"));
+		return;
+	}
+
+	// calculate densities
+	density = FMath::Clamp<float>(density, 0, 1);
+	float edgeDensity = density * (1 - alcoveDensity);
+	alcoveDensity = density * alcoveDensity;
+
+	// calculate amounts based on densities
+	int amount = GetMaxEdgeEntities();
+	int amountEdge = amount * edgeDensity;
+	int amountAlcove = amount * alcoveDensity;
+	// adjust alcove amount if not enough alcoves are available
+	if (amountAlcove > alcoveTiles.size())
+		amountAlcove = alcoveTiles.size();
+
+
+	// fill edges
+	vector<TileState> states{ ROOM, ROOM_ON_PATH };
+	vector<Tile*> edges = GetTilesWithStates(GetEdges(), states);
+	random_shuffle(edges.begin(), edges.end());
+
+	for (size_t i = 0; i < amountEdge; i++)
+		edges[i]->_state = state;
+	
+	// fill alcoves
+	random_shuffle(alcoveTiles.begin(), alcoveTiles.end());
+	for (size_t i = 0; i < amountAlcove; i++)
+	{
+		if (i - 1 > alcoveTiles.size())
+			continue;
+		alcoveTiles[i]->_isFilled = false;
+		alcoveTiles[i]->_state = state;
+	}
+}
+
+void Room::PlaceEntitiesInCenter(float density, TileState state)
+{
+	if (!(state == PICKUP || state == ENEMY || state == KEY)) {
+		UE_LOG(LogTemp, Error, TEXT("Room::PlaceEntitiesInCenter || Incorrect entity type"));
+		return;
+	}
+
+	density = FMath::Clamp<float>(density, 0, 1);
+	int amount = GetMaxCenterEntities() * density;
+
+	if (state == ENEMY)
+	{
+		float roomSizeFactor = float(_width + _height + (_width + _height) / 2) / (_width * _height);
+		roomSizeFactor = FMath::Clamp<float>(roomSizeFactor, 0.0, 1.0);
+		amount *= roomSizeFactor;
+	}
+	
+	vector<TileState> states{ ROOM, ROOM_ON_PATH };
+	vector<Tile*> middle = GetMiddle();
+	random_shuffle(middle.begin(), middle.end());
 	for (size_t i = 0; i < amount; i++)
 	{
-		locations[i]->_state = ENEMY;
+		middle[i]->_state = state;
 	}
 }
 
@@ -278,4 +312,18 @@ void Room::AddLevelStart()
 void Room::AddLevelEnd()
 {
 	GetCenterTile()->_state = END_POS;
+}
+
+int Room::GetMaxEdgeEntities()
+{
+	// bases maximum amount of entities on the ratio and the amount of currently available tiles
+	vector<TileState> states{ ROOM, ROOM_ON_PATH };
+	return GetTilesWithStates(GetEdges(),states).size() * ENTITY_PER_EDGE;
+}
+
+int Room::GetMaxCenterEntities()
+{
+	// bases maximum amount of entities on the ratio and the amount of currently available tiles
+	vector<TileState> states{ ROOM, ROOM_ON_PATH };
+	return GetTilesWithStates(GetMiddle(), states).size() * ENTITY_PER_MIDDLE;
 }

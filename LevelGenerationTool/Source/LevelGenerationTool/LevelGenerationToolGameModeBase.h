@@ -14,7 +14,9 @@ class LEVELGENERATIONTOOL_API ALevelGenerationToolGameModeBase : public AGameMod
 {
 	GENERATED_BODY()
 	
-	
-	
+	ALevelGenerationToolGameModeBase()
+	{
+		DefaultPawnClass = nullptr;
+	}
 	
 };

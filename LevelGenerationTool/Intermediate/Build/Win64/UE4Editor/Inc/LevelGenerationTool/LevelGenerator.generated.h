@@ -16,41 +16,13 @@ struct FVector2D;
 #endif
 #define LEVELGENERATIONTOOL_LevelGenerator_generated_h
 
-#define LevelGenerationTool_Source_LevelGenerationTool_LevelGenerator_h_14_RPC_WRAPPERS \
+#define LevelGenerationTool_Source_LevelGenerationTool_LevelGenerator_h_15_RPC_WRAPPERS \
  \
-	DECLARE_FUNCTION(execSetRandomized_Inset) \
+	DECLARE_FUNCTION(execUpdateLevelContent) \
 	{ \
-		P_GET_UBOOL(Z_Param_enabled); \
 		P_FINISH; \
 		P_NATIVE_BEGIN; \
-		this->SetRandomized_Inset(Z_Param_enabled); \
-		P_NATIVE_END; \
-	} \
- \
-	DECLARE_FUNCTION(execSetDeviation_Granularity) \
-	{ \
-		P_GET_PROPERTY(UIntProperty,Z_Param_deviation); \
-		P_FINISH; \
-		P_NATIVE_BEGIN; \
-		this->SetDeviation_Granularity(Z_Param_deviation); \
-		P_NATIVE_END; \
-	} \
- \
-	DECLARE_FUNCTION(execSetPercentage_DoubleCorridor) \
-	{ \
-		P_GET_PROPERTY(UIntProperty,Z_Param_odds); \
-		P_FINISH; \
-		P_NATIVE_BEGIN; \
-		this->SetPercentage_DoubleCorridor(Z_Param_odds); \
-		P_NATIVE_END; \
-	} \
- \
-	DECLARE_FUNCTION(execSetPercentage_WideCorridor) \
-	{ \
-		P_GET_PROPERTY(UIntProperty,Z_Param_odds); \
-		P_FINISH; \
-		P_NATIVE_BEGIN; \
-		this->SetPercentage_WideCorridor(Z_Param_odds); \
+		this->UpdateLevelContent(); \
 		P_NATIVE_END; \
 	} \
  \
@@ -145,41 +117,13 @@ struct FVector2D;
 	}
 
 
-#define LevelGenerationTool_Source_LevelGenerationTool_LevelGenerator_h_14_RPC_WRAPPERS_NO_PURE_DECLS \
+#define LevelGenerationTool_Source_LevelGenerationTool_LevelGenerator_h_15_RPC_WRAPPERS_NO_PURE_DECLS \
  \
-	DECLARE_FUNCTION(execSetRandomized_Inset) \
+	DECLARE_FUNCTION(execUpdateLevelContent) \
 	{ \
-		P_GET_UBOOL(Z_Param_enabled); \
 		P_FINISH; \
 		P_NATIVE_BEGIN; \
-		this->SetRandomized_Inset(Z_Param_enabled); \
-		P_NATIVE_END; \
-	} \
- \
-	DECLARE_FUNCTION(execSetDeviation_Granularity) \
-	{ \
-		P_GET_PROPERTY(UIntProperty,Z_Param_deviation); \
-		P_FINISH; \
-		P_NATIVE_BEGIN; \
-		this->SetDeviation_Granularity(Z_Param_deviation); \
-		P_NATIVE_END; \
-	} \
- \
-	DECLARE_FUNCTION(execSetPercentage_DoubleCorridor) \
-	{ \
-		P_GET_PROPERTY(UIntProperty,Z_Param_odds); \
-		P_FINISH; \
-		P_NATIVE_BEGIN; \
-		this->SetPercentage_DoubleCorridor(Z_Param_odds); \
-		P_NATIVE_END; \
-	} \
- \
-	DECLARE_FUNCTION(execSetPercentage_WideCorridor) \
-	{ \
-		P_GET_PROPERTY(UIntProperty,Z_Param_odds); \
-		P_FINISH; \
-		P_NATIVE_BEGIN; \
-		this->SetPercentage_WideCorridor(Z_Param_odds); \
+		this->UpdateLevelContent(); \
 		P_NATIVE_END; \
 	} \
  \
@@ -274,7 +218,7 @@ struct FVector2D;
 	}
 
 
-#define LevelGenerationTool_Source_LevelGenerationTool_LevelGenerator_h_14_INCLASS_NO_PURE_DECLS \
+#define LevelGenerationTool_Source_LevelGenerationTool_LevelGenerator_h_15_INCLASS_NO_PURE_DECLS \
 private: \
 	static void StaticRegisterNativesALevelGenerator(); \
 	friend LEVELGENERATIONTOOL_API class UClass* Z_Construct_UClass_ALevelGenerator(); \
@@ -284,7 +228,7 @@ public: \
 	enum {IsIntrinsic=COMPILED_IN_INTRINSIC};
 
 
-#define LevelGenerationTool_Source_LevelGenerationTool_LevelGenerator_h_14_INCLASS \
+#define LevelGenerationTool_Source_LevelGenerationTool_LevelGenerator_h_15_INCLASS \
 private: \
 	static void StaticRegisterNativesALevelGenerator(); \
 	friend LEVELGENERATIONTOOL_API class UClass* Z_Construct_UClass_ALevelGenerator(); \
@@ -294,7 +238,7 @@ public: \
 	enum {IsIntrinsic=COMPILED_IN_INTRINSIC};
 
 
-#define LevelGenerationTool_Source_LevelGenerationTool_LevelGenerator_h_14_STANDARD_CONSTRUCTORS \
+#define LevelGenerationTool_Source_LevelGenerationTool_LevelGenerator_h_15_STANDARD_CONSTRUCTORS \
 	/** Standard constructor, called after all reflected properties have been initialized */ \
 	NO_API ALevelGenerator(const FObjectInitializer& ObjectInitializer); \
 	DEFINE_DEFAULT_OBJECT_INITIALIZER_CONSTRUCTOR_CALL(ALevelGenerator) \
@@ -307,7 +251,7 @@ private: \
 public:
 
 
-#define LevelGenerationTool_Source_LevelGenerationTool_LevelGenerator_h_14_ENHANCED_CONSTRUCTORS \
+#define LevelGenerationTool_Source_LevelGenerationTool_LevelGenerator_h_15_ENHANCED_CONSTRUCTORS \
 private: \
 	/** Private move- and copy-constructors, should never be used */ \
 	NO_API ALevelGenerator(ALevelGenerator&&); \
@@ -318,26 +262,26 @@ DEFINE_VTABLE_PTR_HELPER_CTOR_CALLER(ALevelGenerator); \
 	DEFINE_DEFAULT_CONSTRUCTOR_CALL(ALevelGenerator)
 
 
-#define LevelGenerationTool_Source_LevelGenerationTool_LevelGenerator_h_14_PRIVATE_PROPERTY_OFFSET
-#define LevelGenerationTool_Source_LevelGenerationTool_LevelGenerator_h_11_PROLOG
-#define LevelGenerationTool_Source_LevelGenerationTool_LevelGenerator_h_14_GENERATED_BODY_LEGACY \
+#define LevelGenerationTool_Source_LevelGenerationTool_LevelGenerator_h_15_PRIVATE_PROPERTY_OFFSET
+#define LevelGenerationTool_Source_LevelGenerationTool_LevelGenerator_h_12_PROLOG
+#define LevelGenerationTool_Source_LevelGenerationTool_LevelGenerator_h_15_GENERATED_BODY_LEGACY \
 PRAGMA_DISABLE_DEPRECATION_WARNINGS \
 public: \
-	LevelGenerationTool_Source_LevelGenerationTool_LevelGenerator_h_14_PRIVATE_PROPERTY_OFFSET \
-	LevelGenerationTool_Source_LevelGenerationTool_LevelGenerator_h_14_RPC_WRAPPERS \
-	LevelGenerationTool_Source_LevelGenerationTool_LevelGenerator_h_14_INCLASS \
-	LevelGenerationTool_Source_LevelGenerationTool_LevelGenerator_h_14_STANDARD_CONSTRUCTORS \
+	LevelGenerationTool_Source_LevelGenerationTool_LevelGenerator_h_15_PRIVATE_PROPERTY_OFFSET \
+	LevelGenerationTool_Source_LevelGenerationTool_LevelGenerator_h_15_RPC_WRAPPERS \
+	LevelGenerationTool_Source_LevelGenerationTool_LevelGenerator_h_15_INCLASS \
+	LevelGenerationTool_Source_LevelGenerationTool_LevelGenerator_h_15_STANDARD_CONSTRUCTORS \
 public: \
 PRAGMA_ENABLE_DEPRECATION_WARNINGS
 
 
-#define LevelGenerationTool_Source_LevelGenerationTool_LevelGenerator_h_14_GENERATED_BODY \
+#define LevelGenerationTool_Source_LevelGenerationTool_LevelGenerator_h_15_GENERATED_BODY \
 PRAGMA_DISABLE_DEPRECATION_WARNINGS \
 public: \
-	LevelGenerationTool_Source_LevelGenerationTool_LevelGenerator_h_14_PRIVATE_PROPERTY_OFFSET \
-	LevelGenerationTool_Source_LevelGenerationTool_LevelGenerator_h_14_RPC_WRAPPERS_NO_PURE_DECLS \
-	LevelGenerationTool_Source_LevelGenerationTool_LevelGenerator_h_14_INCLASS_NO_PURE_DECLS \
-	LevelGenerationTool_Source_LevelGenerationTool_LevelGenerator_h_14_ENHANCED_CONSTRUCTORS \
+	LevelGenerationTool_Source_LevelGenerationTool_LevelGenerator_h_15_PRIVATE_PROPERTY_OFFSET \
+	LevelGenerationTool_Source_LevelGenerationTool_LevelGenerator_h_15_RPC_WRAPPERS_NO_PURE_DECLS \
+	LevelGenerationTool_Source_LevelGenerationTool_LevelGenerator_h_15_INCLASS_NO_PURE_DECLS \
+	LevelGenerationTool_Source_LevelGenerationTool_LevelGenerator_h_15_ENHANCED_CONSTRUCTORS \
 private: \
 PRAGMA_ENABLE_DEPRECATION_WARNINGS
 

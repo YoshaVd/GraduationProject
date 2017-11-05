@@ -29,6 +29,7 @@ public:
 		_y = coordinates.Y;
 	}
 	Tile(bool isFilled) : _isFilled(isFilled) {}
+	Tile(const Tile& other);
 	~Tile() {}
 
 	/* --- Functions --- */

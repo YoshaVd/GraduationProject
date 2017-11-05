@@ -47,6 +47,7 @@ public:
 	void SetTileStatesArea(const int bottom, const int left, const int top, const int right, const TileState state);
 
 	vector<Tile*> GetTilesWithState(const vector<Tile*> tiles, const TileState state);
+	vector<Tile*> GetTilesWithStates(const vector<Tile*> tiles, const vector<TileState> states);
 	bool IsAdjTileWithState(const FVector2D pos, const TileState state);
 	bool IsNearTileWithState(const FVector2D pos, const TileState state);
 
@@ -66,7 +67,9 @@ public:
 	vector<FVector2D> GetIsolatedPositionsExclusion(const vector<FVector2D> positions, const FVector2D exclusion);
 
 	vector<FVector2D> GetEmpties(const vector<FVector2D> positions);
+	vector<Tile*> GetEmptyTiles(const vector<Tile*> tiles);
 	vector<FVector2D> GetFilleds(const vector<FVector2D> positions);
+	vector<Tile*> GetFilledTiles(const vector<Tile*> tiles);
 
 	// Get Tiles
 	vector<Tile*> GetAdjacentTiles(Tile* tile);
