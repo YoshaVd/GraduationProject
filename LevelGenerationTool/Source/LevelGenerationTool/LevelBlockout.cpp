@@ -114,7 +114,7 @@ void ALevelBlockout::SpawnBlock(const Tile * tile, const int x, const int y)
 		case ENEMY:
 		{
 			int depth = tile->_parent->GetDepthLevel();
-			FColor col = FColor(_colPathRooms.R - depth * 30, _colPathRooms.G - depth * 30, _colPathRooms.B - depth * 30);
+			FColor col = FColor(_colPathRooms.R - depth * 40, _colPathRooms.G - depth * 40, _colPathRooms.B - depth * 40);
 			mat->SetVectorParameterValue(FName(TEXT("Color")), col);
 			break;
 		}
@@ -122,18 +122,23 @@ void ALevelBlockout::SpawnBlock(const Tile * tile, const int x, const int y)
 			mat->SetVectorParameterValue(FName(TEXT("Color")), _colPathRooms);
 			break;
 		case CORRIDOR:
-			mat->SetVectorParameterValue(FName(TEXT("Color")), FColor::White);
+		case DOOR_LOCKED:
+		case DOOR_OPEN:
+		case DOOR_NONE:
+			mat->SetVectorParameterValue(FName(TEXT("Color")), _colPathRooms);
 			break;
 		case START_POS:
 			_spawnLocation = FVector(x, y, BLOCK_SCALE * BLOCK_SIZE);
-			mat->SetVectorParameterValue(FName(TEXT("Color")), FColor::Green);
+			mat->SetVectorParameterValue(FName(TEXT("Color")), FColor::Purple);
 			break;
 		case END_POS:
-			mat->SetVectorParameterValue(FName(TEXT("Color")), FColor::Red);
+			mat->SetVectorParameterValue(FName(TEXT("Color")), FColor::Black);
 			break;
 		case PATH:
-			mat->SetVectorParameterValue(FName(TEXT("Color")), FColor::Yellow);
+			mat->SetVectorParameterValue(FName(TEXT("Color")), FColor(230, 180, 0));
 			break;
+
+
 		//case PICKUP:
 		//	mat->SetVectorParameterValue(FName(TEXT("Color")), FColor::Orange);
 		//	break;
@@ -200,10 +205,10 @@ void ALevelBlockout::Generate()
 				origin.X + col * BLOCK_SCALE * BLOCK_SIZE,
 				origin.Y + row * BLOCK_SCALE * BLOCK_SIZE);
 
-			if (_tiles[col][row]->_state == DOOR_NONE)
-				SpawnDoorTop(_tiles[col][row], 
-					origin.X + col * BLOCK_SCALE * BLOCK_SIZE,
-					origin.Y + row * BLOCK_SCALE * BLOCK_SIZE);
+			//if (_tiles[col][row]->_state == DOOR_NONE)
+			//	SpawnDoorTop(_tiles[col][row], 
+			//		origin.X + col * BLOCK_SCALE * BLOCK_SIZE,
+			//		origin.Y + row * BLOCK_SCALE * BLOCK_SIZE);
 		}
 	}
 }

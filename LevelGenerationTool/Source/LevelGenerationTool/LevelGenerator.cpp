@@ -24,15 +24,9 @@ void ALevelGenerator::ResetLevel()
 	int width = _pGrid->GetWidth();
 	int height = _pGrid->GetHeight();
 
-	for (auto mesh : _pMeshes)
-	{
-		if(mesh->IsValidLowLevel())
-			mesh->DestroyComponent();
-	}
-	_pMeshes.clear();
 	delete _pGrid;
-
 	_pGrid = new LevelGrid(width, height);
+	SetLayoutParamaters(_pGrid);
 }
 
 void ALevelGenerator::PerfectMaze()
@@ -170,11 +164,20 @@ void ALevelGenerator::PartitionSpace(const int granularity, const int roomInset)
 		UE_LOG(LogTemp, Error, TEXT("ALevelGenerator::PartitionSpace || Granularity/inset ratio too low."));
 		return;
 	}
+	/* --- Set up subgrid --- */
 	LevelGrid* pGrid = new LevelGrid(*_pGrid);
 	pGrid =	_pGrid->CreateSubGrid(1, 1, _pGrid->GetHeight() - 2, _pGrid->GetWidth() - 2);
 	_pGrid->AddChild(pGrid);
 
-	SetLayoutParamaters(_pGrid);
+	/* --- Generate SEED --- */
+	ResetRandomOffsets();
+	if(_generateNewSeed && _useSeeding)
+		_randomSeed = rand();
+	_pGrid->SetRandomSeed(_randomSeed);
+	pGrid->SetRandomSeed(_randomSeed);
+
+	/* --- Generate layout --- */
+	SetLayoutParamaters(pGrid);
 	pGrid->SplitDeep(granularity);
 	_pGrid->AddRoomToChildrenDeep(roomInset);
 	_pGrid->ConnectRoomsDeep();
@@ -186,30 +189,34 @@ void ALevelGenerator::PartitionSpace(const int granularity, const int roomInset)
 		return;
 
 	// place start and end
-	rooms.back()->AddLevelEnd();
+	int endOffset = rand() % (rooms.size() / 5);
+	Room* endRoom = rooms[rooms.size() - (endOffset % rooms.size() + 1)];
+	endRoom->AddLevelEnd();
 	Room* startRoom = _pGrid->GetFurthestRoom(rooms, rooms.back());
+	auto roomPath = _pGrid->GetRoomPath(startRoom, endRoom);
+	startRoom = roomPath[roomPath.size() - (rand() % (roomPath.size() / 4) + 1)];
 	startRoom->AddLevelStart();
 
-	// flag rooms and set depths
-	auto path = _pGrid->FindShortestPathBFS(startRoom->GetCenterPos(), rooms.back()->GetCenterPos(), false);
+	//// flag rooms and set depths
+	auto path = _pGrid->FindShortestPathBFS(startRoom->GetCenterPos(), endRoom->GetCenterPos(), false);
 	_pGrid->FlagRoomsOnPath(path, ON_PATH);
 	_pGrid->SetRoomDepths();
 	
 	/* --- door & key test ---*/
-	_pGrid->GetTopTile(startRoom->GetCenterTile())->_state = KEY;
-	vector<Tile*> tiles;
-	for (auto col : rooms.back()->GetTiles())
-	{
-		for (auto tile : col)
-		{
-			tiles.push_back(tile);
-		}
-	}
-	tiles = _pGrid->GetTilesWithState(tiles, DOOR_NONE);
-	for (auto t : tiles)
-	{
-		t->_state = DOOR_LOCKED;
-	}
+	//_pGrid->GetTopTile(startRoom->GetCenterTile())->_state = KEY;
+	//vector<Tile*> tiles;
+	//for (auto col : endRoom->GetTiles())
+	//{
+	//	for (auto tile : col)
+	//	{
+	//		tiles.push_back(tile);
+	//	}
+	//}
+	//tiles = _pGrid->GetTilesWithState(tiles, DOOR_NONE);
+	//for (auto t : tiles)
+	//{
+	//	t->_state = DOOR_LOCKED;
+	//}
 	/* ---------------------- */
 
 	/* ------------------ */
@@ -219,13 +226,13 @@ void ALevelGenerator::PartitionSpace(const int granularity, const int roomInset)
 	_pFiller->FillRoomsWithLoot();
 	_pFiller->FillRoomsWithEnemies();
 
-	/* -------------------- */
-	/* --- Display Path --- */
+	///* -------------------- */
+	///* --- Display Path --- */
 	for (auto t : path)
 	{
 		_pGrid->SetColor(t, FColor::Yellow);
-		if(t->_state == ROOM)
-			_pGrid->SetTileState(t, PATH);
+		//if(t->_state == ROOM_ON_PATH || t->_state == ROOM)
+		_pGrid->SetTileState(t, PATH);
 	}
 
 
@@ -255,23 +262,17 @@ void ALevelGenerator::GenerateBlockout()
 
 void ALevelGenerator::EmptySubGridTest()
 {
+	_pGrid->SetRandomSeed(2534);
+	SetLayoutParamaters(_pGrid);
 	_pGrid->SplitDeep(7);
-	_pGrid->AddRoomToChildrenDeep(2);
+	_pGrid->AddRoomToChildrenDeep(0);
 
-	FVector2D start(1, 1);
-	FVector2D end(rand() % 30, rand() % 30);
-
-	auto path = _pGrid->FindShortestPathBFS(start, end, true);
-	for (auto p : path)
-	{
-		_pGrid->SetColor(p, FColor::Yellow);
-	}
-	_pGrid->SetColor(start, FColor::Green);
-	_pGrid->SetColor(end, FColor::Red);
 }
 
 void ALevelGenerator::UpdateLevelContent()
 {
+	ResetRandomOffsets();
+
 	_pFiller->EmptyRooms();
 	SetFillerParameters();
 	_pFiller->FillRoomsWithLoot();
@@ -287,6 +288,7 @@ void ALevelGenerator::SetLayoutParamaters(LevelGrid* grid)
 	grid->SetOddsDoubleCorridor(_doubleCorridorPercentage);
 	grid->SetGranularityDeviation(_granularityDeviation);
 	grid->SetInsetRandomized(_isInsetRandomized);
+	grid->SetSeedingEnabled(_useSeeding);
 }
 
 void ALevelGenerator::SetFillerParameters()
@@ -304,4 +306,12 @@ void ALevelGenerator::SetFillerParameters()
 	_pFiller->SetEnemySideSpawnrate(_enemySideSpawnRate);
 	_pFiller->SetEnemyCenterSpawnrate(_enemyCenterSpawnRate);
 	_pFiller->SetEnemyAlcoveSpawnrate(_enemyAlcoveRate);
+}
+
+void ALevelGenerator::ResetRandomOffsets()
+{
+	auto grids = _pGrid->GetChildrenDeep();
+	for (auto g : grids) g->SetSeedOffset(0);
+	auto rooms = _pGrid->GetChildRoomsDeep();
+	for (auto r : rooms) r->SetSeedOffset(0);
 }

@@ -31,6 +31,7 @@ BaseGrid::BaseGrid(const BaseGrid & other)
 	_baseColor = other._baseColor;
 	_tiles = other._tiles;
 	_biasFactor = other._biasFactor;
+	_useSeeding = other._useSeeding;
 }
 
 BaseGrid & BaseGrid::operator=(const BaseGrid & other)
@@ -40,6 +41,7 @@ BaseGrid & BaseGrid::operator=(const BaseGrid & other)
 	_baseColor = other._baseColor;
 	_tiles = other._tiles;
 	_biasFactor = other._biasFactor;
+	_useSeeding = other._useSeeding;
 	return *this;
 }
 
@@ -198,6 +200,36 @@ void BaseGrid::SetColorAll(const FColor color)
 	}
 }
 
+vector<Tile*> BaseGrid::ShuffleTiles(vector<Tile*> tiles, const int seed)
+{
+	vector<int> indices;
+	vector<Tile*> result;
+
+	while (!tiles.empty())
+	{
+		int index = (int)pow(seed, 2) % tiles.size();
+		result.push_back(tiles[index]);
+		tiles.erase(tiles.begin() + index);
+	}
+
+	return result;
+}
+
+vector<TPair<Tile*, Tile*>> BaseGrid::ShuffleTilePairs(vector<TPair<Tile*, Tile*>> pairs, const int seed)
+{
+	vector<int> indices;
+	vector<TPair<Tile*, Tile*>> result;
+
+	while (!pairs.empty())
+	{
+		int index = (int)pow(seed, 2) % pairs.size();
+		result.push_back(pairs[index]);
+		pairs.erase(pairs.begin() + index);
+	}
+
+	return result;
+}
+
 void BaseGrid::SetTileStatesArea(const int bottom, const int left, const int top, const int right, const TileState state)
 {
 	if (top < bottom || top >= _height || bottom < 0 || right < left || right >= _width || left < 0) {
@@ -265,8 +297,11 @@ bool BaseGrid::IsNearTileWithState(const FVector2D pos, const TileState state)
 
 FVector2D BaseGrid::GetRandomPos(const int xOffset, const int yOffset)
 {
-	int randomCol = rand() % (_width - 2 * xOffset) + xOffset;
-	int randomRow = rand() % (_height - 2 * yOffset) + yOffset;
+	if (!_useSeeding)
+		_randomSeed = rand();
+
+	int randomCol = (_randomSeed + ++_seedOffset) % (_width - 2 * xOffset) + xOffset;
+	int randomRow = (_randomSeed + ++_seedOffset) % (_height - 2 * yOffset) + yOffset;
 
 	return FVector2D(randomRow, randomCol);
 }
@@ -287,7 +322,10 @@ FVector2D BaseGrid::GetRandomPos(const bool isFilled, const int xOffset, const i
 
 FVector2D BaseGrid::GetRandomPosFromSet(const vector<FVector2D>& positions)
 {
-	int randomNr = rand() % positions.size();
+	if (!_useSeeding)
+		_randomSeed = rand();
+
+	int randomNr = _randomSeed % positions.size();
 	return positions[randomNr];
 }
 
@@ -307,7 +345,10 @@ FVector2D BaseGrid::GetRandomPosFromSetBiased(const vector<FVector2D>& positions
 		normalizer += 1.0 / distancesToTarget[distancesToTarget.size() - 1];
 	}
 
-	int randomNr = rand() % 100;
+	if (!_useSeeding)
+		_randomSeed = rand();
+
+	int randomNr = _randomSeed % 100;
 	int rangeMin = 0;
 	int rangeMax = 0;
 	UE_LOG(LogTemp, Warning, TEXT("Random number: %d"), randomNr);
@@ -462,7 +503,10 @@ vector<Tile*> BaseGrid::GetAdjacentTiles(Tile * tile)
 
 Tile * BaseGrid::GetRandomTileFromSet(const vector<Tile*> tiles)
 {
-	int randomNr = rand() % tiles.size();
+	if (!_useSeeding)
+		_randomSeed = rand();
+
+	int randomNr = _randomSeed % tiles.size();
 	return tiles[randomNr];
 }
 
@@ -576,7 +620,10 @@ bool BaseGrid::GetAdjacentPairs(vector<TPair<Tile*, Tile*>> pairs, TPair<TPair<T
 		return false;
 	}
 
-	adjacents = adjPairPairs[rand() % adjPairPairs.size()];
+	if (!_useSeeding)
+		_randomSeed = rand();
+
+	adjacents = adjPairPairs[_randomSeed % adjPairPairs.size()];
 	return true;
 }
 

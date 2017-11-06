@@ -52,6 +52,7 @@ public:
 
 	void FlagRoomsOnPath(vector<Tile*> path, RoomType type);
 	vector<Room*> GetRoomPathToType(Room* start, RoomType type);
+	vector<Room*> GetRoomPath(Room* start, Room* target);
 	void SetRoomDepths();
 
 	// Pathfinding functions

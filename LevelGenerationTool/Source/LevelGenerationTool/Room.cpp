@@ -169,13 +169,21 @@ void Room::PlaceEntitiesOnEdges(float density, const TileState state, float alco
 	// fill edges
 	vector<TileState> states{ ROOM, ROOM_ON_PATH };
 	vector<Tile*> edges = GetTilesWithStates(GetEdges(), states);
-	random_shuffle(edges.begin(), edges.end());
+
+	if (!_useSeeding)
+		random_shuffle(edges.begin(), edges.end());
+	else
+		edges = ShuffleTiles(edges, _randomSeed + ++_seedOffset);
 
 	for (size_t i = 0; i < amountEdge; i++)
 		edges[i]->_state = state;
 	
 	// fill alcoves
-	random_shuffle(alcoveTiles.begin(), alcoveTiles.end());
+	if (!_useSeeding)
+		random_shuffle(alcoveTiles.begin(), alcoveTiles.end());
+	else
+		alcoveTiles = ShuffleTiles(alcoveTiles, _randomSeed + ++_seedOffset);
+
 	for (size_t i = 0; i < amountAlcove; i++)
 	{
 		if (i - 1 > alcoveTiles.size())
@@ -204,7 +212,11 @@ void Room::PlaceEntitiesInCenter(float density, TileState state)
 	
 	vector<TileState> states{ ROOM, ROOM_ON_PATH };
 	vector<Tile*> middle = GetMiddle();
-	random_shuffle(middle.begin(), middle.end());
+	if (!_useSeeding)
+		random_shuffle(middle.begin(), middle.end());
+	else
+		middle = ShuffleTiles(middle, _randomSeed + ++_seedOffset);
+
 	for (size_t i = 0; i < amount; i++)
 	{
 		middle[i]->_state = state;
@@ -218,7 +230,9 @@ void Room::AddAlcove(Entity * entity)
 	int randomWall = 0;
 	do
 	{
-		randomWall = rand() % walls.size();
+		if (!_useSeeding)
+			_randomSeed = rand();
+		randomWall = (_randomSeed + ++_seedOffset) % walls.size();
 	} while (IsNearTileWithState(walls[randomWall], DOOR_NONE)
 		|| IsNearTileWithState(walls[randomWall], PICKUP)
 		|| _tiles[walls[randomWall].X][walls[randomWall].Y]->_state == DOOR_NONE);
@@ -307,6 +321,7 @@ void Room::FlagRoom(RoomType type)
 void Room::AddLevelStart()
 {
 	GetCenterTile()->_state = START_POS;
+	_type = START;
 }
 
 void Room::AddLevelEnd()

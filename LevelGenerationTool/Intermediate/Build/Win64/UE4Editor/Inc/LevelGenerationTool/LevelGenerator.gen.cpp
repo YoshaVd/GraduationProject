@@ -324,6 +324,11 @@ void EmptyLinkFunctionForGeneratedCodeLevelGenerator() {}
 				OuterClass->LinkChild(Z_Construct_UFunction_ALevelGenerator_SetBasicBlock());
 				OuterClass->LinkChild(Z_Construct_UFunction_ALevelGenerator_UpdateLevelContent());
 
+				UProperty* NewProp__randomSeed = new(EC_InternalUseOnlyConstructor, OuterClass, TEXT("_randomSeed"), RF_Public|RF_Transient|RF_MarkAsNative) UUnsizedIntProperty(CPP_PROPERTY_BASE(_randomSeed, ALevelGenerator), 0x0010000000000005);
+				CPP_BOOL_PROPERTY_BITMASK_STRUCT(_generateNewSeed, ALevelGenerator);
+				UProperty* NewProp__generateNewSeed = new(EC_InternalUseOnlyConstructor, OuterClass, TEXT("_generateNewSeed"), RF_Public|RF_Transient|RF_MarkAsNative) UBoolProperty(FObjectInitializer(), EC_CppProperty, CPP_BOOL_PROPERTY_OFFSET(_generateNewSeed, ALevelGenerator), 0x0010000000000005, CPP_BOOL_PROPERTY_BITMASK(_generateNewSeed, ALevelGenerator), sizeof(bool), true);
+				CPP_BOOL_PROPERTY_BITMASK_STRUCT(_useSeeding, ALevelGenerator);
+				UProperty* NewProp__useSeeding = new(EC_InternalUseOnlyConstructor, OuterClass, TEXT("_useSeeding"), RF_Public|RF_Transient|RF_MarkAsNative) UBoolProperty(FObjectInitializer(), EC_CppProperty, CPP_BOOL_PROPERTY_OFFSET(_useSeeding, ALevelGenerator), 0x0010000000000005, CPP_BOOL_PROPERTY_BITMASK(_useSeeding, ALevelGenerator), sizeof(bool), true);
 				UProperty* NewProp__enemyAlcoveRate = new(EC_InternalUseOnlyConstructor, OuterClass, TEXT("_enemyAlcoveRate"), RF_Public|RF_Transient|RF_MarkAsNative) UFloatProperty(CPP_PROPERTY_BASE(_enemyAlcoveRate, ALevelGenerator), 0x0010000000000005);
 				UProperty* NewProp__enemyCenterSpawnRate = new(EC_InternalUseOnlyConstructor, OuterClass, TEXT("_enemyCenterSpawnRate"), RF_Public|RF_Transient|RF_MarkAsNative) UFloatProperty(CPP_PROPERTY_BASE(_enemyCenterSpawnRate, ALevelGenerator), 0x0010000000000005);
 				UProperty* NewProp__enemySideSpawnRate = new(EC_InternalUseOnlyConstructor, OuterClass, TEXT("_enemySideSpawnRate"), RF_Public|RF_Transient|RF_MarkAsNative) UFloatProperty(CPP_PROPERTY_BASE(_enemySideSpawnRate, ALevelGenerator), 0x0010000000000005);
@@ -358,6 +363,15 @@ void EmptyLinkFunctionForGeneratedCodeLevelGenerator() {}
 				UMetaData* MetaData = OuterClass->GetOutermost()->GetMetaData();
 				MetaData->SetValue(OuterClass, TEXT("IncludePath"), TEXT("LevelGenerator.h"));
 				MetaData->SetValue(OuterClass, TEXT("ModuleRelativePath"), TEXT("LevelGenerator.h"));
+				MetaData->SetValue(NewProp__randomSeed, TEXT("Category"), TEXT("Filler parameters"));
+				MetaData->SetValue(NewProp__randomSeed, TEXT("ModuleRelativePath"), TEXT("LevelGenerator.h"));
+				MetaData->SetValue(NewProp__randomSeed, TEXT("ToolTip"), TEXT("Whether to keep the old seed or generate a new one"));
+				MetaData->SetValue(NewProp__generateNewSeed, TEXT("Category"), TEXT("Filler parameters"));
+				MetaData->SetValue(NewProp__generateNewSeed, TEXT("ModuleRelativePath"), TEXT("LevelGenerator.h"));
+				MetaData->SetValue(NewProp__generateNewSeed, TEXT("ToolTip"), TEXT("Whether to keep the old seed or generate a new one"));
+				MetaData->SetValue(NewProp__useSeeding, TEXT("Category"), TEXT("Filler parameters"));
+				MetaData->SetValue(NewProp__useSeeding, TEXT("ModuleRelativePath"), TEXT("LevelGenerator.h"));
+				MetaData->SetValue(NewProp__useSeeding, TEXT("ToolTip"), TEXT("Chance of edge spawns to generate an alcove"));
 				MetaData->SetValue(NewProp__enemyAlcoveRate, TEXT("Category"), TEXT("Filler parameters"));
 				MetaData->SetValue(NewProp__enemyAlcoveRate, TEXT("ModuleRelativePath"), TEXT("LevelGenerator.h"));
 				MetaData->SetValue(NewProp__enemyAlcoveRate, TEXT("ToolTip"), TEXT("Chance to spawn in the center of rooms vs at the edges"));
@@ -408,7 +422,7 @@ void EmptyLinkFunctionForGeneratedCodeLevelGenerator() {}
 		check(OuterClass->GetClass());
 		return OuterClass;
 	}
-	IMPLEMENT_CLASS(ALevelGenerator, 242796263);
+	IMPLEMENT_CLASS(ALevelGenerator, 123878110);
 	static FCompiledInDefer Z_CompiledInDefer_UClass_ALevelGenerator(Z_Construct_UClass_ALevelGenerator, &ALevelGenerator::StaticClass, TEXT("/Script/LevelGenerationTool"), TEXT("ALevelGenerator"), false, nullptr, nullptr, nullptr);
 	DEFINE_VTABLE_PTR_HELPER_CTOR(ALevelGenerator);
 PRAGMA_ENABLE_DEPRECATION_WARNINGS

@@ -20,6 +20,13 @@ public:
 	~BaseGrid();
 
 	// Tile get/set functions
+	void SetRandomSeed(const int seed) { _randomSeed = seed; }
+	int GetRandomSeed() { return _randomSeed; }
+	void SetSeedOffset(const int offset) { _seedOffset = offset; }
+	int& GetSeedOffset() { return _seedOffset; }
+	void SetSeedingEnabled(const bool enabled) { _useSeeding = enabled; }
+	bool GetSeedingEnabled() { return _useSeeding; }
+
 	vector<vector<Tile*>>& GetTiles() { return _tiles; }
 	vector<vector<Tile*>> GetTilesArea(const int bottom, const int left, const int top, const int right);
 	void SetTiles(vector<vector<Tile*>>& tiles) { _tiles = tiles; }
@@ -40,6 +47,9 @@ public:
 	void SetColor(Tile* tile, const FColor color);
 	void SetColorArea(const int bottom, const int left, const int top, const int right, const FColor color);
 	void SetColorAll(const FColor color);
+
+	vector<Tile*> ShuffleTiles(vector<Tile*> tiles, const int seed);
+	vector<TPair<Tile*, Tile*>> ShuffleTilePairs(vector<TPair<Tile*, Tile*>> pairs, const int seed);
 
 	// Tile state
 	void SetTileState(Tile* tile, const TileState state) { tile->_state = state; }
@@ -104,6 +114,10 @@ protected:
 	int _width, _height;
 	int _biasFactor;
 	FColor _baseColor = FColor::Black;
+
+	bool _useSeeding;
+	int _randomSeed;
+	int _seedOffset = 0;
 
 	vector<vector<Tile*>> _tiles;
 };

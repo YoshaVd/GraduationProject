@@ -92,16 +92,22 @@ public:
 		float _enemyCenterSpawnRate = 0.5;			// Chance to spawn in the center of rooms vs at the edges
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Filler parameters")
 		float _enemyAlcoveRate = 0.5;				// Chance of edge spawns to generate an alcove
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Filler parameters")
+		bool _useSeeding = false;				// Whether to keep the old seed or generate a new one
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Filler parameters")
+		bool _generateNewSeed = true;				// Whether to keep the old seed or generate a new one
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Filler parameters")
+		int _randomSeed;
+
 
 private:
 	/* --- Functions --- */
 	void SetLayoutParamaters(LevelGrid* grid);
 	void SetFillerParameters();
+	void ResetRandomOffsets();
 
 	/* --- Members --- */
 	LevelGrid* _pGrid = nullptr;
 	LevelFiller* _pFiller = nullptr;
 	UStaticMesh* _pBasicBlock = nullptr;
-
-	vector<UStaticMeshComponent*> _pMeshes;
 };

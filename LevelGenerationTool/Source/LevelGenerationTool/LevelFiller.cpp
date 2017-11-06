@@ -42,18 +42,20 @@ vector<Tile*> LevelFiller::GetAlcoveFriendlyTiles(Room * room)
 void LevelFiller::FillRoomsWithLoot()
 {
 	float pickupEdgeSpawnRate = 1 - _pickupCenterSpawnRate;
+	float pathDensity = _pickupDensity * _pickupPathSpawnRate;
+	float sideDesnity = _pickupDensity *_pickupSideSpawnRate;
 
 	for (auto r : _rooms)
 	{
 		if (r->GetType() == ON_PATH || r->GetType() == START)
 		{
-			r->PlaceEntitiesOnEdges(_pickupDensity * _pickupPathSpawnRate * pickupEdgeSpawnRate, PICKUP, _pickupAlcoveRate, GetAlcoveFriendlyTiles(r));
-			r->PlaceEntitiesInCenter(_pickupDensity *_pickupPathSpawnRate * _pickupCenterSpawnRate, PICKUP);
+			r->PlaceEntitiesOnEdges(pathDensity * pickupEdgeSpawnRate, PICKUP, _pickupAlcoveRate, GetAlcoveFriendlyTiles(r));
+			r->PlaceEntitiesInCenter(pathDensity * _pickupCenterSpawnRate, PICKUP);
 		}
 		else
 		{
-			r->PlaceEntitiesOnEdges(_pickupDensity *_pickupSideSpawnRate * pickupEdgeSpawnRate, PICKUP, _pickupAlcoveRate, GetAlcoveFriendlyTiles(r));
-			r->PlaceEntitiesInCenter(_pickupDensity *_pickupSideSpawnRate * _pickupCenterSpawnRate, PICKUP);
+			r->PlaceEntitiesOnEdges(sideDesnity * pickupEdgeSpawnRate * r->GetDepthLevel() / 2, PICKUP, _pickupAlcoveRate, GetAlcoveFriendlyTiles(r));
+			r->PlaceEntitiesInCenter(sideDesnity * _pickupCenterSpawnRate * r->GetDepthLevel() / 2, PICKUP);
 		}
 	}
 }

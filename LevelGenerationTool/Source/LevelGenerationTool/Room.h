@@ -46,6 +46,7 @@ public:
 	void SetTilesParent();
 	void FlagRoom(RoomType type);
 	RoomType GetType() { return _type; }
+	void SetType(RoomType type) { _type = type; }
 
 	// Connect
 	void AddConnection(Room* room) { _connectedRooms.push_back(room); }

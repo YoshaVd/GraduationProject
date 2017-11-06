@@ -2,7 +2,6 @@
 #include "LevelGenerationTool.h"
 #include <algorithm>
 #include <stack>
-#include <unordered_set>
 #include <queue>
 #include <map>
 #include "Runtime/Core/Public/Containers/Map.h"
@@ -16,6 +15,7 @@ LevelGrid::LevelGrid(const LevelGrid & other)
 	_childGrids = other._childGrids;
 	_oddsDoubleCorridor = other._oddsDoubleCorridor;
 	_oddsWideCorridor = other._oddsWideCorridor;
+	_useSeeding = other._useSeeding;
 }
 
 LevelGrid & LevelGrid::operator=(const LevelGrid & other)
@@ -29,6 +29,7 @@ LevelGrid & LevelGrid::operator=(const LevelGrid & other)
 	_childGrids = other._childGrids;
 	_oddsDoubleCorridor = other._oddsDoubleCorridor;
 	_oddsWideCorridor = other._oddsWideCorridor;
+	_useSeeding = other._useSeeding;
 	return *this;
 }
 
@@ -54,7 +55,10 @@ bool LevelGrid::Split(const int sizeMin)
 {
 	/*	50% chance to split vertically or horizontally
 		split grid in 2, taking into account the minimum size */
-	int rnd = rand() % 2;
+	if (!_useSeeding)
+		_randomSeed = rand();
+
+	int rnd = (_randomSeed + ++_seedOffset) % 2;
 	LevelGrid *subLeft(new LevelGrid(*this)), *subRight(new LevelGrid(*this));
 	bool hasSplit = false;
 
@@ -69,8 +73,9 @@ bool LevelGrid::Split(const int sizeMin)
 	else if (!hasSplit && _height / 2 >= sizeMin)
 		hasSplit = SplitVertical(sizeMin, *subLeft, *subRight);
 
-	if (!hasSplit) return false;
-
+	if (!hasSplit) 
+		return false;
+	
 	AddChild(subLeft);
 	AddChild(subRight);
 	return true;
@@ -79,8 +84,7 @@ bool LevelGrid::Split(const int sizeMin)
 bool LevelGrid::SplitDeep(const int sizeMin, int level)
 {
 	// Deep split child grids if the current split was successful
-	//int deviation = rand() % (_granularityDeviation + 1);
-	int deviation = FMath::RandRange(1, GetParentDeep()->_granularityDeviation);
+	int deviation = (_randomSeed + ++_seedOffset) % (_granularityDeviation + 1);
 
 	if (Split(sizeMin + deviation))
 	{
@@ -98,7 +102,9 @@ bool LevelGrid::SplitHorizontal(const int sizeMin, LevelGrid& subLeft, LevelGrid
 		//UE_LOG(LogTemp, Warning, TEXT("LevelGrid::Split || Grid is not wide enough to split"));
 		return false;
 	}
-	int x = rand() % (_width - 2 * sizeMin + 1) + sizeMin;
+	if (!_useSeeding)
+		_randomSeed = rand();
+	int x = (_randomSeed + ++_seedOffset) % (_width - 2 * sizeMin + 1) + sizeMin;
 	// - 1 to prevent grid overlap
 	subLeft = *CreateSubGrid(0, 0, _height, x - 1);
 	subRight = *CreateSubGrid(0, x, _height, _width);
@@ -111,8 +117,10 @@ bool LevelGrid::SplitVertical(const int sizeMin, LevelGrid& subLeft, LevelGrid& 
 		//UE_LOG(LogTemp, Warning, TEXT("LevelGrid::Split || Grid is not high enough to split [420 blaze it]"));
 		return false;
 	}
+	if (!_useSeeding)
+		_randomSeed = rand();
+	int y = (_randomSeed + ++_seedOffset) % (_height - 2 * sizeMin + 1) + sizeMin;
 
-	int y = rand() % (_height - 2 * sizeMin + 1) + sizeMin;
 	subLeft = *CreateSubGrid(0, 0, y - 1, _width);
 	subRight = *CreateSubGrid(y, 0, _height, _width);
 	return true;
@@ -139,7 +147,9 @@ LevelGrid * LevelGrid::CreateSubGrid(const int bottom, const int left, const int
 		}
 	}
 
-	return new LevelGrid(newTiles);
+	LevelGrid* newGrid = new LevelGrid(newTiles);
+	newGrid->SetSeedingEnabled(_useSeeding);
+	return newGrid;
 }
 
 vector<LevelGrid*> LevelGrid::GetChildrenDeep()
@@ -169,10 +179,19 @@ void LevelGrid::AddRoom(int inset)
 		UE_LOG(LogTemp, Error, TEXT("LevelGrid::AddRoom || Inset is too high for this room size"));
 		return;
 	}
-	if (GetParentDeep()->_isInsetRandomized)
-		inset = rand() % ++inset;
 
-	_rooms.push_back(new Room(GetTilesArea(inset, inset, _height - (inset + 1), _width - (inset + 1))));
+	if (GetParentDeep()->_isInsetRandomized)
+	{
+		if (!_useSeeding)
+			_randomSeed = rand();
+		inset = (_randomSeed * _height/_width) % ++inset;
+	}
+
+	Room* room = new Room(GetTilesArea(inset, inset, _height - (inset + 1), _width - (inset + 1)));
+	room->SetRandomSeed(GetParentDeep()->GetRandomSeed());
+	room->SetSeedOffset(++GetParentDeep()->GetSeedOffset());
+	room->SetSeedingEnabled(_useSeeding);
+	_rooms.push_back(room);
 }
 
 void LevelGrid::AddRoomToChildrenDeep(const int inset)
@@ -198,9 +217,13 @@ bool LevelGrid::ConnectRoomsStraight(Room * roomA, Room * roomB)
 	vector<TPair<Tile*, Tile*>> closest = GetClosestStraightPairs(roomA->GetWalls(), roomB->GetWalls());
 
 	// shuffle pairs and attempt to path them in that order
-	random_shuffle(closest.begin(), closest.end());
-	vector<Tile*> path;
+	if (!_useSeeding)
+		random_shuffle(closest.begin(), closest.end());
+	else
+		closest = ShuffleTilePairs(closest, _randomSeed + ++_seedOffset);
 
+	vector<Tile*> path;
+	
 	for (auto pair : closest)
 	{
 		if (FindStraightPath(pair.Key, pair.Value, path))
@@ -289,7 +312,10 @@ void LevelGrid::ConnectRoomsDeep()
 		closestRooms = GetClosestRoomPair(roomsLeft, roomsRight);
 
 	// determine what kind of connection based on odds
-	if (rand() % ODDS_BASE < GetParentDeep()->_oddsWideCorridor)
+	if(_useSeeding)
+		_randomSeed = rand();
+
+	if (_randomSeed % ODDS_BASE < GetParentDeep()->_oddsWideCorridor)
 	{
 		if (!ConnectRoomsStraightWide(closestRooms.Key, closestRooms.Value))
 			ConnectRoomsStraight(closestRooms.Key, closestRooms.Value); // make regular connection if wide one fails
@@ -298,9 +324,9 @@ void LevelGrid::ConnectRoomsDeep()
 		ConnectRoomsStraight(closestRooms.Key, closestRooms.Value);
 
 	// determine whether to generate double corridors or not
-	if (rand() % ODDS_BASE < GetParentDeep()->_oddsDoubleCorridor)
+	if (_randomSeed % ODDS_BASE < GetParentDeep()->_oddsDoubleCorridor)
 	{
-		if (rand() % ODDS_BASE < GetParentDeep()->_oddsWideCorridor)
+		if (_randomSeed % ODDS_BASE < GetParentDeep()->_oddsWideCorridor)
 		{
 			if (!ConnectRoomsStraightWide(closestRooms.Key, closestRooms.Value))
 				ConnectRoomsStraight(closestRooms.Key, closestRooms.Value); // make regular connection if wide one fails
@@ -429,6 +455,8 @@ void LevelGrid::FlagRoomsOnPath(vector<Tile*> path, RoomType type)
 		}
 		previous = t;
 	}
+
+	path.back()->_parent->SetType(START);
 }
 
 vector<Room*> LevelGrid::GetRoomPathToType(Room * start, RoomType type)
@@ -473,11 +501,53 @@ vector<Room*> LevelGrid::GetRoomPathToType(Room * start, RoomType type)
 	return vector<Room*>();
 }
 
+vector<Room*> LevelGrid::GetRoomPath(Room * start, Room * target)
+{
+	TQueue<Room*> nodeQueue;
+	vector<Room*> explored;
+	TMap<Room*, Room*> connections;
+	nodeQueue.Enqueue(start);
+
+	while (!nodeQueue.IsEmpty())
+	{
+		Room* current;
+		nodeQueue.Dequeue(current);
+		if (current == target)
+		{
+			vector<Room*> path;
+			while (connections[current] != start)
+			{
+				current = connections[current];
+				path.push_back(current);
+			}
+			return path;
+		}
+
+		vector<Room*> adjacents = current->GetConnectedRooms();
+
+		for (auto node : adjacents)
+		{
+			// make sure no explored nodes are checked again
+			if (std::find(explored.begin(), explored.end(), node) != explored.end())
+				continue;
+
+			// mark node as explored
+			explored.push_back(node);
+			// store reference to previous node
+			connections.Add(node, current);
+			// add to queue of nodes to examine
+			nodeQueue.Enqueue(node);
+		}
+	}
+
+	return vector<Room*>();
+}
+
 void LevelGrid::SetRoomDepths()
 {
 	for (auto r : GetChildRoomsDeep())
 	{
-		if (r->GetType() != ON_PATH)
+		if (r->GetType() != ON_PATH && r->GetType() != START)
 		{
 			int depth = GetRoomPathToType(r, ON_PATH).size() + 1;
 			r->SetDepthLevel(depth);
