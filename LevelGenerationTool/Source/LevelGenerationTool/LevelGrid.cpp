@@ -230,10 +230,8 @@ bool LevelGrid::ConnectRoomsStraight(Room * roomA, Room * roomB)
 		{
 			SetFilledTiles(path);
 			SetTileStates(path, CORRIDOR);
-			SetTileState(path[0], DOOR_NONE);
-			SetTileState(path[path.size()-1], DOOR_NONE);
-			roomA->AddConnection(roomB);
-			roomB->AddConnection(roomA);
+			roomA->AddConnection(roomB, path.front());
+			roomB->AddConnection(roomA, path.back());
 			return true;
 		}
 	}
@@ -256,12 +254,10 @@ bool LevelGrid::ConnectRoomsStraightWide(Room * roomA, Room * roomB)
 			SetFilledTiles(pathB);
 			SetTileStates(pathA, CORRIDOR);
 			SetTileStates(pathB, CORRIDOR);
-			SetTileState(pathA[0], DOOR_NONE);
-			SetTileState(pathB[0], DOOR_NONE);
-			SetTileState(pathA[pathA.size() - 1], DOOR_NONE);
-			SetTileState(pathB[pathB.size() - 1], DOOR_NONE);
-			roomA->AddConnection(roomB);
-			roomB->AddConnection(roomA);
+			roomA->AddConnection(roomB, pathA.front());
+			roomA->AddConnection(roomB, pathB.front());
+			roomB->AddConnection(roomA, pathA.back());
+			roomB->AddConnection(roomA, pathB.back());
 			return true;
 		}
 	}
@@ -283,10 +279,8 @@ bool LevelGrid::ConnectRoomsBFS(Room * roomA, Room * roomB)
 	{
 		SetFilledTiles(path);
 		SetTileStates(path, CORRIDOR);
-		SetTileState(path[0], DOOR_NONE);
-		SetTileState(path[path.size() - 1], DOOR_NONE);
-		roomA->AddConnection(roomB);
-		roomB->AddConnection(roomA);
+		roomA->AddConnection(roomB, path.front());
+		roomB->AddConnection(roomA, path.back());
 		return true;
 	}
 	return false;
@@ -448,7 +442,7 @@ void LevelGrid::FlagRoomsOnPath(vector<Tile*> path, RoomType type)
 	for (auto t : path)
 	{
 		if ((t->_state == PATH || t->_state == ROOM) &&
-			(previous->_state == DOOR_NONE || previous->_state == DOOR_LOCKED || previous->_state == DOOR_OPEN))
+			(previous->_state == DOOR_NONE || previous->_state == DOOR_LOCKED || previous->_state == DOOR_HIDDEN))
 		{
 			if (t->_parent)
 				t->_parent->FlagRoom(type);
@@ -541,6 +535,36 @@ vector<Room*> LevelGrid::GetRoomPath(Room * start, Room * target)
 	}
 
 	return vector<Room*>();
+}
+
+vector<Room*> LevelGrid::GetRoomsBeforeLockedDoor(Room * start)
+{
+	TQueue<Room*> nodeQueue;
+	vector<Room*> explored;
+	nodeQueue.Enqueue(start);
+
+	while (!nodeQueue.IsEmpty())
+	{
+		Room* current;
+		nodeQueue.Dequeue(current);
+
+		vector<Room*> adjacents = current->GetConnectedRoomsNotLocked();
+
+		for (auto node : adjacents)
+		{
+			// make sure no explored nodes are checked again
+			if (std::find(explored.begin(), explored.end(), node) != explored.end())
+				continue;
+
+			// mark node as explored
+			explored.push_back(node);
+
+			// add to queue of nodes to examine
+			nodeQueue.Enqueue(node);
+		}
+	}
+
+	return explored;
 }
 
 void LevelGrid::SetRoomDepths()

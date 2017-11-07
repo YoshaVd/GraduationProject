@@ -50,6 +50,17 @@ BaseGrid::~BaseGrid()
 	_tiles.clear();
 }
 
+vector<Tile*> BaseGrid::GetTiles1D()
+{
+	vector<Tile*> tiles;
+	for (auto col : _tiles)
+	{
+		for (auto tile : col)
+			tiles.push_back(tile);
+	}
+	return tiles;
+}
+
 vector<vector<Tile*>> BaseGrid::GetTilesArea(const int bottom, const int left, const int top, const int right)
 {
 	vector<vector<Tile*>> areaTiles;

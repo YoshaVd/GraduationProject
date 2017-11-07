@@ -182,60 +182,14 @@ void ALevelGenerator::PartitionSpace(const int granularity, const int roomInset)
 	_pGrid->AddRoomToChildrenDeep(roomInset);
 	_pGrid->ConnectRoomsDeep();
 
-	/* ------------------- */
-	/* --- Start & End --- */
-	vector<Room*> rooms = _pGrid->GetChildRoomsDeep();
-	if (rooms.size() < 2)
-		return;
-
-	// place start and end
-	int endOffset = rand() % (rooms.size() / 5);
-	Room* endRoom = rooms[rooms.size() - (endOffset % rooms.size() + 1)];
-	endRoom->AddLevelEnd();
-	Room* startRoom = _pGrid->GetFurthestRoom(rooms, rooms.back());
-	auto roomPath = _pGrid->GetRoomPath(startRoom, endRoom);
-	startRoom = roomPath[roomPath.size() - (rand() % (roomPath.size() / 4) + 1)];
-	startRoom->AddLevelStart();
-
-	//// flag rooms and set depths
-	auto path = _pGrid->FindShortestPathBFS(startRoom->GetCenterPos(), endRoom->GetCenterPos(), false);
-	_pGrid->FlagRoomsOnPath(path, ON_PATH);
-	_pGrid->SetRoomDepths();
-	
-	/* --- door & key test ---*/
-	//_pGrid->GetTopTile(startRoom->GetCenterTile())->_state = KEY;
-	//vector<Tile*> tiles;
-	//for (auto col : endRoom->GetTiles())
-	//{
-	//	for (auto tile : col)
-	//	{
-	//		tiles.push_back(tile);
-	//	}
-	//}
-	//tiles = _pGrid->GetTilesWithState(tiles, DOOR_NONE);
-	//for (auto t : tiles)
-	//{
-	//	t->_state = DOOR_LOCKED;
-	//}
-	/* ---------------------- */
-
-	/* ------------------ */
 	/* --- Fill level --- */
 	_pFiller = new LevelFiller(_pGrid);
+	_pFiller->SetStartAndEnd();
 	SetFillerParameters();
 	_pFiller->FillRoomsWithLoot();
 	_pFiller->FillRoomsWithEnemies();
-
-	///* -------------------- */
-	///* --- Display Path --- */
-	for (auto t : path)
-	{
-		_pGrid->SetColor(t, FColor::Yellow);
-		//if(t->_state == ROOM_ON_PATH || t->_state == ROOM)
-		_pGrid->SetTileState(t, PATH);
-	}
-
-
+	_pFiller->AddLockedDoorAndKey();
+	_pFiller->AddHiddenRoom();
 }
 
 void ALevelGenerator::GenerateBlockout()

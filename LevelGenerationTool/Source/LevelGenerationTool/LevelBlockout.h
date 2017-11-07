@@ -18,10 +18,11 @@ UENUM(BlueprintType)
 enum class EProp : uint8
 {
 	E_KEY 	UMETA(DisplayName = "Key"),
-	E_DOOR_OPEN 	UMETA(DisplayName = "Door Open"),
+	E_DOOR_HIDDEN UMETA(DisplayName = "Door Hidden"),
 	E_DOOR_LOCKED UMETA(DisplayName = "Door Locked"),
 	E_ENEMY UMETA(DisplayName = "Enemy"),
-	E_PICKUP UMETA(DisplayName = "Pickup")
+	E_PICKUP UMETA(DisplayName = "Pickup"),
+	E_DOOR_OPEN 	UMETA(DisplayName = "Door Open")
 };
 
 USTRUCT(BlueprintType)

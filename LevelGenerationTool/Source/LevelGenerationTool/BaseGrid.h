@@ -28,6 +28,7 @@ public:
 	bool GetSeedingEnabled() { return _useSeeding; }
 
 	vector<vector<Tile*>>& GetTiles() { return _tiles; }
+	vector<Tile*> GetTiles1D();
 	vector<vector<Tile*>> GetTilesArea(const int bottom, const int left, const int top, const int right);
 	void SetTiles(vector<vector<Tile*>>& tiles) { _tiles = tiles; }
 	Tile* GetTopLeftTile() { return _tiles[0][_height - 1]; }

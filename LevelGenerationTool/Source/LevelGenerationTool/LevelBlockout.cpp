@@ -40,8 +40,8 @@ void ALevelBlockout::GenerateSpawnData()
 				pos.Z =
 				_spawnData.Add(FSpawnData(pos, EProp::E_DOOR_LOCKED));
 				break;
-			case DOOR_OPEN:
-				_spawnData.Add(FSpawnData(pos, EProp::E_DOOR_OPEN));
+			case DOOR_HIDDEN:
+				_spawnData.Add(FSpawnData(pos, EProp::E_DOOR_HIDDEN));
 				break;
 			case ENEMY:
 				_spawnData.Add(FSpawnData(pos, EProp::E_ENEMY));
@@ -123,7 +123,7 @@ void ALevelBlockout::SpawnBlock(const Tile * tile, const int x, const int y)
 			break;
 		case CORRIDOR:
 		case DOOR_LOCKED:
-		case DOOR_OPEN:
+		case DOOR_HIDDEN:
 		case DOOR_NONE:
 			mat->SetVectorParameterValue(FName(TEXT("Color")), _colPathRooms);
 			break;
@@ -134,6 +134,7 @@ void ALevelBlockout::SpawnBlock(const Tile * tile, const int x, const int y)
 		case END_POS:
 			mat->SetVectorParameterValue(FName(TEXT("Color")), FColor::Black);
 			break;
+		case KEY:
 		case PATH:
 			mat->SetVectorParameterValue(FName(TEXT("Color")), FColor(230, 180, 0));
 			break;

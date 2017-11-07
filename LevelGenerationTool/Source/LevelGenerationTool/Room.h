@@ -49,8 +49,11 @@ public:
 	void SetType(RoomType type) { _type = type; }
 
 	// Connect
-	void AddConnection(Room* room) { _connectedRooms.push_back(room); }
-	vector<Room*> GetConnectedRooms() { return _connectedRooms; }
+	void AddConnection(Room* room, Tile* door);
+	vector<TPair<Room*, Tile*>> GetConnections() { return _connections; }
+	vector<Room*> GetConnectedRooms();
+	vector<Room*> GetConnectedRoomsNotLocked();
+	void AddLockedDoorFrom(Room* from);
 
 	int GetDepthLevel() { return _depthLevel; }
 	void SetDepthLevel(const int depth) { _depthLevel = depth; }
@@ -65,7 +68,7 @@ public:
 	void AddAlcove(Entity* entity);
 
 private:
-	vector<Room*> _connectedRooms;
+	vector<TPair<Room*, Tile*>> _connections; // pointer to connected room + door tile to that room
 	RoomType _type = NO_TYPE;
 	int _depthLevel = 0;
 

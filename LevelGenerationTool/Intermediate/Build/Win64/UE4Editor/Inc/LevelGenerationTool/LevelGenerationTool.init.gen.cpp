@@ -20,7 +20,7 @@ void EmptyLinkFunctionForGeneratedCodeLevelGenerationTool_init() {}
 			ReturnPackage = CastChecked<UPackage>(StaticFindObjectFast(UPackage::StaticClass(), nullptr, FName(TEXT("/Script/LevelGenerationTool")), false, false));
 			ReturnPackage->SetPackageFlags(PKG_CompiledIn | 0x00000000);
 			FGuid Guid;
-			Guid.A = 0xD4220C84;
+			Guid.A = 0x954AE9AB;
 			Guid.B = 0x237E450A;
 			Guid.C = 0x00000000;
 			Guid.D = 0x00000000;

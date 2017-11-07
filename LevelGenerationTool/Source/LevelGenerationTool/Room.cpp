@@ -235,7 +235,8 @@ void Room::AddAlcove(Entity * entity)
 		randomWall = (_randomSeed + ++_seedOffset) % walls.size();
 	} while (IsNearTileWithState(walls[randomWall], DOOR_NONE)
 		|| IsNearTileWithState(walls[randomWall], PICKUP)
-		|| _tiles[walls[randomWall].X][walls[randomWall].Y]->_state == DOOR_NONE);
+		|| _tiles[walls[randomWall].X][walls[randomWall].Y]->_state == DOOR_NONE
+		|| _tiles[walls[randomWall].X][walls[randomWall].Y]->_state == DOOR_LOCKED);
 
 	_tiles[walls[randomWall].X][walls[randomWall].Y]->_state = PICKUP;
 	_tiles[walls[randomWall].X][walls[randomWall].Y]->_isFilled = false;
@@ -315,6 +316,57 @@ void Room::FlagRoom(RoomType type)
 	{
 		for (auto t : _tiles)
 			SetTileStates(GetTilesWithState(t, ROOM), ROOM_ON_PATH);
+	}
+}
+
+void Room::AddConnection(Room * room, Tile * door)
+{
+	_connections.push_back(TPair<Room*, Tile*>(room, door));
+	door->_state = DOOR_NONE;
+}
+
+vector<Room*> Room::GetConnectedRooms()
+{
+	vector<Room*> rooms;
+	for (auto c : _connections)
+	{
+		rooms.push_back(c.Key);
+	}
+	return rooms;
+}
+
+vector<Room*> Room::GetConnectedRoomsNotLocked()
+{
+	vector<Room*> rooms;
+	bool isOtherRoomLocked = false;
+	// For each connection check if it is locked
+	for (auto c : _connections)
+	{
+		if (c.Value->_state != DOOR_LOCKED)
+		{
+			// If it is not check if the room it connects top is locked
+			auto otherConnections = c.Key->GetConnections();
+			for (auto other : otherConnections)
+			{
+				if (other.Value->_state == DOOR_LOCKED)
+					isOtherRoomLocked = true;
+			}
+			// If neither room is locked add the first connected room
+			if(!isOtherRoomLocked)
+				rooms.push_back(c.Key);
+		}
+	}
+	return rooms;
+}
+
+void Room::AddLockedDoorFrom(Room * from)
+{
+	for (auto c : _connections)
+	{
+		if (c.Key && c.Key == from)
+		{
+			c.Value->_state = DOOR_LOCKED;
+		}
 	}
 }
 

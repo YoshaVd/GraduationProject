@@ -9,10 +9,17 @@ public:
 	LevelFiller(LevelGrid* pGrid) : _pGrid(pGrid) { _rooms = _pGrid->GetChildRoomsDeep(); }
 	~LevelFiller();
 
+	void SetStartAndEnd();
 	vector<Tile*> GetAlcoveFriendlyTiles(Room* room);
 	void FillRoomsWithLoot();
 	void FillRoomsWithEnemies();
 	void EmptyRooms();
+
+	void AddLockedDoorAndKey();
+	void AddHiddenRoom();
+
+	vector<Room*> GetSideRooms(vector<Room*> rooms);
+
 
 	/* --- SETTERS --- */
 	void SetPickupDensity(float density) { _pickupDensity = FMath::Clamp<float>(density, 0, 1); }
@@ -31,6 +38,7 @@ public:
 private:
 	LevelGrid* _pGrid;
 	vector<Room*> _rooms;
+	vector<Room*> _roomPath;
 
 	/* ----------------------- */
 	/* --- fill parameters --- */ 
